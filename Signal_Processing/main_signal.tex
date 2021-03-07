@@ -1,5 +1,5 @@
 %\documentclass[12pt]{article}
-%\documentclass{tufte-book}
+% \documentclass{tufte-book}
 \providecommand{\exclude}[1]{}
 % Simple approach for selecting styles
 % #1 article + archive
@@ -47,9 +47,11 @@
 % \documentclass[]{foils}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%  preamble  %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%____________________________________________________________
+%
+%         preamble  
+%
+%____________________________________________________________
 \usepackage{etoolbox}
 \usepackage{amssymb}
 \usepackage{epsfig}
@@ -232,7 +234,9 @@
 
 %\makeindex
 
-%%%%%%%%%%%% Begin Document %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%____________________________________________________________
+%
+%%%%%%%%%%% Begin Document 
 
 % here is the includegraphics system that permits us
 % to use pdf files and then PDFLaTeX.  This is now
@@ -296,7 +300,8 @@
 % $\mychitest{3}{.6}{F}$
 % $\mychi{F}$
 
-%%%%%%%%%%%%%%%%%%
+%____________________________________________________________
+%
 %%%%%%%%%%%%%%%%%% HN packages
 %%%%%%%%%%%%%%%%%%
 \usepackage{amsfonts}
@@ -318,7 +323,7 @@
 % \renewenvironment{comment}{}{}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%____________________________________________________________
 %\LogoOff  %this is for the foiltex documents
 
 \begin{document}
@@ -352,6 +357,7 @@
   \let\oldmaketitle\maketitle
   \def\maketitle{\begin{fullwidth}\oldmaketitle\end{fullwidth}}
 } %\select
+
 
 \providecommand{\marginnote}[1]{Sidebar: {#1}}
 
