@@ -13,7 +13,6 @@
 }{% #3 Tufte
 } 
 
-
 \select
  {% #1 article + archive
   \documentclass[%twocolumn,
@@ -32,12 +31,14 @@
                   colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue,
                  ]{revtex4-2}
 }{% #3 Tufte
-  \documentclass[notitlepage, justified, openany]{tufte-book}
+  \documentclass[notitlepage, justified, openany]{tufte-book} % notitlepage
   \bibliographystyle{unsrt} % plainnat # HN: I changed this from plainnat to plain. This way \citep works nicer (in my opinion and the citations at the end are numbered as well; easier to navigate). Feel free to change it back
   
 } 
 
 \providecommand{\captionsetup}[1]{}
+
+\usepackage[nottoc]{tocbibind} % Remove Chapter number from References
 
 % good colors for todo notes
 % BlueGreen, CornflowerBlue Dandelion 
@@ -71,12 +72,13 @@
 
 %% HN packages
 % \usepackage{amsfonts}
-
+\usepackage{tocloft} % trying to put dots in table of content. goes with \renewcommand{\cftdot}{} before \tableofcontents. In Tufte case removing the \renewcommand{\cftdot}{} will generate the dots.
 \usepackage{enumitem,mathtools}
 \usepackage{algorithmic}
 % \usepackage{soul}
 % \modulolinenumbers[5]
 % \usepackage{multirow}
+
 
 % break the damn long references (URL link)
 \usepackage{lineno}
@@ -276,7 +278,6 @@
 
 
 
-
 %\graphicspath{{figures/}}
 
 %\makeindex
@@ -346,10 +347,7 @@
 % $\mychi{F}$
 
 
-
-
-%%________________________________________________________________
-%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\LogoOff  %this is for the foiltex documents
 
 \begin{document}
@@ -387,21 +385,25 @@
 
 \maketitle
 
-\setcounter{secnumdepth}{4} % If this commented out. Chapters/Sections are not numbered
+
+\setcounter{secnumdepth}{3} % If this commented out. Chapters/Sections are not numbered
+\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
+
 
 % \newpage
+% \renewcommand{\cftdot}{}
 \tableofcontents
 
+
 \newpage
-\input{./00_Motivation}
+\input{../00_Motivation}
 
 \input{./01_Introduction}
 
 
 
+\bibliography{RegressionBib}
 
-\bibliography{clusteringBib}
-
-%\printindex
+% \printindex
 
 \end{document}
