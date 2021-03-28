@@ -1,0 +1,27 @@
+\chapter{Compressive Sampling}
+\label{sec:CompressiveSampling}
+Compressive sampling, a.k.a compressed sensing,
+is a method to reconstruct certain signals/images from
+fewer samples/measurements than traditional methods~\citep{candes2008intro}.''
+
+\section{Introduction to compressive sampling through papers}
+\label{sec:Introductiontocompressivesamplingthroughpapers}
+\begin{deff}{}
+\textbf{Bandlimiting} is the limiting of a signal's frequency domain 
+representation or spectral density to zero above a certain finite frequency.
+
+A band-limited signal is one whose Fourier transform or spectral 
+density has bounded support.\marginnote{This definition came from Wikipedia.}
+
+Said differently, a signal is said to be band-limited if the amplitude 
+of its spectrum goes to zero for all frequencies beyond some threshold 
+called the cutoff frequency.
+\end{deff}
+
+CS relies on two principles
+$
+\begin{cases} 
+  \text{sparsity: related/pertains to the signal of interest}\\
+   \text{incoherence: related/pertains to signal modality}. \\
+\end{cases}
+$
