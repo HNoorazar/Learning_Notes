@@ -1,0 +1,30 @@
+\section{Performance Metric}
+\label{chap:Performance_Metric}
+
+Consider an imbalanced dataset with 90\%
+of the data from class $A$ and 10\% from class $B$.
+Predicting every data point as class $A$ will result in a model
+with 90\% accuracy. Accuracy is not a good performance metric.
+Moreover, it assumes a false positive and a false negative 
+cost the same. Labeling a sick person as a healthy person is a bad
+mistake. However, labeling a healthy person as an ill person
+is not as bad as it will become clear and corrected in the next
+steps by examinations. True positive rate, false positive rate, true negative rate,
+and false negative rate have the advantage of being independent 
+of class costs and prior probabilities.
+
+Some classifiers (e.g. logistic regression or some Neural Networks), 
+yield a score that represents the degree to
+which an example is a member of a class. 
+Such ranking can be used to produce several classifiers, 
+by varying the threshold of an example pertaining to a class. 
+Each threshold value produces a different point in the ROC space. These
+points are linked by tracing straight lines through two consecutive 
+points to produce a ROC curve.
+\begin{marginfigure}[-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/ROC_curve}
+  \caption{An example of ROC curve.}
+  \label{fig:ROCCurve}
+\end{marginfigure}

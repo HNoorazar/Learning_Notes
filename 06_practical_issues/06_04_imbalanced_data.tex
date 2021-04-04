@@ -1,0 +1,189 @@
+\section{Imbalanced Data}
+\label{sec:ImbalancedData}
+
+The abstract of~\citep{BatistaImbalanced}.
+\begin{tcolorbox}
+There are several aspects that might influence the performance 
+achieved by existing learning systems. It has been
+reported that one of these aspects is related to class 
+imbalance in which examples in training data belonging to one
+class heavily outnumber the examples in the other class. In
+this situation, which is found in real world data describing
+an infrequent but important event, the learning system may
+have difficulties to learn the concept related to the minority
+class. Our experiments provide evidence that class
+imbalance does not systematically hinder the performance
+of learning systems. In fact, the problem seems to be related
+to learning with too few minority class examples in the presence 
+of other complicating factors, such as class overlapping.
+Our comparative experiments show that, 
+in general, over-sampling methods provide more accurate results
+than under-sampling methods considering the area under
+the ROC curve (AUC). This result seems to contradict results previously 
+published in the literature. Two of our proposed methods, 
+SMOTE + Tomek and SMOTE + ENN, presented very good 
+results for datasets with a small number of
+minority examples. Moreover, Random over-sampling, a very
+simple over-sampling method, is very competitive to more
+complex over-sampling methods. Since the over-sampling
+methods provided very good performance results, we also
+measured the syntactic complexity of the decision trees 
+induced from over-sampled data. Our results show that these
+trees are usually more complex then the ones induced from
+original data. Random over-sampling usually produced the
+smallest increase in the mean number of induced rules and
+SMOTE + ENN the smallest increase in the mean number of
+conditions per rule, when compared among the investigated
+over-sampling methods.
+\end{tcolorbox}
+
+\begin{description}
+\item[\textbf{Tomek links}]
+Tomek links [22] can be defined as follows:
+given two examples $\mathbf{x_i}$ and $\mathbf{x_j}$ 
+belonging to different classes, and $d(\mathbf{x_i}, \mathbf{x_j})$ 
+is the distance between $\mathbf{x_i}$ and
+$\mathbf{x_j}$ . A $(\mathbf{x_i}, \mathbf{x_j})$ pair is called a 
+Tomek link if there is not an example $\mathbf{x_\ell}$, such that 
+$d(\mathbf{x_i}, \mathbf{x_\ell}) < d(\mathbf{x_i}, \mathbf{x_j})$ or
+$d(\mathbf{x_j} , \mathbf{x_\ell}) < d(\mathbf{x_i}, \mathbf{x_j})$. 
+If two examples form a Tomek
+link, then either one of these examples is noise or both
+examples are borderline. Tomek links can be used as an
+under-sampling method or as a data cleaning method.
+As an under-sampling method, only examples belonging to 
+the majority class are eliminated, and as a data
+cleaning method, examples of both classes are removed.
+
+\item[\textbf{Condensed Nearest Neighbor Rule}]
+Hart's Condensed
+Nearest Neighbor Rule (CNN) [11] is used to find a consistent 
+subset of examples. A subset $\hat E \subseteq E$ is consistent with 
+E if using a 1-NN, $\hat E$ correctly
+classifies the examples in $E$. An algorithm to create a
+subset $\hat E$ from $E$ as an under-sampling method is the
+following [14]: First, randomly draw one majority class
+example and all examples from the minority class and
+put these examples in $\hat E$. Afterwards, use a 1-NN over
+the examples in $\hat E$ to classify the examples in $E$. 
+Every misclassified example from $E$ is moved to $\hat E$. It is
+important to note that this procedure does not find the
+smallest consistent subset from $E$. The idea behind this
+implementation of a consistent subset is to eliminate the
+examples from the majority class that are distant from
+the decision border, since these sorts of examples might
+be considered less relevant for learning.
+
+\item[\textbf{One-sided selection}]
+One-sided selection (OSS) [14] is an
+under-sampling method resulting from the application of
+Tomek links followed by the application of CNN. Tomek
+links are used as an under-sampling method and removes
+noisy and borderline majority class examples. 
+Borderline examples can be considered ``unsafe'' since a small
+amount of noise can make them fall on the wrong side
+of the decision border. CNN aims to remove examples
+from the majority class that are distant from the decision
+border. The remainder examples, i.e. ``safe'' majority
+class examples and all minority class examples are used
+for learning.
+
+\item[\textbf{CNN + Tomek links}]
+This is one of the methods proposed in this work. It is similar to the 
+one-sided selection, but the method to find the consistent subset
+is applied before the Tomek links. Our objective is to
+verify its competitiveness with OSS. As finding Tomek
+links is computationally demanding, it would be computationally 
+cheaper if it was performed on a reduced data
+set.
+
+\item[\textbf{Neighborhood Cleaning Rule}]
+Neighborhood Cleaning
+Rule (NCL) [15] uses the Wilson's Edited Nearest Neighbor Rule
+(ENN) [24] to remove majority class examples.
+ENN removes any example whose class label differs from
+the class of at least two of its three nearest neighbors.
+NCL modifies the ENN in order to increase the data
+cleaning. For a two-class problem the algorithm can be
+described in the following way: for each example $\mathbf{x_i}$ in
+the training set, its three nearest neighbors are found.
+If $\mathbf{x_i}$ belongs to the majority class and the classification
+given by its three nearest neighbors contradicts the 
+original class of $\mathbf{x_i}$, then $\mathbf{x_i}$ is removed. If 
+$\mathbf{x_i}$ belongs to the
+minority class and its three nearest neighbors misclassify $\mathbf{x_i}$, 
+then the nearest neighbors that belong to the
+majority class are removed.
+
+
+\item[\textbf{SMOTE}] 
+Synthetic Minority Over-sampling Technique (SMOTE) [5] is 
+an over-sampling method. Its main idea is to
+form new minority class examples by interpolating between
+several minority class examples that lie together.
+Thus, the overfitting problem is avoided and causes the
+decision boundaries for the minority class to spread further into the majority class space
+
+
+\item[\textbf{SMOTE + Tomek links}]
+Although over-sampling minority
+class examples can balance class distributions, some other
+problems usually present in datasets with skewed class
+distributions are not solved. Frequently, class clusters
+are not well defined since some majority class examples 
+might be invading the minority class space. The
+opposite can also be true, since interpolating minority
+class examples can expand the minority class clusters,
+introducing artificial minority class examples too deeply
+in the majority class space. Inducing a classifier under 
+such a situation can lead to overfitting. In order to
+create better-defined class clusters, we propose applying
+Tomek links to the over-sampled training set as a data
+cleaning method. Thus, instead of removing only the
+majority class examples that form Tomek links, examples 
+from both classes are removed. The application of
+this method is illustrated in Figure 2. First, the original
+dataset (a) is over-sampled with SMOTE (b), and then
+Tomek links are identified (c) and removed, producing
+a balanced dataset with well-defined class clusters (d).
+The SMOTE + Tomek links method was first used to 
+improve the classification of examples for the problem of
+annotation of proteins in Bioinformatics [1].
+
+\item[\textbf{SMOTE + ENN}]
+The motivation behind this method is similar to 
+SMOTE + Tomek links. ENN tends to remove
+more examples than the Tomek links does, so it 
+is expected that it will provide a more in depth data 
+cleaning. Differently from NCL which is an under-sampling
+method, ENN is used to remove examples from both
+classes. Thus, any example that is misclassified by its
+three nearest neighbors is removed from the training set.
+
+\end{description}
+
+The authors~\citep{BatistaImbalanced} conclude
+that the over-sampling methods in general, and SMOTE + Tomek and
+SMOTE + ENN in
+particular for datasets with few minority examples, provided very good results in practice. 
+Moreover, Random over-sampling, frequently considered an unprosperous
+method provided competitive results with the more complex
+methods. As a general recommendation, SMOTE + Tomek or
+SMOTE + ENN might be applied to datasets with a small
+number of positive instances, a condition that is likely to
+lead to classification performance problems for imbalanced
+datasets. For datasets with larger number of positive examples, 
+the Random over-sampling method which is computationally less 
+expensive than other methods would produce meaningful results.
+It should be noted that allocating half of the training examples 
+to the minority class does not always provide optimal
+results [23]. We plan to address this issue in future research.
+Furthermore, some under-sampling methods, such as Tomek
+links and NCL, that do not originally allow the user to specify the 
+resulting class distribution, must be improved to include this feature.
+Another natural extension to this work
+is to analyze the ROC curves obtained from the classifiers.
+This might provide us with a more in depth understanding
+of the behavior of balancing and cleaning methods.
+
+
