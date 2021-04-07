@@ -10,3 +10,69 @@ Two approximations are happening here:
 \item conditioning at point x is relaxed to conditioning on some region ``close'' to the target point (See Exc.~\ref{ex:LRcond}, especially the margin note). One can show that as $N,k \rightarrow \infty$
 such that $k/N \rightarrow 0$, $\hat f(x) \rightarrow E[Y|X=x]$.
 \end{itemize}
+
+\hrule
+\vspace{.1in}
+
+While least squares is generally very convenient, it 
+is not the only criterion used and in some cases would 
+not make much sense. A more general principle for estimation is 
+maximum likelihood estimation. Suppose we have a random 
+sample $y_i, ~ i = 1, \dots , N$ from a density $Pr_{\theta}(y)$ 
+indexed by some parameters $\theta$. The log-probability of the observed sample is
+\begin{equation}
+L(\theta) = \sum_{i=1}^N log(Pr_\theta(y_i))
+\end{equation}
+The principle of maximum likelihood assumes that the 
+most reasonable values for $\theta$ are those for which 
+the probability of the observed sample is largest. 
+Least squares for the additive error model 
+$Y = f_\theta(X) + \epsilon$, with $\epsilon \sim N(0,\sigma^2)$, is equivalent to 
+maximum likelihood using the conditional likelihood
+\begin{equation}
+Pr(Y|X,\theta) = N(f_\theta(X), \sigma^2)
+\end{equation}
+So although the additional assumption of normality seems more restrictive,
+the results are the same. The log-likelihood of the data is
+\begin{equation}
+L(\theta) = -\frac{N}{2} log(2\pi) - N log(\sigma) - \frac{1}{2\sigma^2} \sum_{i=1}^N (y_i - f_\theta(x_i))^2
+\end{equation}
+and the only term involving $\theta$ is the last, which is 
+RSS($\theta$) up to a scalar negative multiplier.
+
+\hrule
+\vspace{.1in}
+If the following does not make sense, read the
+last paragraph on page 32 of~\citep{Hastie2001elements}.
+
+Any function that passes through the points
+$(x_i, y_i)$ will minimize the $RSS(\theta)$.
+Hence, there are infinitely many solutions. So we have
+to restrict the solutions to a smaller set.
+Any restrictions imposed on f that lead to a unique 
+solution to $RSS(\theta)$ do not really remove the ambiguity
+caused by the multiplicity of solutions. There are infinitely 
+many possible restrictions, each leading to a unique solution, 
+so the ambiguity has simply been transferred to the choice of constraint.
+
+\hrule
+\vspace{.1in}
+Typically we have a set of training data 
+$(x_1, y_1) \dots (x_N , y_N)$ from which to estimate the 
+parameters $\beta$. The most popular estimation
+method is least squares, in which we pick the coefficients $\beta$ 
+to minimize the residual sum of squares
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+RSS(\beta) &=  \sum_{i=1}^N (y_i - f(x_i))^2 \\ 
+                   &=  \sum_{i=1}^N (y_i - \beta_0  - \sum_{j=1}^N x_{ij}\beta_j)^2\\ 
+\end{aligned}
+\end{gather} 
+From a statistical point of view, this criterion is 
+reasonable if the training observations $(x_i, y_i)$
+represent independent random draws from their 
+population. Even if the xi’s were not drawn randomly, 
+the criterion is still valid if the $y_i$'s are conditionally 
+independent given the inputs $x_i$.
+
+

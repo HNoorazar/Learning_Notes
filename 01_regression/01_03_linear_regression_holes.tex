@@ -33,3 +33,26 @@ f(x) = E[Y | X=x]
 \end{equation}
 \end{exc}
 
+\begin{exc}\label{ex:varCovarfromTrain}
+If $\mathbf{X}$ is full-rank then $\mathbf{X}^T\mathbf{X}$ is positive definite,
+which means it is invertible. Then the solution for minimizing
+$RSS(\theta)$ is 
+\begin{equation}\label{eq:analySol}
+\hat \beta = (\mathbf{X}^T \mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}
+\end{equation}
+Derive the variance-covariance of $\hat \beta$ from~\cref{eq:analySol}
+which is
+\begin{equation}
+Var(\hat \beta) = (\mathbf{X}^T \mathbf{X})^{-1}\sigma^2
+\end{equation}
+Moreover, one estimates $\sigma$ by
+\begin{equation}
+\hat \sigma^2 = \frac{1}{N-p-1}\sum_{i=1}^N(y_i - \hat y_i)^2.
+\end{equation}
+Find out what it means to say $N-p-1$ makes the estimation unbiased.
+\end{exc}
+
+
+\begin{exc}
+Derive Eq. (3.10) of the book from Eq. (3.9) in the book.
+\end{exc}
