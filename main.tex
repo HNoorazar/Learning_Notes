@@ -32,6 +32,7 @@
                  ]{revtex4-2}
 }{% #3 Tufte
   \documentclass[notitlepage, justified, openany]{tufte-book} % notitlepage
+  \usepackage[caption=false]{subfig}
   \bibliographystyle{unsrt} % plainnat # HN: I changed this from plainnat to plain. This way \citep works nicer (in my opinion and the citations at the end are numbered as well; easier to navigate). Feel free to change it back
   
 } 
@@ -72,7 +73,7 @@
 
 %% HN packages
 % \usepackage{amsfonts}
-\usepackage{tocloft} % trying to put dots in table of content. goes with \renewcommand{\cftdot}{} before \tableofcontents. In Tufte case removing the \renewcommand{\cftdot}{} will generate the dots.
+% \usepackage{tocloft} % trying to put dots in table of content. goes with \renewcommand{\cftdot}{} before \tableofcontents. In Tufte case removing the \renewcommand{\cftdot}{} will generate the dots.
 \usepackage{enumitem,mathtools}
 \usepackage{algorithmic}
 % \usepackage{soul}

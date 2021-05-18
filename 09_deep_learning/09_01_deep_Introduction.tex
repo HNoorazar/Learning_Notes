@@ -3,5 +3,37 @@
 
 \section{Introduction}
 \label{sec:Deep_Learning_introduction}
+Figure~\ref{fig:ActivationFunctions} shows
+examples of activation functions. ReLu is the most
+widely used one.\marginnote[-1\baselineskip]{This is from Deep Learning Specialization course. The first course (Neural Networks and Deep Learning), week 3.} In order to compute interesting features we need to use
+nonlinear activation functions.
+\iffalse
+\begin{textfigure}[h!]
+  \centering
+    \captionsetup{justification=centering}
+    \includegraphics[width=0.5\textwidth]{./00_figures/sigmoid_function_1}%
+    \includegraphics[width=0.5\textwidth]{./00_figures/tanh_function_1}
+\caption{Examples of activation functions. Use ReLu.}
+\label{fig:ActivationFunctions1}
+\end{textfigure}
+\fi
 
-Deep Intro.
+\begin{figure}
+\centering
+\subfloat[]{\includegraphics[width=0.5\textwidth]{00_figures/sigmoid_function_1}}
+\subfloat[]{\includegraphics[width=0.5\textwidth]{00_figures/tanh_function_1}}
+\subfloat[]{\includegraphics[width=0.5\textwidth]{00_figures/reLu_1}}
+\caption[][11\baselineskip]{Activation function examples.
+\label{fig:ActivationFunctions}}
+\end{figure}
+
+The weights has to be initialized randomly
+in order to break the symmetry! If all weights are zeros
+then we do not compute anything. If all weights
+are identical, then each neuron of a given layer
+is computing the same thing. The initial weights
+better be small. If initial weights are large, then
+the activation functions (such as sigmoid or tanh) will be at the far ends
+of the spectrum where derivatives are close to zero
+and consequently, gradient descent will be slow.
+
