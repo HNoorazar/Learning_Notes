@@ -3,6 +3,9 @@
 
 \section{Introduction}
 \label{sec:Deep_Learning_introduction}
+
+
+\subsection{Basics}\label{deepLearningBasics}
 Figure~\ref{fig:ActivationFunctions} shows
 examples of activation functions. ReLu is the most
 widely used one.\marginnote[-1\baselineskip]{This is from Deep Learning Specialization course. The first course (Neural Networks and Deep Learning), week 3.} In order to compute interesting features we need to use
@@ -36,4 +39,126 @@ better be small. If initial weights are large, then
 the activation functions (such as sigmoid or tanh) will be at the far ends
 of the spectrum where derivatives are close to zero
 and consequently, gradient descent will be slow.
+
+\section{Improving Neural Networks: Hyper-parameter tuning, Regularization, and Optimization}\label{ImprovingNeuralNetworks}
+
+\begin{description}
+\item [Train, Validation, and Test Sets] When the dataset is small (e.g. less than 1000), one can divide the data into
+training/validation/test set like so 70\%, 30\% (or 60\%, 20\%, 20\%).
+However, in the big data era with large datasets (e.g. 1,000,000 data)
+the percentage of validation/test set is smaller as percentage (e.g. 98\%, 1\%, 1\%).
+
+\item [Data Distribution] Shuffle the data so that the (training,) validation and test sets come from the same distribution. 
+
+\end{description}
+
+Below is a flowchart of a basic recipe for machine learning.
+In deep learning and era of big data there is not a trade-off between
+variance and bias. One can use a big network to reduce bias 
+without necessarily hurting variance. In this case regularization
+is helpful to take care of the variance. One can get  a large number of data
+to reduce variance without hurting the bias.\\
+
+\begin{tikzpicture}[node distance=2cm]
+\node (HighBias) [startstop] {High Bias};
+\node (withBias) [io, right of=HighBias, xshift=1cm] {Yes};
+\node (withBiasSolution) [process, right of=withBias, xshift=3cm] {Bigger Network,
+Train Longer, (architecture)};
+
+\node (noBias) [io, below of=HighBias] {No};
+\node (HighVariance) [startstop, below of=noBias] {High Variance};
+\node (withVariance) [io, right of=HighVariance, xshift=1cm] {Yes};
+\node (withVarSolution) [process, right of=withVariance, xshift=3cm] {More Data, Regularization, (architecture)};
+
+\node (noVariance) [io, below of=HighVariance] {No};
+\node (Done) [decision, below of=noVariance] {Done};
+
+\draw [arrow] (HighBias) -- (noBias);
+\draw [arrow] (HighBias) -- (withBias);
+\draw [arrow] (withBias) -- (withBiasSolution);
+\draw [arrow] (noBias) -- (HighVariance);
+\draw [arrow] (HighVariance) -- (withVariance);
+\draw [arrow] (HighVariance) -- (noVariance);
+\draw [arrow] (withVariance) -- (withVarSolution);
+\draw [arrow] (noVariance) -- (Done);
+
+\end{tikzpicture}
+
+\subsection{Regularization}\label{Regularization}
+Having high variance (overfitting) can be taken care of by regularization
+or obtaining more data which is not always possible. Below is a list of
+regularization techniques.
+\begin{enumerate}
+\item L2 regularization
+\item Dropout regularization
+\item Obtaining more data (data augmentation; rotation, reflection, cropping)
+\item Early stopping; plot train and validation errors.
+\end{enumerate}
+
+
+One of the ways of regularization is similar to L2-regularization (reffered to as
+\emph{weight decay} here):
+\begin{equation}
+J(w^{[1]}, b^{[1]}, \dots, w^{[l]}, b^{[l]}) = 
+\frac{1}{m} \sum_{i=1}^m \ell(\hat y^{(i)} - y^{(i)}) + 
+ \frac{\lambda}{2m}\sum_{l=1}^{L} ||W^{[l]}||_F^2
+\end{equation}
+
+Then we have
+
+\begin{equation}
+dW^{[l]} = \frac{\partial J}{\partial W^{[l]}} = (from~backprop) + \frac{\lambda}{m} W^{[l]}
+\end{equation}
+
+and the updates will be as follows:
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned} 
+W^{[l]} &= W^{[l]} - \alpha dW^{[l]} \\
+           &= W^{[l]} - \alpha \left[(from~backprop) + \frac{\lambda}{m} W^{[l]} \right] \\ 
+           &= W^{[l]} - \alpha \frac{\lambda}{m} W^{[l]} - \alpha (from~backprop) 
+\end{aligned} 
+\end{gather} %
+The first two terms in above equation is referred to as
+\emph{weight decay}.\\
+
+In drop out regularization, (for each training example) at every training step, 
+we train the model on a smaller network where the smaller
+network is obtained by tossing neurons randomly. The
+structure of the network will be different for each training example.
+For test examples there will not be any drop out.
+
+One can have different probability of dropping out
+for each layer. Specifically, the layers with large number
+of weights can enjoy a higher drop out rate/probability.
+
+In computer vision, where there are not a lot of data, the
+overfitting is a problem and consequently drop out method
+is often used.\\
+
+Early stopping is a technique for regularization. However,
+it is interfering with the task of optimizing the cost function.
+Let me elaborate. In ML it is a good practice to think and work
+on a given task (e.g. minimizing the cost function for which we have
+a set of tools, or, reducing the overfitting) one at a time. However,
+early stopping which is used for avoiding overfitting
+couples the problem at hand with the task of minimizing the cost function.
+
+\subsection{Normalizing the Inputs}\label{NormalizingtheInputs}
+Normalizing the inputs helps with the training process.
+
+\subsection{Vanishing/Exploding Gradients}\label{Vanishing/ExplodingGradients}
+A partial solution for avoiding the problem of vanishing/exploding
+the weights one can be careful with the initialization of the weights.
+Let the number of ingoing features of a neuron on layer $l$ be $n^{[l-1]}$.
+For that layer we have $z = w_1 x_1 + \dots + w_n{^{[l-1]}} x_n{^{[l-1]}}$.
+Consequently, one can do the following for initialization of
+the weights:
+\[W^{[l]} = np.random.randn(proper~shape) * np.sqrt(1/n^{[l-1]})\]
+If ReLu is the activation function when one can/is advised to replace 
+$np.sqrt(1/n^{[l-1]})$ with $np.sqrt(2/n^{[l-1]})$.
+
+\subsection{Mini-batch Gradient Descent}
+
+
+
 
