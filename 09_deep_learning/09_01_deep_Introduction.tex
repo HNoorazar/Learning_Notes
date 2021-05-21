@@ -158,7 +158,118 @@ If ReLu is the activation function when one can/is advised to replace
 $np.sqrt(1/n^{[l-1]})$ with $np.sqrt(2/n^{[l-1]})$.
 
 \subsection{Mini-batch Gradient Descent}
+Rather than using the whole training data 
+$\mathbf{X} \in \mathbb{R}^{p \times N}$ to 
+take an step of gradient descent, take small subsets of $\mathbf{X}; \mathbf{X_{mini}} \in \mathbb{R}^{p \times 1000}$
+at every iteration as the training set.
+\begin{marginfigure}% [-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/costFunction}
+  \caption{Using mini-batch makes the cost function not to be monotonically decreasing.}
+  \label{fig:costFunction}
+\end{marginfigure}
+One epoch in deep learning means making one
+pass (forward and backward propagation) through  
+the training set. If we divide the training set into 500
+mini-batches, with one epoch we take 500 steps
+for gradient descent.
 
+If mini-batch size is 1 then we get stochastic gradient descent.
+Here we lose vectorization advantage. Typical sizes for mini-batch 
+are 64, 128, 256, 512. 
+
+
+\subsection{Fast Optimization Methods}
+There are methods that converge faster than mini-batch gradient descent:
+\begin{itemize}
+\item Gradient descent with momentum,
+\item RMSprop,
+\item Adam optimization algorithm.
+\end{itemize}
+
+Let $\{a_t\}$ be a sequence. In order to get a smooth version of the
+sequence we can compute $v_t = \frac{\beta v_{t-1} + (1-\beta) a_t}{1-\beta^t}$
+that is called \emph{exponentially weighted averages}\marginnote[-1\baselineskip]{This is from Deep Learning Specialization course. The second course (improving the neural networks), week 2.}. The denominator
+corrects for the bias we have at the beginning of the sequence. This is the basis
+for the next optimization algorithms.
+
+\textbf{Gradient descent with momentum} improves the convergence of
+gradient descent. It can prevent oscillation in some directions.
+In this method we will have the following for iteration $t$:
+
+\begin{tcolorbox}
+%  \textbf{Algorithm for gradient descent with momentum is given below}
+  \begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{Faster convergence}
+$\mathbf{V_{d_w}} = \mathbf{0}, \mathbf{V_{d_b}} = \mathbf{0}  $\;
+ \While{at iteration $t$}{
+  compute $\mathbf{dW, db}$ on current (mini-)batch\;
+  $\mathbf{V}_{d_w} = \beta \mathbf{V}_{d_w} + (1-\beta) {d\mathbf{W}} $\;
+  $\mathbf{V}_{d_b} = \beta \mathbf{V}_{d_b} + (1-\beta) {d\mathbf{b}} $\;
+  $\mathbf{W} = \mathbf{W} - \alpha \mathbf{V}_{d_w}$\;
+  $\mathbf{b} = \mathbf{b} - \alpha \mathbf{V}_{d_b}$\;
+ }
+ \caption{gradient descent with momentum}
+\end{algorithm}
+Usually $\beta=0.9$ is a good option.
+\end{tcolorbox}
+
+\textbf{RMSprop} is another optimization algorithm that
+similarly tries to minimize oscillations:
+\begin{tcolorbox}
+%  \textbf{Algorithm for gradient descent with momentum is given below}
+  \begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{Faster convergence}
+$\mathbf{s_{d_w}} = \mathbf{0}, \mathbf{s_{d_b}} = \mathbf{0}  $\;
+ \While{While condition}{
+  compute $\mathbf{dW, db}$ on current (mini-)batch\;
+  $\mathbf{S}_{d_w} = \beta \mathbf{S}_{d_w} + (1-\beta) {d\mathbf{W}}^2 $\;
+  $\mathbf{S}_{d_b}  = \beta \mathbf{S}_{d_b} + (1-\beta) {d\mathbf{b}}^2 $\;
+  $\mathbf{W} =\mathbf{W} - \alpha \frac{d\mathbf{W}}{\epsilon + \sqrt{s_{d_w}}}$\;
+  $\mathbf{b} = \mathbf{b} - \alpha \frac{d\mathbf{b}}{\epsilon +  \sqrt{\mathbf{S}_{d_b}}}$\;
+   }
+ \caption{RMSprop algorithm}
+\end{algorithm}
+${d\mathbf{W}}^2$ and ${d\mathbf{b}}^2$ are element-wise. $\epsilon$ is to avoid dividing by zero.\\
+Usually $\beta=0.9$ is a good option.
+\end{tcolorbox}
+\marginnote[-1\baselineskip]{The video says $dW$ and $db$
+however, I am suspicious it should be $s_{d_w}$ and $s_{d_b}$.}
+
+\textbf{Adams optimization} combines gradient descent with momentum
+and the RMSprop:
+\begin{tcolorbox}
+%  \textbf{Algorithm for gradient descent with momentum is given below}
+  \begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{Faster convergence}
+$\mathbf{S_{d_w}}=\mathbf{0},~ \mathbf{V_{d_w}}=\mathbf{0},~ \mathbf{S_{d_b}} = \mathbf{0},~\mathbf{V_{d_b}} = \mathbf{0}  $\;
+ \While{at iteration $t$}{
+ 
+  compute $d\mathbf{W}, d\mathbf{b}$ on current (mini-)batch\;
+  $\mathbf{V}_{d_w} = \beta_1 \mathbf{V}_{d_w} + (1-\beta_1) {d\mathbf{W}}$\;
+  $\mathbf{S}_{d_w} = \beta_2 \mathbf{S}_{d_w} + (1-\beta_2) {d\mathbf{W}}^2$\;
+  \vspace{.2in}
+  $\mathbf{V}_{d_b}  = \beta_1 \mathbf{V}_{d_b} + (1-\beta_1) {d\mathbf{b}}$\;
+  $\mathbf{S}_{d_b}  = \beta_2 \mathbf{S}_{d_b} + (1-\beta_2) {d\mathbf{b}}^2$\;
+  \vspace{.2in}
+  $\mathbf{V}_{d_w}^{corrected} = \mathbf{V}_{d_w}/(1-\beta_1^t),
+  \mathbf{V}_{d_b}^{corrected} = \mathbf{V}_{d_b}/(1-\beta_1^t)$\;
+  $\mathbf{S}_{d_w}^{corrected} = \mathbf{S}_{d_w}/(1-\beta_2^t), ~~
+  \mathbf{S}_{d_b}^{corrected} = \mathbf{S}_{d_b}/(1-\beta_2^t)$\;
+  \vspace{.2in}
+  
+  $\mathbf{W} = \mathbf{W} - \alpha \frac{\mathbf{V}_{d_w}^{corrected}}{\epsilon + \sqrt{\mathbf{S}_{d_w}^{corrected}}}$\;
+  $\mathbf{b} =  \mathbf{b} - \alpha \frac{\mathbf{V}_{d_b}^{corrected}}{\epsilon +  \sqrt{\mathbf{S}_{d_b}^{corrected}}}$\
+ }
+ \caption{Adams algorithm}
+\end{algorithm}
+ Usually $\beta_1=0.9$, $\beta_2=0.999$ are a good options, and $\alpha$ needs
+ to be tuned.
+\end{tcolorbox}
 
 
 
