@@ -1,0 +1,155 @@
+\section{Definitions and General Ideas}
+\label{sec:Definitions_and_General_Ideas}
+
+Let us start this section with some definitions.
+
+\begin{deff}{}
+\textbf{Test Error:} also referred to as generalization error is the 
+prediction error over an independent test sample"
+\begin{equation}
+Err_\Tau = E[L(Y, \hat f(X)) | \Tau]
+\end{equation}
+where both $X$ and $Y$ are drawn randomly from
+their joint distribution. Here the training set $\Tau$ is fixed
+and test error refers to the error specific to this training set.
+\end{deff}{}
+
+\begin{deff}{}
+\textbf{Expected Prediction Error:} also referred to 
+as expected test error is
+\begin{equation}
+Err = E[Err_\Tau] = E[L(Y, \hat f(X))].
+\end{equation}
+\end{deff}{}
+\noindent Notice that this expectation averages over everything 
+that is random, including the training set $\Tau$ that produced $\hat f$.
+
+Estimation of $Err_\Tau$ is the goal, however, most
+methods estimate $Err$.
+
+\begin{deff}{}
+\textbf{Training Error:} is the average loss over the training sample:
+\begin{equation}
+\overline{err} = \frac{1}{N}\sum_{i=1}^N L(y_i, \hat f(x_i)).
+\end{equation}
+\end{deff}{}
+
+Two typical loss functions for categorical variables are:
+\begin{equation}
+L(G, \hat G(X)) = I(G \neq \hat G(X)) ~~~(\text{0-1 loss})
+\end{equation}
+and
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+L(G, \hat G(X)) &= -2\sum_{k=1}^K I(G=k) log(\hat p_k(X))\\
+                         &= -2 log(\hat p_G(X)) ~~~(-2 \times \text{log-likelihood})
+\end{aligned}
+\end{gather}
+
+Once again, if we are in a data-rich situation, the best approach for both problems 
+is to randomly divide the dataset into three parts: a training set, a 
+validation set, and a test set. The training set is used to fit the models; 
+the validation set is used to estimate prediction error for model selection; 
+the test set is used for assessment of the generalization error of the final chosen model.
+It is difficult to give a general rule on how to choose the number of observations 
+in each of the three parts, as this depends on the signal-to-noise ratio in 
+the data and the training sample size,
+and the complexity of the models being fit to the data. 
+
+
+\section{Bias-Variance Decomposition}
+\label{sec:Bias_Variance_Decomposition}
+Assume $Y=f(X)+\varepsilon$ where  $E(\varepsilon)=0$ and
+$Var(\varepsilon) = \sigma^2$. Use the squared-error as
+the loss function. Then, the expected prediction error at an input
+point $X=x_0$ with the fitted function $\hat f(X)$ can be decomposed as follows:       
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+Err(x_0) &= E[(Y-\hat f(x_0))^2 | X=x_0] \\
+              &= \sigma^2_\varepsilon + (E[\hat f(x_0)] - f(x_0) )^2 + E[(\hat f(x_0) - E[\hat f(x_0)])^2] \\
+              &= \sigma^2_\varepsilon + Bias^2(\hat f(x_0)) + Var(\hat f(x_0)) \\
+              &= \text{Irreducible Error + Bias}^2 + \text{Variance}.
+\end{aligned}
+\end{gather}
+
+Bias is the amount by which the average of our estimate differs from the true mean.
+Variance is the expected value of ``(square of) difference between our estimate and its average''.
+
+For $k$-nearest neighbor regression we have
+the following simple form:
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+Err(x_0) &= E[(Y-\hat f_k(x_0))^2 | X=x_0] \\
+              &= \sigma^2_\varepsilon + \left[  f(x_0) - \frac{1}{k} \sum_{\ell=1}^k f(x_\ell) \right]^2 + \frac{\sigma^2_\varepsilon }{k}.
+\end{aligned}
+\end{gather}
+\noindent Here we assume for simplicity that training inputs xi are fixed, and 
+the randomness arises from the $y_i$. The number of neighbors $k$ is inversely 
+related to the model complexity. For small $k$, the estimate $\hat f_k(x)$ can 
+potentially adapt itself better to the underlying 
+$f(x)$. As we increase $k$, the bias—the squared difference 
+between $f(x_0)$ and the average of $f(x)$ at the $k$-nearest 
+neighbors—will typically increase, while the variance decreases.
+
+For a linear model fit $\hat f_p(x) = x^T \hat \beta$, where the parameter vector 
+$\beta$ with$p$ components is fit by least squares, we have
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+Err(x_0) &= E[(Y-\hat f_p(x_0))^2 | X=x_0] \\
+              &= \sigma^2_\varepsilon + \left[  f(x_0) - E[\hat f_p(x_0)] \right]^2 + ||\mathbf{h}(x_0)||^2 \sigma^2_\varepsilon.
+\end{aligned}
+\end{gather}
+
+\noindent Here $\mathbf{h}(x_0) = \mathbf{X(X}^T \mathbf{X)}^{-1}x_0$, 
+the $N$-vector of linear weights that produce 
+the fit $\hat f_p(x_0) = x_0^T \mathbf{(X}^T \mathbf{X)^{-1} X}^T \mathbf{y}$ , 
+and hence $Var[\hat f_p(x_0)] = ||\mathbf{h}(x_0)||^2 \sigma^2_\varepsilon$.
+While this variance changes with $x_0$, its average (with $x_0$ 
+taken to be each of the sample values $x_i$) is $(p/N) \sigma^2_\varepsilon$, and hence
+\begin{equation}
+\frac{1}{N} \sum_{i=1}^N Err(x_i) = \sigma^2_\varepsilon + \frac{1}{N} \sum_{i=1}^N \left( f(x_i)  - E[\hat f (x_i)] \right)^2 + \frac{p}{N} \sigma^2_\varepsilon,
+\end{equation}
+the in-sample error.\marginnote{For a little detail about this type of decomposition for ridge regression see page 224 of the Tibshirani's book.}
+
+\section{Optimism of Training Error Rate, $C_p$, AIC, and BIC}
+\label{sec:AIC_BIC}
+Recall some definitions with a more robust notations:
+
+\begin{deff}{}
+\textbf{Generalization Error:} 
+Given training set $\Tau$ the generalization error of the model $\hat f$ is
+\begin{equation}
+Err_\Tau = E_{X^0Y^0} [L(Y^0, \hat f^(X^0)) | \Tau]
+\end{equation}
+\end{deff}{}
+\noindent The training set $\Tau$ is fixed above. The point $(X^0, Y^0)$
+is a new point from the joint distribution. Averaging over training set $\Tau$
+yields the \textbf{\emph{expected error}}:
+
+\begin{equation}
+Err = E[Err_\Tau] = E_\Tau E_{X^0Y^0} [L(Y^0, \hat f^(X^0)) | \Tau]
+\end{equation}
+
+The training error, $\overline{err}$, is optimistic estimate of $Err_\Tau$.
+Part of the discrepancy is due to where the evaluation points occur. 
+The quantity $Err_\Tau$ can be thought of as extra-sample error, 
+since the test input vectors don’t need to 
+coincide with the training input vectors. 
+The nature of the optimism in $\overline{err}$ is easiest to 
+understand when we focus instead on the in-sample error.
+\begin{equation}
+Err_{in} = \frac{1}{N} \sum_{i=1}^N E_{Y^0}[L(Y^0, \hat f(x^0)) | \Tau]
+\end{equation}
+
+The $Y^0$ notation indicates that we observe $N$ new 
+response values at each of the training points $x_i, i = 1,2,...,N$. 
+We define the optimism (which is typically positive) as 
+\begin{equation}
+op = Err_{in} - \overline{err}
+\end{equation}
+and $\omega = E_{\mathbf{y}}(op)$. Here the predictors in the 
+training set are fixed, and the expectation is over the training set outcome values.
+The goal is predicting $op$, however, we can only estimate $\omega$.
+The same way as the goal is to predict $Err_\Tau$ but we can only estimate
+$Err$.
+

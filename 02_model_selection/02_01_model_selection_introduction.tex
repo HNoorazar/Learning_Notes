@@ -1,0 +1,40 @@
+\chapter{Model Selection}
+\label{chap:Model_Selection}
+
+
+\section{Introduction}
+\label{sec:Model_Selection_Introduction}
+In this chapter we describe a number of methods for estimating the
+expected test error for a model. Typically our model will have a tuning
+parameter or parameters $\alpha$ and so we can write our predictions as $\hat f_\alpha(X)$.
+The tuning parameter varies the complexity of our model, and we wish to find the value of $\alpha$ 
+that minimizes error, that is, produces the minimum of the average test error. 
+Having said this, for brevity we will often suppress the dependence of $\hat f(X)$ on $\alpha$.
+
+It is important to note that there are in fact two separate goals 
+that we might have in mind:
+\begin{description}
+\item [Model selection:] estimating the performance of different models in order to choose the best one.
+\item [Model assessment:] having chosen a final model, estimating its prediction 
+error (generalization error) on new data.
+\end{description}
+If we are in a data-rich situation, the best approach for both problems 
+is to randomly divide the dataset into three parts: a training set, a 
+validation set, and a test set. The training set is used to fit the models; 
+the validation set is used to estimate prediction error for model selection; 
+the test set is used for assessment of the generalization error of the final chosen model.
+It is difficult to give a general rule on how to choose the number of observations 
+in each of the three parts, as this depends on the signal-to-noise ratio in 
+the data and the training sample size,
+and the complexity of the models being fit to the data. 
+
+The methods in this chapter are designed for situations where there 
+is insufficient data to split it into three parts.
+The methods of this chapter approximate the validation step either 
+analytically (AIC, BIC, MDL, SRM) or by efficient sample re-use 
+(cross- validation and the bootstrap).
+\marginnote{Insert bias-variance trade off on pages 223 and 224 of the book here.}
+
+
+
+

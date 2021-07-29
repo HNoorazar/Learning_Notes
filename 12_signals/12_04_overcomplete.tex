@@ -1,0 +1,122 @@
+\section{Overcomplete Dictionary Methods}
+\label{sec:Overcomplete_Dictionary_Methods}
+In this section we consider overcomplete dictionary methods
+for representing a signals.
+Designing dictionaries to better 
+fit the above model can be done by either selecting one from a 
+prespecified set of linear transforms or adapting the dictionary to 
+a set of training signals. Both of these techniques have been 
+considered, but this topic is largely still open.
+
+\subsection{Dictionary Construction by Maximum Likelihood Methods}\label{sec:DictionaryConstructionMaximumLikelihood}
+
+
+\subsection{Dictionary Construction by Method of Optimal Directions}\label{sec:DictionaryConstructionOptimalDirections}
+
+
+\subsection{$K-$SVD}
+\label{sec:ksvd}
+The study of sparse representation of signals is of interest. 
+Using an overcomplete dictionary that contains prototype 
+signal-atoms, signals are described by sparse linear combinations 
+of these atoms. Recent activity in this field has 
+concentrated mainly on the study of pursuit algorithms that decompose 
+signals with respect to a given dictionary. In this paper we 
+look at a paper that proposes an algorithm for adapting 
+dictionaries in order to achieve sparse signal representations~\citep{AharonKSVD}.
+
+Given a set of training signals, we seek the dictionary that 
+leads to the best representation for each 
+member in this set, under strict sparsity constraints. 
+We present a new method---the $K$-SVD algorithm---generalizing 
+the $K$-means clustering process. $K$-SVD is 
+an iterative method that alternates between 
+sparse coding of the examples based on the 
+current dictionary and a process of updating 
+the dictionary atoms to better fit the data. 
+The update of the dictionary columns is 
+combined with an update of the sparse representations, 
+thereby accelerating convergence. The $K$-SVD 
+algorithm is flexible and can work with any pursuit 
+method (e.g., basis pursuit, FOCUSS, or matching pursuit). 
+
+There is a signal $\mathbf{s} \in \mathbb{R}^n$ for which we
+are looking for a sparse representation. Suppose
+we have a dictionary represented by matrix 
+$\mathbf{D} \in \mathbb{R}^{n\times K}$. Representaiton
+of  $\mathbf{s}$ is given by $\mathbf{x}$:
+\begin{equation}
+\min_\mathbf{x} \norm{\mathbf{x}}_0 \text{ subject to } \mathbf{s = Dx} 
+\end{equation}
+or
+\begin{equation}
+\min_\mathbf{x} \norm{\mathbf{x}}_0 \text{ subject to } \norm{\mathbf{s - Dx}} \le \epsilon.
+\end{equation}
+The $\norm{.}_0$ is the number of non-zero elements of the
+vector and ensures sparsity. In~\citep{AharonKSVD}
+the 2-norm is considered.
+
+\subsection{Adaptive Dictionary Construction: Maximum Likelihood Methods}
+\label{sec:ADCMLM}
+
+
+
+
+\subsection{Dictionary Construction by $K$-means: $K-$SVD}
+\label{sec:KSVD}
+Clustering is also referred to as vector quantization (VQ).
+In $K$-means each point is represented by a 
+given point (cluster center). One can think
+of this as an extreme sparse representation
+where only one vector is allowed in the decomposition.
+Furthermore, the coefficient of the cluster center is 1.
+A variant in which the coefficient can vary is called gain-shape VQ.
+
+
+An overcomplete dictionary $\mathbf{D}$
+that leads to sparse representations can either be 
+chosen as a prespecified set of functions or designed by 
+adapting its content to fit a given set of signal 
+examples.
+Choosing a prespecified transform matrix is appealing 
+because it is simpler. Also, in many cases it leads 
+to simple and fast algorithms for the evaluation 
+of the sparse representation.
+In~\citep{AharonKSVD}, authors consider a different 
+route for designing dictionaries based on learning. 
+The goal is to find the dictionary 
+that yields sparse representations for the training signals. 
+
+There is an intriguing relation between 
+sparse representation and clustering (i.e., vector quantization). 
+In clustering, a set of descriptive vectors $\{\mathbf{d_k} \}_{k=1}^K$ 
+is learned, and each sample is represented by one of those 
+vectors (the one closest to it, usually in the $\ell^2$ distance measure). 
+We may think of this as an extreme sparse representation, 
+where only one atom is allowed in the signal decomposition, 
+and furthermore, the coefficient multiplying it must be 
+one~\citep{AharonKSVD}.
+In contrast, in sparse representations each example is 
+represented as a linear combination of several 
+vectors $\{\mathbf{d_k} \}_{k=1}^K$. 
+Thus, sparse representations can be referred to as a 
+generalization of the clustering problem.
+
+We briefly mention that the
+$K$-means process applies two steps per each iteration: 
+i) given, $\{\mathbf{d_k} \}_{k=1}^K$ assign the training 
+examples to their nearest neighbor; and 
+ii) given that assignment, update to better fit the examples.
+The approaches to dictionary design that have been tried so
+far are very much in line with the two-step process described
+above. The first step finds the coefficients given the dictionary---
+a step we shall refer to as ``sparse coding.'' Then, the dictionary 
+is updated assuming known and fixed coefficients. 
+The differences between the various algorithms that 
+have been proposed are in the method used for the 
+calculation of coefficients and in the procedure used 
+for modifying the dictionary.\\
+
+% \textbf{$K-$means algorithm for Vector Quantization}
+
+

@@ -1,0 +1,59 @@
+\section{Classification Techniques}
+\label{chap:Classification_Techniques}
+
+Linear classification techniques are those
+whose decision boundaries are linear. Some methods
+such as perceptron and optimally separating hyperplanes
+attempt to find such boundaries directly. Some other models
+such as linear regression, logistic regression, and linear discriminant analysis
+do this implicitly. All is needed is to have a monotone transformation of
+the $\delta_k(x)$--the discriminant functions for each class-- or the 
+posterior probability --$P(G=k|X=x)$-- be linear.
+
+
+\section{Linear Discriminant Analysis}
+\label{sec:LinearDiscriminantAnalysis}
+For optimal classification we need to know
+the class posteriors; $P(G=k|X=x)$. 
+Let $f_k(x)$ be the class-conditional density of
+$X$ in class $G=k$, and let $\pi_k$ be the
+prior probability of class $k$ with $\sum_{k=1}^K \pi_k=1$.
+Then by Bayes theorem we have
+\begin{equation}
+P(G=k|X=x) = \frac{f_k(x)\pi_k}{\sum_{\ell=1}^K f_\ell(x)\pi_\ell}.
+\end{equation}
+Many models are based on class densities.
+\begin{itemize}
+\item Linear and quadratic discriminant analysis
+\item Mixture of Gaussian densities that allows nonlinear decision boundaries
+\end{itemize}
+Suppose each class is modeled as a multivariate Gaussian
+\begin{equation}
+f_k(x) = \frac{1}{(2\pi)^{p/2}|\mathbf{\Sigma}_k|^{1/2}}e^{-\frac{1}{2}(x-\mu_k)^T \mathbf{\Sigma_k^{-1}}(x-\mu_k)}
+\end{equation}
+Linear discriminant analysis (LDA) is the special case where we assume $\mathbf{\Sigma}_k=\mathbf{\Sigma}, \forall k$.
+Comparing two classes $k$ and $\ell$ gives us the linear boundaries:
+\begin{gather}\label{eq:LDALogOdd}
+\begin{aligned}
+log\left( \frac{P(G=k|X=x)}{P(G=\ell|X=x)}\right) &= 
+log\left( \frac{f_k(x)}{f_\ell(x)}\right) + log\left(\frac{\pi_k}{\pi_\ell}\right)\\
+&= log\left(\frac{\pi_k}{\pi_\ell}\right) - \frac{1}{2}\left(\mu_k+\mu_\ell\right)^T\mathbf{\Sigma}^{-1}\left(\mu_k-\mu_\ell\right) \\ &~~~~+ x^T\mathbf{\Sigma}^{-1}\left(\mu_k-\mu_\ell\right)
+\end{aligned}
+\end{gather}
+The linear discriminant functions are given by
+\begin{equation}
+\delta_k = log\left(\pi_k\right) - \frac{1}{2}\mu_k^T\mathbf{\Sigma}^{-1}\mu_k+ x^T\mathbf{\Sigma}^{-1}\mu_k
+\end{equation}
+where we have to estimate the followings:
+\begin{itemize}
+\item $\hat \pi_k = N_k/N$
+\item $\hat \mu_k = \sum_{g_i=k}x_i/N_k$
+\item $\mathbf{\Sigma} = \sum_{k=1}^K \sum_{g_i=k}\left(x_i-\hat\mu_k\right)\left(x_i-\hat\mu_k\right)^T/(N-K)$
+\end{itemize}
+If the covariance matrices for each category are
+not equal then the cancellations in~\cref{eq:LDALogOdd}
+do not occur and we get quadratic discriminant analysis:
+\begin{equation}
+\delta_k = log\left(\pi_k\right) - \frac{1}{2}\left(x-\mu_k\right)^T\mathbf{\Sigma}_k^{-1}\left(x-\mu_k\right) - \frac{1}{2}log\left(|\mathbf{\Sigma}_k|\right)
+\end{equation}
+

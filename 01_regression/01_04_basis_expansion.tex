@@ -1,0 +1,113 @@
+\section{Basis Expansion}
+\label{sec:Basis_Expansion}
+
+\begin{deff}{}
+The additive models assume $f(X)=\sum_{j=1}^p f_j(x_j)$.
+\end{deff}{}
+
+
+\begin{deff}{}
+Let $h_m(X)$ be a transformation of input variables $X$.
+Then a linear basis expansion in $X$ is modeled as 
+\begin{equation}\label{eq:linearbasisexpansion}
+f(X) = \sum_{m=1}^M \beta_m h_m(X).
+\end{equation}
+\end{deff}{}
+\noindent Once the basis functions $h_m$ have been determined, 
+the models are linear in these new variables, and the 
+fitting proceeds as before.
+
+\subsection{Piecewise Polynomials and Splines}
+\label{sec:PiecewisePolynomialsandSplines}
+In this section and the sections~\cref{FilteringandFeatureExtraction,SmoothingSplines,AutomaticSelectionoftheSmoothingParameters,NonparametricLogisticRegression,MultidimensionalSplines} 
+we assume $X$ is one-dimensional.
+
+Figure~\ref{fig:pieceWiseCubic} shows a series of 
+piecewise-linear polynomials.
+\begin{figure*}[ht!]
+%  \centering
+  \captionsetup{justification=centering}
+  \includegraphics[width=0.6\textwidth]{00_figures/pieceWiseLinear}
+  \caption[][-18\baselineskip]{The top left panel shows a piecewise constant 
+  function fit to some artificial data.
+The broken vertical lines indicate the positions of the two knots 
+$\xi_1$ and $\xi_2$. 
+The blue curve represents the 
+true function, from which the data were generated 
+with Gaussian noise. 
+The remaining two panels show piecewise linear 
+functions fit to the same data—the top right 
+unrestricted, and the lower left restricted 
+to be continuous at the knots. The lower right panel shows a 
+piecewise–linear basis function, $h_x(X) = (X - \xi_1)_+$,
+continuous at $\xi_1$. The black points indicate the 
+sample evaluations $h_3(x_i)$, $i = 1,...,N$.
+  }%
+  \label{fig:pieceWiseLinear}%
+\end{figure*}
+
+A direct way to proceed in this case is to use a basis that 
+incorporates the constraints:
+\begin{equation*}
+h_1(X)=1,~h_2(X)=X,~ h_3(X)=(X-\xi_1)_+, ~h_4(X)=(X-\xi_2)_+ 
+\end{equation*}
+\noindent where $t_+$ denotes the positive part.
+Figure~\ref{fig:pieceWiseCubic} shows a series of piecewise-cubic 
+polynomials fit to the same data, with increasing orders of 
+continuity at the knots. The function in the lower right panel 
+is continuous, and has continuous first and second 
+derivatives at the knots. It is known as a cubic spline.
+\begin{figure*}[ht!]
+%  \centering
+  \captionsetup{justification=centering}
+  \includegraphics[width=0.6\textwidth]{00_figures/pieceWiseCubic}
+  \caption[][-14\baselineskip]{A series of piecewise-cubic 
+  polynomials, with increasing orders of continuity.
+  }%
+  \label{fig:pieceWiseCubic}%
+\end{figure*}
+
+The following basis represents a cubic spline with knots at $\xi_1$ 
+and $\xi_2$:
+\begin{equation}
+\begin{aligned}\label{eq:cubicSpline}
+h_1(X)=1,~h_3(X)=X^2,~h_5(X)=(X-\xi_1)_+,\\
+~h_2(X)=X, h_4(X)=X^3, ~h_6(X)=(X-\xi_2)_+.
+\end{aligned}
+\end{equation}
+More generally, an order-M spline with 
+knots $\xi_j$, $j = 1, \dots,K$ is a piecewise-polynomial of order 
+$M$, and has continuous derivatives up to order $M-2$. 
+A cubic spline has $M = 4$\marginnote{I do not understand this. A cubic spline 
+has to be a polynomial of degree 3 in each interval, is not it? Or, it seems cubic 
+splice is a splice that its first and second derivatives at the knots are continuous. 
+And the degree of polynomials in each interval is a function of
+order of splice and the how much continuity is needed at the knots.}.
+In fact the piecewise-constant 
+function in~\cref{fig:pieceWiseLinear} is an order-1 
+spline, while the continuous piece-wise linear 
+function is an order-2 spline. Likewise the general 
+form for the truncated-power basis set would be
+\begin{equation}
+\begin{aligned}\label{eq:cubicSpline}
+h_j(X) &= X^{j-1}, ~~~~~~~~~~~~~~ j=1, \dots, M\\
+h_{M+\ell}(X) &= (X-\xi_\ell)_+^{M-1}, ~~\ell=1, \dots, K.
+\end{aligned}
+\end{equation}
+
+
+
+\subsection{Filtering and Feature Extraction}
+\label{FilteringandFeatureExtraction}
+
+\subsection{Smoothing Splines}
+\label{SmoothingSplines}
+
+\subsection{Automatic Selection of the Smoothing Parameters}
+\label{AutomaticSelectionoftheSmoothingParameters}
+
+\subsection{Nonparametric Logistic Regression}
+\label{NonparametricLogisticRegression}
+
+\subsection{Multidimensional Splines}
+\label{MultidimensionalSplines}

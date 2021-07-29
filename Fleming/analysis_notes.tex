@@ -6,7 +6,7 @@
 % #1 article + archive
 % #2 revtex
 % #3 Tufte
-\newcommand{\select}[3]{#3}
+\newcommand{\select}[3]{#2}
 \select
  {% #1 article + preprint
 }{% #2 revtex
@@ -199,6 +199,7 @@
 \newtheorem{exc}{Exercise}[section]
 \newcommand{\Tau}{\mathcal{T}}
 
+\newcommand{\sol}{{\color{red}{\textbf{Solution}.~}}}
 
 %revtex uses \prb...
 %\newtheorem{prb}{Problem}[section]
@@ -377,7 +378,7 @@ font={\color{blue}},
 \begin{document}
 %\raggedright
 
-\title{Learning Notes: Machine Learning, Signal Processing, Image Analysis}
+\title{Analysis Notes}
 \date{\today}
 
 \select
@@ -411,42 +412,19 @@ font={\color{blue}},
 
 
 \setcounter{secnumdepth}{3} % If this commented out. Chapters/Sections are not numbered
-\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
+%\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
 
 \newpage
 
 \vspace{3in}
-
-\begin{figure*}[htb]
-  \centering
-  %\captionsetup{justification=centering}
-  \includegraphics[width=0.5\textwidth]{00_figures/mugShot}
-%  \caption[][1\baselineskip]{}
-  \label{fig:mugShot}
-\end{figure*}
-I dedicate these notes to myself. It was me who went through 
-the process, even though others might have  been part of the journey.
 % \newpage
 % \renewcommand{\cftdot}{}
 \tableofcontents
 
 
 \newpage
-\input{./00_Motivation} %
-
-\input{./01_regression_main}
-\input{./02_model_selection}
-\input{./03_classification_main}
-\input{./04_clustering_main}
-\input{./05_SVM_main}
-\input{./06_TDA_main}
-\input{./07_practical_issues_main}
-\input{./08_wavelet_fourier_main}
-\input{./09_model_inference_main}
-\input{./12_signals_main}
-\input{./13_deep_learning_main}
-
-
+\input{./01_Euclidean_Spaces}
+\input{./02_Elementary_Topology_of_En}
 \bibliography{references}
 
 % \printindex
