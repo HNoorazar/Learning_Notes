@@ -145,11 +145,141 @@ The $Y^0$ notation indicates that we observe $N$ new
 response values at each of the training points $x_i, i = 1,2,...,N$. 
 We define the optimism (which is typically positive) as 
 \begin{equation}
-op = Err_{in} - \overline{err}
+\begin{cases} op = Err_{in} - \overline{err} \\
+\omega = E_{\mathbf{y}}(op). \\
+\end{cases}
 \end{equation}
-and $\omega = E_{\mathbf{y}}(op)$. Here the predictors in the 
+Here the predictors in the 
 training set are fixed, and the expectation is over the training set outcome values.
 The goal is predicting $op$, however, we can only estimate $\omega$.
-The same way as the goal is to predict $Err_\Tau$ but we can only estimate
-$Err$.
+The same way as the goal is to predict $Err_\Tau$ but we can only 
+estimate $Err$.
 
+For squared error, 0-1, and other loss functions, 
+one can show quite generally that
+\begin{equation}
+\omega = \frac{2}{N}\sum_{i=1}^N Cov(\hat y_i, y_i), 
+\end{equation}
+where $Cov$ indicates covariance. Thus the amount by which $err$ 
+underestimates the true error depends on how strongly $y_i$ affects its own prediction. 
+The harder we fit the data, the greater $Cov(\hat y_i, y_i)$ will be, thereby 
+increasing the optimism.
+
+In summary, we have the important relation
+\begin{equation}
+E_\mathbf{y}(Err_{in}) = E_\mathbf{y}(\overline{err}) + \frac{2}{N}\sum_{i=1}^N Cov(\hat y_i, y_i), 
+\end{equation}
+
+This expression simplified for linear fits with $d$ inputs or basis functions.
+For example,
+\begin{equation}\label{eq:effective_params}
+\sum_{i=1}^N Cov(\hat y_i, y_i) = d\sigma^2_\varepsilon
+\end{equation}\marginnote{The~\cref{eq:effective_params} is the basis for effective number of parameters. Moreover, note that if the basis functions are chosen adaptively,~\cref{eq:effective_params} no longer holds. In such a case the effective number of parameters will be greater than $d$. Let $\mathbf{\hat y} = \mathbf{Sy}$, then $d:=trace(\mathbf{S})$. To see more look at page 232 of Tibshirani's book.}
+for additive error model $Y=f(X) + \varepsilon$, and so
+\begin{equation}\label{eq:leading_to_CP}
+E_\mathbf{y}(Err_{in}) = E_\mathbf{y}(\overline{err}) + 2\frac{d}{N}\sigma^2_\varepsilon.
+\end{equation}
+
+The optimism increases linearly with the number $d$ 
+of inputs or basis functions we use, but decreases as the 
+training sample size increases.
+
+An obvious way to estimate prediction error is to estimate
+the optimism and then add it to the training error $\overline{err}$.
+The methods described in the next section—$C_p$, $AIC$, $BIC$ and 
+others—work in this way, for a special class of estimates that are linear in 
+their parameters.
+
+In contrast, cross-validation and bootstrap methods, 
+described later in the chapter, are direct estimates of the extra-sample 
+error $Err$. These general tools can be used with any loss function, 
+and with nonlinear, adaptive fitting techniques.
+
+In-sample error is not usually of direct interest since future
+values of the features are not likely to coincide with their training 
+set values. But for comparison between models, in-sample error 
+is convenient and often leads to effective model selection. 
+The reason is that the relative (rather than absolute) size of the error is what matters.\\
+
+The general form of the in-sample estimates is
+\begin{equation}
+\widehat{Err_{in}} = \overline{err} + \hat{\omega},
+\end{equation}
+where $\hat{\omega}$, is an estimate of the average optimism.
+
+Using expression~\ref{eq:leading_to_CP}, applicable when d parameters are fit under
+squared error loss, leads to a version of the so-called $C_p$ statistic,
+\begin{equation}\label{wq:Cp_statistic}
+C_p = \overline{err} + 2\frac{d}{N}\sigma^2_\varepsilon.
+\end{equation}
+Here $\sigma^2_\varepsilon$ is an estimate of the noise variance, 
+obtained from the mean-squared error of a low-bias model.
+
+The \emph{Akaike information criterion} is a similar but more generally 
+applicable estimate of $Err_{in}$ when a log-likelihood 
+loss function is used. It relies on a relationship similar to~\ref{eq:leading_to_CP}
+that holds asymptotically as $N \rightarrow \infty$:
+\begin{equation}
+-2 E[log(Pr_{\hat \theta}\left(Y) \right)] = -\frac{2}{N} E[loglik] + 2\frac{d}{N}.
+\end{equation}
+Here $Pr_{\hat \theta}(Y)$ is a family of densities for $Y$
+(containing the ``true'' density), $\hat \theta$ is the maximum-likelihood 
+estimate of $\theta$, and ``loglik'' is the maximized log-likelihood:
+\begin{equation}
+loglik = \sum_{i=1}^N log(Pr_{\hat \theta}\left(y_i)\right).
+\end{equation}
+
+For example, for the logistic regression model, using the 
+binomial log-likelihood, we have
+\begin{equation}
+AIC = -\frac{2}{N}~.~loglik + 2~.~\frac{d}{N}.
+\end{equation}
+For the Gaussian model (with variance $\sigma^2_\varepsilon = \hat \sigma^2_\varepsilon$ assumed known), the AIC
+statistic is equivalent to $C_p$, and so we refer to them collectively as AIC.
+
+To use AIC for model selection, we simply choose the model 
+giving smallest AIC over the set of models considered. 
+For nonlinear and other complex models, we need to replace $d$ 
+by some measure of model complexity. We
+discuss this in Section 7.6.\\
+
+The \textbf{\emph{Bayesian information criterion}} (BIC), like AIC, 
+is applicable in settings where the fitting is carried out by maximization of a 
+log-likelihood. The generic form of BIC is
+\begin{equation}
+BIC = -2~loglik + d~log(N).
+\end{equation}
+Under Gaussian model, assuming the variance $\sigma^2_\varepsilon$
+is known, $-2~loglik $ equals (up to a constant) 
+$\sum_{i} \left( y_i - \hat f(x_i)\right)^2 / \sigma^2_\varepsilon$,
+which is $N~.~\overline{err} / \sigma^2_\varepsilon$ for squared error loss.
+Therefore, 
+\begin{equation}
+BIC = \frac{N}{\sigma^2_\varepsilon} \left[\overline{err} + \frac{d}{N} log(N) \sigma^2_\varepsilon  \right]
+\end{equation}
+
+Therefore BIC is proportional to AIC ($C_p$), 
+with the factor 2 replaced by $log(N)$. Assuming $N > e^2 \approx 7.4$, 
+BIC tends to penalize complex models more heavily, giving 
+preference to simpler models in selection. As with AIC, 
+$\sigma^2_\varepsilon$ is typically estimated by the mean squared error of a 
+low-bias model. For classification problems, use of the 
+multinomial log-likelihood leads to a similar relationship with 
+the AIC, using cross-entropy as the error measure.
+
+Note however that the misclassification error measure 
+does not arise in the BIC context, since it does not 
+correspond to the log-likelihood of the data under any probability model.
+Despite its similarity with AIC, BIC is motivated in quite a different way. 
+Please see page 234 of Tibshirani's book. 
+
+For model selection purposes, there is no clear choice 
+between AIC and BIC. BIC is asymptotically consistent 
+as a selection criterion. What this means is that given 
+a family of models, including the true model, the probability 
+that BIC will select the correct model approaches one as the 
+sample size $N \rightarrow \infty$. This is not the case for AIC, 
+which tends to choose models which are too complex as 
+$N \rightarrow \infty$. On the other hand, for finite samples, 
+BIC often chooses models that are too simple, because 
+of its heavy penalty on complexity.
