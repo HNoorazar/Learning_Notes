@@ -1,0 +1,125 @@
+\section{Separating Hyperplanes}
+\label{sec:Separating_Hyperplanes}
+Separating hyperplanes procedures construct linear decision boundaries 
+that explicitly try to separate the data into different classes as well as possible.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Rosenblatt's Perceptron Learning Algorithm}
+\label{sec:RosenblattPerceptron}
+The perceptron learning algorithm tries to find a 
+separating hyperplane by minimizing the distance of 
+misclassified points to the decision boundary. If
+a response $y_i = 1$ is misclassified, then 
+$x_i^T \beta + \beta_0 < 0 $, and the opposite for
+a misclassified response with $y_i = -1$. The goal is to minimize
+\begin{equation}\label{eq:RosenblattsGoal}
+D(\beta, \beta_0) = - \sum_{i \in \mathcal{M}} y_i (x_i^T\beta + \beta_0 )
+\end{equation}
+where $\mathcal{M}$ indexes the set of misclassified points. 
+The quantity is non-negative and proportional to the distance 
+of the misclassified points to the decision boundary defined 
+by $\beta^T x_i+ \beta_0 = 0$. The gradient (assuming $\mathcal{M}$ is fixed) 
+is given by
+\begin{gather}
+% gather and aligned leads to having one label for eq.
+\begin{aligned}
+\partial \frac{D(\beta, \beta_0)}{\beta} &= - \sum_{i \in \mathcal{M}} y_ix_i, \\
+\partial \frac{D(\beta, \beta_0)}{\beta_0} &= - \sum_{i \in \mathcal{M}} y_i.\\
+\end{aligned}
+\end{gather}
+The algorithm in fact uses stochastic gradient descent 
+to minimize this piecewise linear criterion.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Optimal Separating Hyperplanes}
+\label{sec:Optimal_Separating_Hyperplanes}
+Optimal Separating Hyperplanes are the method that
+will develop into the support vector machines.
+
+The optimal separating hyperplane separates the 
+two classes and maximizes the distance to the closest point from 
+either class\cite{vapnik2013nature}.
+Not only does this provide a unique solution to the separating 
+hyperplane problem, but by maximizing the margin between 
+the two classes on the training data, this leads to better 
+classification performance on test data.
+
+Consider the optimization problem
+\begin{equation}
+\label{eq:SepHyperOpt}
+\begin{aligned}
+& \max_{\beta, \beta_0, \norm{\beta}=1} M,\\
+\text{subject to } & y_i(x_i^T \beta + \beta_0) \ge M,~i=1, \dots, N.\\
+\end{aligned}
+\end{equation}
+
+The set of conditions ensure that all the points are at 
+least a signed distance $M$ from the decision boundary 
+defined by $\beta$ and $\beta_0$, and we seek the largest such $M$
+and associated parameters. We can get rid of the 
+$\norm{\beta} = 1$ constraint by replacing the conditions with
+\begin{equation}
+\begin{aligned}
+\frac{1}{\norm{\beta}} y_i (x_i^T \beta + \beta_0) \ge M
+\end{aligned}
+\end{equation}
+(which redefines $\beta_0$) or equivalently
+\begin{equation}
+\begin{aligned}
+y_i (x_i^T \beta + \beta_0) \ge M \norm{\beta}
+\end{aligned}
+\end{equation}
+Since for any $\beta$ and $ \beta_0$ satisfying these inequalities, 
+any positively scaled multiple satisfies them too, we can 
+arbitrarily set $ \beta = 1 / M $. Thus~\ref{eq:SepHyperOpt} 
+is equivalent to
+\begin{equation}\label{eq:SepHyperOpt2}
+\begin{aligned}
+& \min_{\beta, \beta_0} \frac{1}{2}\norm{\beta}^2,\\
+\text{subject to } & y_i(x_i^T \beta + \beta_0) \ge 1,~i=1, \dots, N.\\
+\end{aligned}
+\end{equation}
+The constraints define an empty slab or margin around 
+the linear decision boundary of thickness $1/\norm{\beta}$. 
+Hence we choose $\beta$ and $\beta_0$ to maximize its thickness. 
+This is a convex optimization problem (\hl{quadratic criterion with linear inequality constraints}).
+The Lagrange (primal) function, to be minimized w.r.t. $\beta$ and $\beta_0$, is
+\begin{equation}\label{eq:LagrangeSepHyp}
+\begin{aligned}
+L_p = \frac{1}{2} \norm{\beta}^2 - \sum_{i=1}^N \alpha_i \left[ y_i(x_i^T \beta + \beta_0) - 1  \right]
+\end{aligned}
+\end{equation}
+Setting the derivatives to zero, we obtain:
+\begin{equation}\label{eq:someCond}
+\begin{aligned}
+\beta &= \sum_{i=1}^N\alpha_i y_i x_i,\\
+    0   &= \sum_{i=1}^N\alpha_i y_i  
+\end{aligned}
+\end{equation}
+and substituting these in~\ref{eq:LagrangeSepHyp} we obtain the so-called Wolfe dual
+we obtain the so-called Wolfe dual
+\begin{equation}\label{eq:WolfeSepHyp}
+\begin{aligned}
+L_D = \sum_{i=1}^N\alpha_i - \frac{1}{2} \sum_{i=1}^N \sum_{k=1}^N \alpha_i \alpha_k y_i y_k x_i^T x_k \\
+\text{subject to } \alpha_i \ge 0, \text{ and }  \sum_{i=1}^N\alpha_i y_i  = 1
+\end{aligned}
+\end{equation}
+The solution is obtained by maximizing $L_D$ in 
+the positive orthant, a simpler convex optimization problem, 
+for which standard software can be used.
+In addition the solution must satisfy the Karush–Kuhn–Tucker conditions, 
+which include \ref{eq:someCond},~\ref{eq:WolfeSepHyp} and
+\begin{equation}
+\begin{aligned}
+\alpha_i \left[ y_i(x_i^T \beta + \beta_0) - 1  \right] = 0 ~ \forall i.
+\end{aligned}
+\end{equation}
+
+
+
+
