@@ -1,0 +1,477 @@
+\section{Trees (additive trees, boosting trees, and more)}
+\label{chap:Trees}
+We include trees in the classification chapter,
+however, they can be used for regression as we
+will see here.
+
+Trees can easily overfit. The preferred strategy is 
+to grow a large tree $T_0$, stopping the splitting process only 
+when some minimum node size (say 5) is reached. Then this 
+large tree is pruned using \emph{cost-complexity pruning}, 
+which we now describe.
+
+Index terminal nodes by $m$, with node $m$ representing 
+region $R_m$. Let $abs{T}$ denote the number 
+of terminal nodes in $T$. Letting
+\begin{gather}\label{eq:regressionTreeCost}
+% gather and aligned leads to having one label for eq.
+\begin{aligned}
+N_m &= \# \{x_i \in R_m\}, \\
+\hat c_m &= \frac{1}{N_m} \sum_{x_i \in R_m} y_i, \\
+Q_m &=  \frac{1}{N_m} \sum_{x_i \in R_m} (y_i - \hat c_m)^2, \\
+\end{aligned}
+\end{gather}
+we define the cost complexity criterion
+\begin{equation}
+C_{\alpha}(T) = \sum_{m=1}^{\abs{T} } N_m Q_m(T) + \alpha \abs{T}
+\end{equation}
+The idea is to find, for each $\alpha$, the subtree 
+$T_\alpha \subseteq T_0$ to minimize $C_{\alpha}(T)$. 
+The tuning parameter $\alpha \ge 0$ governs the 
+tradeoff between tree size and its goodness of fit to the data.
+
+How to choose $\alpha$?
+For each $\alpha$ one can show that there is a unique 
+smallest subtree $T_\alpha$ that minimizes $C_\alpha(T)$. 
+To find $T_\alpha$ we use weakest link pruning: we 
+successively collapse the internal node that produces the 
+smallest per-node increase in $\sum_mN_mQ_m(T)$
+and continue until we produce the single-node (root) tree.
+This gives a (finite) sequence of subtrees, and one can show this sequence must contain $T_\alpha$.
+Estimation of $\alpha$ is achieved by five- or tenfold 
+cross-validation: we choose the value $\hat \alpha$ to 
+minimize the cross-validated sum of squares. Our final tree 
+is $T_{\hat\alpha}$.
+
+In a classification setting with $K$ classes
+the impurity measure is given below. In a node $m$, 
+representing a region $R_m$ with $N_m$ observations, let
+\begin{equation}
+\hat p_{mk} = \frac{1}{N_m}\sum_{x_i \in R_m} I(y_i = k),
+\end{equation}
+the proportion of class $k$ observations in node $m$.
+We classify the observations in node $m$ to class 
+$k(m) = argmax_k \hat p_{mk}$, the majority class in 
+node $m$. Different measures $Q_m(T)$ of node impurity 
+include the following:
+\begin{gather}
+% gather and aligned leads to having one label for eq.
+\begin{aligned}
+&\text{{\color{blue}{Misclassification error: }}}          & & \frac{1}{N_m} \sum_{i \in R_m} I(y_i \neq k(m)) = 1 - \hat p_{mk}(m)\\
+&\text{{\color{blue}{Gini index: }}}                             & & \sum_{k \neq k'}  \hat p_{mk}  \hat p_{mk'} = \sum_{k=1}^K \hat p_{mk} (1-\hat p_{mk})\\
+&\text{{\color{blue}{Cross-entropy or deviance: }}}    & & -\sum_{k=1}^K \hat p_{mk} log(\hat p_{mk})
+\end{aligned}
+\end{gather}
+For two classes, if $p$ is the proportion in the second class, 
+these three measures are  $1 - max(p, 1-p)$, $2p(1-p)$, and $-plog(p)log(1-p)$,
+respectively.
+\begin{marginfigure}[-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/gini_crossEntropy}
+  \caption{Node impurity measures for two-class classification. I did the Cross-entropy with log in base 4 and Tibshirani has scaled it to pass through (0.5, 0.5).}
+  \label{fig:impurityMeasure}
+\end{marginfigure}
+
+They are shown in~\cref{fig:impurityMeasure}. All three are similar, but 
+cross-entropy and the Gini index are differentiable, 
+and hence more amenable to numerical optimization. 
+Comparing(9.13) and (9.15) [<--This is the book], we see that we need to weight 
+the node impurity measures by the number $N_{m_L}$ and $N_{m_R}$ of
+observations in the two child nodes created by splitting node $m$.
+
+In addition, cross-entropy and the Gini index 
+are more sensitive to changes in the node probabilities than 
+the misclassification rate. For example, in a two-class problem 
+with 400 observations in each class (denote this by (400, 400)), 
+suppose one split created nodes (300, 100) and (100, 300), while
+the other created nodes (200, 400) and (200, 0). Both splits produce a 
+misclassification rate of 0.25, but the second split produces a pure 
+node and is probably preferable. Both the Gini index and cross-entropy 
+are lower for the second split. For this reason, either the Gini index 
+or cross-entropy should be used when growing the tree. To guide 
+cost-complexity pruning, any of the three measures can be used, but typically it is the 
+misclassification rate.\\
+
+
+\textbf{{\color{blue}{Missing Predictor Values}}}
+
+Other than deleting and imputing the missing values, 
+for tree-based models, there are two better approaches. 
+The first is applicable to categorical predictors: 
+we simply make a new category for ``missing.'' 
+From this we might dis- cover that observations with missing values for some measurement 
+behave differently than those with nonmissing values. 
+The second more general approach is the 
+construction of surrogate variables. When considering a 
+predictor for a split, we use only the observations for which 
+that predictor is not missing. Having chosen the best (primary) 
+predictor and split point, we form a list of surrogate predictors 
+and split points.
+
+
+\begin{deff}{}
+
+\textbf{{\color{blue}{Sensitivity}}}: probability of predicting disease given true state is disease.
+
+\textbf{{\color{blue}{Specificity}}}: probability of predicting non-disease given true state is non- disease.
+\end{deff}
+
+\section{Boosting}
+A weak classifier is one whose error rate is only slightly 
+better than random guessing. The purpose of boosting 
+is to sequentially apply the weak classification algorithm 
+to repeatedly modified versions of the data, thereby producing 
+a sequence of weak classifiers $G_m(x)$, $m = 1, 2, . . . , M$.
+The predictions from all of them are then combined through a 
+weighted majority vote to produce the final prediction:
+\begin{equation}\label{eq:GeneralBoostingScheme}
+G(x) = sign \left(  \sum_{m=1}^M \alpha_m G_m(x)  \right).
+\end{equation}
+At step $m$, those observations that were misclassified by the 
+classifier $G_{m-1}(x)$ induced at the previous step have their 
+weights increased, whereas the weights are decreased for those 
+that were classified correctly. Thus as iterations proceed, observations 
+that are difficult to classify correctly receive ever-increasing influence.
+
+\begin{tcolorbox}
+%  \textbf{Algorithm for gradient descent with momentum is given below}
+  \begin{algorithm}[H]
+  \label{alg:AdaBoost_M1}
+   \caption{AdaBoost.M1.}
+   
+\SetAlgoLined
+% \KwResult{Faster convergence}
+1.  Initialize the observation weights $w_i = 1/N$, $i=1, 2, \dots, N$\;
+2. 
+ \For{m=1 to M}{
+  (a) Fit a classifier $G_m(x)$ to the training data using weights $w_i$.\;
+  (b) Compute
+  \[err_m = \frac{\sum_{i=1}^N w_i I(y_i \neq G_m(x_i))}{\sum_{i=1}^N w_i} \]  
+
+  (c) Compute $\alpha_m = log((1-err_m)/err_m)$\;
+  (d) Set $w_i \leftarrow w_i \cdot exp(\alpha_m I(y_i \neq G_m(x_i)))$\;
+ }
+ 
+3. Output $G(x) = sign\left[   \sum_{m=1}^M \alpha_m  G_m(x)\right]$
+\end{algorithm}
+\end{tcolorbox}
+The AdaBoost.M1 algorithm is known as ``Discrete AdaBoost'' 
+in Friedman et al. (2000), because the base classifier $G_m(x)$ 
+returns a discrete class label. If the base classifier instead returns a 
+real-valued prediction (e.g., a probability mapped to the interval [-1, 1] ), 
+AdaBoost can be modified appropriately (see ``Real AdaBoost'' in Friedman et al. (2000)).
+
+Let us rewrite the~\cref{eq:GeneralBoostingScheme} in the form of
+a way of fitting an additive expansion in a set of elementary ``basis'' functions:
+\begin{equation}
+f(x) = \sum_{m=1}^M \beta_m b(x ; \gamma_m)
+\end{equation}
+\marginnote{$\beta_m$, $m = 1,2, \dots,M$ are the expansion 
+coefficients $b(x;\gamma) \in \mathbb{R}$,  and are usually simple functions of the 
+multivariate argument $x$ characterized by a set of parameters $\gamma$.}
+These additive expansions are typically are fit by minimizing the 
+following (\cref{eq:ExpensiveAdditiveMinimizer}) that is computationally expensive. 
+\begin{equation}\label{eq:ExpensiveAdditiveMinimizer}
+\min_{\{\beta_m, \gamma_m\}_1^M} \sum_{i=1}^N L \left( y_i, \sum_{m=1}^M \beta_m b(x_i; \gamma_m)\right)
+\end{equation}
+However, a simple alternative often can be found when it is feasible to rapidly solve the subproblem of fitting just a single basis function,
+\begin{equation}\label{eq:CheapAdditiveMinimizer}
+\min_{\{\beta, \gamma\}} \sum_{i=1}^N L \left( y_i,  \beta b(x_i; \gamma)\right).
+\end{equation}
+
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%
+\section{Forward Stagewise Additive Modeling}
+\label{sec:Forward_Stagewise_Additive_Modeling}
+Forward stagewise modeling approximates the solution to~\cref{eq:ExpensiveAdditiveMinimizer}
+by sequentially adding new basis functions to the expansion 
+without adjusting the parameters and coefficients of those that 
+have already been added. This is outlined in 
+Algorithm~\ref{alg:Forward_Stagewise_Additive_Modeling}. At 
+each iteration $m$, one solves for the optimal basis function $b(x; \gamma_m) $
+and corresponding coefficient $\beta_m$ to add to the current expansion 
+$f_{m-1}(x)$. This produces $f_{m}(x)$, and the process is repeated. 
+Previously added terms are not modified.
+\begin{tcolorbox}
+  \begin{algorithm}[H]
+  \label{alg:Forward_Stagewise_Additive_Modeling}
+   \caption{Forward Stagewise Additive Modeling.}
+\SetAlgoLined
+\KwResult{Faster convergence/Cheaper Computation}
+1.  Initialize $f_0(x) = 0$.\;
+2. 
+ \For{m=1 to M}{
+  (a) Compute
+  \[ (\beta_m, \gamma_m) = \argmin_{\beta, \gamma} \sum_{i=1}^N L\left( y_i, f_{m-1}(x_i) + \beta b(x_i; \gamma)  \right) \]
+
+  (b) Set $f_{m}(x) = f_{m-1}(x) + \beta_m b(x; \gamma_m) $     \;
+ }
+\end{algorithm}
+\end{tcolorbox}
+
+AdaBoost.M1 (Algorithm~\ref{alg:AdaBoost_M1}) is equivalent to forward 
+stagewise additive modeling (Algorithm~\ref{alg:Forward_Stagewise_Additive_Modeling}) 
+using the exponential loss function:
+\begin{equation}
+\label{eq:AdaBoostExpLoss}
+L(y, f(x)) = exp(-y f(x)).
+\end{equation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Loss Functions and Robustness}
+\label{sec:Loss_Functions_and_Robustness}
+
+\subsection{Robust Loss Functions for Classification}
+\label{sec:Robust_Loss_Functions_for_Classification}
+
+In classification (with a -1/1 response) the margin 
+plays a role analogous to the residuals $y-f(x)$ in regression. 
+The classification rule $G(x) = sign[f(x)]$ implies that observations 
+with positive margin $y_i f(x_i) > 0$ are classified correctly whereas 
+those with negative margin $y_i f(x_i) < 0$ are misclassified
+
+
+\begin{marginfigure}[-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/exponentialLoss_DevianceLoss}
+\caption{Loss functions for two-class classification. 
+              The response is $y = \pm 1$; 
+              the prediction is $f$, with class prediction $sign(f)$.
+              The losses are \\
+              \emph{{\color{red}{misclassification}}}: $I(sign(f) \neq y)$; \\
+              \emph{{\color{red}{exponential}}}: $exp(-yf)$; \\
+              \emph{{\color{red}{binomial deviance}}}: $log \left( 1 + exp(-2yf)    \right)$; \\
+              \emph{{\color{red}{squared error}}}: $(y-f)^2$; and\\ 
+              \emph{{\color{red}{support vector}}}: $(1-yf)_+$.\\
+              Each function has been scaled so that 
+              it passes through the point.
+             }
+  \label{fig:exponentialLoss_DevianceLoss}
+\end{marginfigure}
+
+Both the exponential and deviance loss can 
+be viewed as monotone continuous approximations 
+to misclassification loss. They continuously penalize 
+increasingly negative margin values more heavily than 
+they reward increasingly positive ones. The difference 
+between them is in degree. The penalty associated with 
+binomial deviance increases linearly for large increasingly 
+negative margin, whereas the exponential criterion increases 
+the influence of such observations exponentially.
+
+
+At any point in the training process the exponential criterion 
+concentrates much more influence on observations with large 
+negative margins. Binomial deviance concentrates relatively 
+less influence on such observations, more evenly spreading 
+the influence among all of the data. It is therefore far more 
+robust in noisy settings where the Bayes error rate is not close 
+to zero, and especially in situations where there is misspecification 
+of the class labels in the training data. The performance of AdaBoost 
+has been empirically observed to dramatically degrade in such situations.
+
+Squared-error loss is not a good surrogate for misclassification error. 
+As seen in~\cref{fig:exponentialLoss_DevianceLoss}, it is not a monotone decreasing function of 
+increasing margin $y f(x)$. For margin values $y_i f(x_i) > 1$ it increases 
+quadratically, thereby placing increasing influence (error) on observations 
+that are correctly classified with increasing certainty, thereby reducing 
+the relative influence of those incorrectly classified $y_i f(x_i) < 0$. 
+Thus, if class assignment is the goal, a monotone decreasing criterion serves 
+as a better surrogate loss function. Figure~\ref{fig:HingeLoss} includes a 
+modification of quadratic loss, the ``Huberized''
+square hinge loss (Rosset et al., 2004b), which enjoys the favorable 
+properties of the binomial deviance, quadratic loss and the SVM 
+hinge loss. It has the same population minimizer as the quadratic 
+(10.19), is zero for $yf(x) > 1$, and becomes linear for $y f(x) < -1$. 
+Since quadratic functions are easier to compute with than exponentials, 
+our experience suggests this to be a useful alternative to the binomial deviance.
+\begin{marginfigure}[-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/HingeLoss}
+\caption{The support vector loss function (hinge loss), 
+             compared to the negative log-likelihood loss (binomial deviance) 
+             for logistic regression, squared-error loss, and a ``Huberized'' 
+             version of the squared hinge loss. All are shown as a function of 
+             $yf$ rather than $f$, because of the symmetry between the 
+             $ y = +1 $ and $y = -1$ case. The deviance and Huber have the same 
+             asymptotes as the SVM loss, but are rounded in the interior. 
+             All are scaled to have the limiting left-tail slope of -1.}
+  \label{fig:HingeLoss}
+\end{marginfigure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Robust Loss Functions for Regression}
+\label{sec:Robust_Loss_Functions_for_Regression}
+In the regression setting, analogous to the relationship 
+between exponential loss and binomial log-likelihood is the 
+relationship between squared-error loss 
+$L(y, f(x)) = (y - f(x))^2$ and absolute loss $L(y, f(x)) = \abs{y - f(x)}$
+The population solutions are $f(x) = E(Y | x)$ for squared-error 
+loss, and $f(x) = median(Y | x)$ for absolute loss; for symmetric 
+error distributions these are the same. However, on finite samples 
+squared-error loss places much more emphasis on observations 
+with large absolute residuals $\abs{y_i - f(x_i)}$ during the fitting process. 
+It is thus far less robust, and its performance severely degrades 
+for long-tailed error distributions and especially for grossly mis-measured
+y-values (``outliers''). Other more robust criteria, such as absolute loss, 
+perform much better in these situations. In the statistical robustness 
+literature, a variety of regression loss criteria have been proposed
+that provide strong resistance (if not absolute immunity) to gross
+outliers while being nearly as efficient as least squares for Gaussian
+errors. They are often better than either for error distributions with moderately heavy tails. One such criterion is the Huber loss criterion used for M-regression (Huber, 1964)
+\begin{equation}\label{eq:Huber_Loss}
+L(y, f(x)) = 
+\begin{cases} (y - f(x))^2            & \text{for }\abs{ y - f(x) } \leq \delta\\
+2 \delta \abs{ y - f(x) } - \delta^2 & o.w. \\
+\end{cases}
+\end{equation}
+
+\begin{marginfigure}[-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=\textwidth]{00_figures/Huber_Loss}
+\caption{A comparison of three loss functions for regression, 
+              plotted as a function of the margin $y - f$. The Huber loss 
+              function combines the good properties of squared-error 
+              loss near zero and absolute error loss when $\abs{ y - f}$ is large.}
+  \label{fig:Huber_Loss}
+\end{marginfigure}
+
+These considerations suggest that when robustness is 
+a concern, as is especially the case in data mining applications 
+(see Section 10.7), squared- error loss for regression and 
+exponential loss for classification are not the best criteria from a 
+statistical perspective. However, they both lead to the elegant 
+modular boosting algorithms in the context of forward stagewise 
+additive modeling. For squared-error loss one simply fits the base 
+learner to the residuals from the current model $y_i - f_{m-1}(x_i)$ at each step. 
+For exponential loss one performs a weighted fit of the base learner 
+to the output values $y_i$, with weights $w_i = exp(-y_i f_{m-1}(x_i))$. Using 
+other more robust criteria directly in their place does not give rise 
+to such simple feasible boosting algorithms. However, in Section 10.10.2 
+we show how one can derive simple elegant boosting algorithms 
+based on any differentiable loss criterion, thereby producing highly 
+robust boosting procedures for data mining.
+
+
+\subsection{Boosting Trees}
+\label{sec:Boosting Trees}
+A tree can be formally expressed as
+\begin{equation}
+T(x;\Theta) = \sum_{j=1}^J \gamma_j I(x \in R_j)
+\end{equation}
+with parameters $\Theta = \{  R_j, \gamma_j  \}_i^J$.
+$J$ is usually treated as a meta-parameter.
+The parameters are found by minimizing the empirical risk
+\begin{equation}
+\hat \Theta = \argmin_\Theta \sum_{j=1}^J \sum_{ x_i \in R_j} L(y_i, \gamma_j)
+\end{equation}
+This is a formidable combinatorial optimization problem, 
+and we usually settle for approximate suboptimal solutions. 
+It is useful to divide the optimization problem into two parts: 
+Finding $\gamma_j$ given $R_j$ and Finding $R_j$.
+
+The boosted tree model is a sum of such trees,
+\begin{equation}
+f_M(x) =  \sum_{m=1}^M T(x;\Theta_m)
+\end{equation}
+induced in forward stagewise manner. At each step in 
+the forward stagewise procedure one must solve
+\begin{equation}\label{eq:ForwardStagewiseBoostTree}
+\hat \Theta_m = \argmin_{\Theta_m} \sum_1^N L\left(y_i, f_{m-1}(x_i) + T(x_i; \Theta_m) \right)
+\end{equation}
+for the region set and constants $\Theta_m = \{R_{jm}, \gamma_{jm} \}_1^{J_m}$ 
+of the next tree, given the current model $f_{m-1}(x)$.
+
+Given $R_{jm}$ finding $\gamma_{jm}$ is straightforward. Finding $R_{jm}$ is difficult.
+For squared-error loss, the solution to~\cref{eq:ForwardStagewiseBoostTree}
+is no harder than for a single tree. It is simply the regression tree that best 
+predicts the current residuals $y_i - f_{m-1}(x_i)$, 
+and $\hat \gamma_{jm}$ is the mean of these residuals in each
+region. For two-class classification and exponential loss, this 
+stagewise approach gives rise to the AdaBoost method for boosting classification 
+trees.
+
+Using loss criteria such as the absolute error or the Huber 
+loss (\ref{eq:Huber_Loss}) in place of squared-error loss for regression, 
+and the deviance (10.22 on page 349 of Tibshirani's~\cite{Hastie2001elements}) 
+in place of exponential loss for classification, will serve to robustify boosting trees. 
+Unfortunately, unlike their nonrobust counterparts, these robust 
+criteria do not give rise to simple fast boosting algorithms.\\
+
+{\color{red}{\textbf{Right-Sized Trees for Boosting}}}
+Although in many applications $J=2$ (number of terminal nodes)
+\marginnote{See page 362 of Tibshirani's~\cite{Hastie2001elements}} 
+will be insufficient, it is unlikely that $J > 10$ will be required. 
+Experience so far indicates that $ 4 \leq J \leq 8$  works well in 
+the context of boosting, with results being fairly insensitive to particular 
+choices in this range. One can fine-tune the value for J by trying several 
+different values and choosing the one that produces the lowest risk on 
+a validation sample. However, this seldom provides significant 
+improvement over using $J \approx 6$.
+
+
+\section{Regularization}
+\label{sec:boostingTreeRegularization}
+Besides the size of the constituent trees, $J$, the other 
+meta-parameter of gradient boosting is the number 
+of boosting iterations M. Each iteration usually reduces 
+the training risk $L(f_M )$, so that for M large enough this risk 
+can be made arbitrarily small. However, fitting the training data 
+too well can lead to overfitting, which degrades the risk on 
+future predictions. Thus, there is an optimal number $M^*$ minimizing future 
+risk that is application dependent. A convenient way to estimate $M^*$ 
+is to monitor prediction risk as a function of $M$ on a validation sample. 
+The value of M that minimizes this risk is taken to be an estimate 
+of $M^*$. This is analogous to the early stopping strategy often used 
+with neural networks (Section 11.4).
+
+\section{Shrinkage}
+\label{sec:boostingTreeShrinkage}
+Controlling the value of $M$ is not the only possible 
+regularization strategy. As with ridge regression, shrinkage 
+techniques can be employed as well. The simplest implementation 
+of shrinkage in the context of boosting is to scale the contribution 
+of each tree by a factor $0 < \nu < 1$:
+\begin{equation}
+f_m(x) = f_{m-1}(x) + \nu \cdot \sum_{j=1}^J \gamma_{jm} I(x_i \in R_{jm})
+\end{equation}
+Empirically it has been found (Friedman, 2001) 
+that smaller values of $\nu$ favor better test error, and 
+require correspondingly larger values of $M$. In fact, the 
+best strategy appears to be to set $nu$ to be very small ($nu < 0.1$)
+and then choose $M$ by early stopping. This yields dramatic 
+improvements (over no shrinkage $nu = 1$) for regression and for probability estimation
+
+\section{Subsampling}
+\label{sec:BoostingTreeSubsampling}
+We saw in Section 8.7 that bootstrap averaging 
+(bagging) improves the performance of a noisy 
+classifier through averaging. Chapter 15 discusses 
+in some detail the variance-reduction mechanism of 
+this sampling followed by averaging. We can exploit the 
+same device in gradient boosting, both to improve performance 
+and computational efficiency.
+
+With stochastic gradient boosting (Friedman, 1999), at each 
+iteration we sample a fraction $\eta$ of the training observations 
+(without replacement), and grow the next tree using that subsample. 
+The rest of the algorithm is identical. A typical value for 
+$\eta$ can be $1/2$, although for large $N$, $\eta$ can be 
+substantially smaller than $1/2$ .
+
+\section{Interpretation}
+\label{sec:Interpretation}
+
+\subsection{Relative Importance of Predictor Variables}
+\label{sec:Relative_Importance}
+
+

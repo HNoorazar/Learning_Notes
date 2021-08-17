@@ -1,0 +1,49 @@
+\section{Generalized Additive Models}
+\label{sec:Generalized_Additive_Models}
+
+
+In the regression setting, a generalized 
+additive model has the form
+\begin{equation}
+E[Y|X_1, X_2, \dots, X_p] = \alpha + f_1(X_1) + f_2(X_2) + \dots + f_p(X_p)
+\end{equation}
+where $f_i(X_i)$s are unspecified smooth 
+(``nonparametric'') functions where each function is fit 
+using a scatterplot smoother (e.g., a cubic smoothing spline or 
+kernel smoother). 
+% and we provide an algorithm for simultaneously estimating all $p$ functions
+
+
+In two-class classification setting, a generalized 
+additive model (additive logistic regression) has the form
+\begin{equation}
+log\left( \frac{\mu(X)}{1-\mu(X)} \right) = \alpha + f_1(X_1) + f_2(X_2) + \dots + f_p(X_p)
+\end{equation}
+where $\mu(X) = Pr(Y = 1 | X)$.
+In general, the conditional mean $\mu(X)$ of a response 
+$Y$ is related to an additive function of the predictors 
+via a link function $g$:
+\begin{equation}
+g(\mu(X)) = \alpha + f_1(X_1) + f_2(X_2) + \dots + f_p(X_p).
+\end{equation}
+
+Examples of $g$ are $g(\mu) = \mu$, $g(\mu) = logit(\mu)$, $g(\mu) = log(\mu)$.
+
+
+\subsection{Fitting Additive Models}
+\label{sec:Fitting_Additive_Models}
+In this section we describe a modular algorithm 
+for fitting additive models and their generalizations. The 
+building block is the scatterplot smoother for fitting nonlinear 
+effects in a flexible way. For concreteness\marginnote{what the hell does correctness mean?} we use as our 
+scatterplot smoother the cubic smoothing spline.
+
+The point, here, is that scatterplot smoothing is not a
+specific technique. It is an umbrella for a variety
+of techniques that one is used in the Tibshirani's book (see page 297 of Tibshirani's book).
+
+
+
+
+
+
