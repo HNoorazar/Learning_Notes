@@ -57,3 +57,83 @@ do not occur and we get quadratic discriminant analysis:
 \delta_k = log\left(\pi_k\right) - \frac{1}{2}\left(x-\mu_k\right)^T\mathbf{\Sigma}_k^{-1}\left(x-\mu_k\right) - \frac{1}{2}log\left(|\mathbf{\Sigma}_k|\right)
 \end{equation}
 
+Both LDA and QDA perform well on an amazingly 
+large and diverse set of classification tasks. For example, 
+in the STATLOG project (Michie et al., 1994) LDA 
+was among the top three classifiers for 7 of the 22 
+datasets, QDA among the top three for four datasets, 
+and one of the pair were in the top three for 10 datasets. 
+Both techniques are widely used, and entire books 
+are devoted to LDA. It seems that whatever exotic tools 
+are the rage of the day, we should always have available 
+these two simple tools. The question arises why LDA and 
+QDA have such a good track record. The reason is not likely 
+to be that the data are approximately Gaussian, and in 
+addition for LDA that the covariances are approximately 
+equal. More likely a reason is that the data can only 
+support simple decision boundaries such as linear or 
+quadratic, and the estimates provided via the Gaussian 
+models are stable. This is a bias variance tradeoff—we 
+can put up with the bias of a linear decision boundary 
+because it can be estimated with much lower variance
+than more exotic alternatives. This argument is less 
+believable for QDA, since it can have many parameters 
+itself, although perhaps fewer than the non-parametric alternatives.
+We will see generalization of LDA 
+in~\cref{sec:Generalizing_Linear_Discriminant_Analysis}.\\
+
+Some of the virtues of LDA are as follows:
+\begin{itemize}
+\item It is a simple prototype classifier. A new observation 
+is classified to the class with closest centroid. 
+A slight twist is that distance is measured in the 
+Mahalanobis metric, using a pooled covariance estimate.
+
+\item LDA is the estimated Bayes classifier if the 
+observations are multi- variate Gaussian in each 
+class, with a common covariance matrix. Since this 
+assumption is unlikely to be true, this might not seem 
+to be much of a virtue.
+\item The decision boundaries created by LDA are 
+linear, leading to decision rules that are simple to 
+describe and implement.
+
+\item LDA provides natural low-dimensional views of the data.
+
+\item Often LDA produces the best classification 
+results, because of its simplicity and low variance. 
+LDA was among the top three classifiers for 7 of the 22 
+datasets studied in the STATLOG 
+project~\cite{michie1994machine}.
+\end{itemize}
+Unfortunately the simplicity of LDA causes it to fail in 
+a number of situations as well:
+\begin{itemize}
+\item Often linear decision boundaries do not 
+adequately separate the classes. When $N$ is large, 
+it is possible to estimate more complex decision 
+boundaries. Quadratic discriminant analysis (QDA) 
+is often useful here, and allows for quadratic 
+decision boundaries. More generally we would 
+like to be able to model irregular decision boundaries.
+
+\item The aforementioned shortcoming of LDA 
+can often be paraphrased by saying that a 
+single prototype per class is insufficient. LDA 
+uses a single prototype (class centroid) plus a 
+common covariance matrix to describe the 
+spread of the data in each class. In many 
+situations, several prototypes are more appropriate.
+
+\item At the other end of the spectrum, we 
+may have way too many (correlated) predictors, 
+for example, in the case of digitized analogue 
+signals and images. In this case LDA uses too 
+many parameters, which are estimated with high 
+variance, and its performance suffers. In cases such 
+as this we need to restrict or regularize LDA even further.
+\end{itemize}
+
+
+
+
