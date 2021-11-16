@@ -1,0 +1,100 @@
+\section{SVM Overview}
+\label{sec:SVMOverview}
+We will be diving into the book of Steinwart\cite{steinwart2008support} now.
+Let us start by defining some notations used in this\cite{steinwart2008support} book.
+They define the training set by $D = ((x_1, y_1), (x_2, y_2), \dots, (x_n, y_n))$.
+However, I will stick to the notation used before; 
+$\tau = \{(x_1, y_1), (x_2, y_2), \dots, (x_n, y_n)\}$. We want to learn a function
+$\hat f:X \rightarrow Y$ such that $f(x)$ is good approximation for $y$ to an arbitrary $x$.
+Again I will use the notation $y=f(x)$ and our estimation (in my notes) 
+is denoted by $\hat f$. 
+The pair $(x, y)$ is generated in two steps; first $x$ is generated 
+according to the marginal distribution $P_{X}$ and then the
+output $y$ is generated according to the conditional probability $P(.|x)$.
+The quality measure, \emph{loss function}, is a non-negative real number $L(x, y, \hat f(x))$; $L : X \times Y \times \hat f(x) \rightarrow [0, \infty)$. In statistical learning theory, one usually measures
+how small the function $(x, y) \rightarrow L(x, y, \hat f(x))$ is by considering the 
+expected loss of $\hat f$:
+\begin{equation}
+\label{eq:expectedLossf}
+\mathcal{R}_{L, P}(\hat f) = \int_{X \times Y} L(x, y, \hat f(x)) dP(x, y) =  \int_{X} \int_{Y} L(x, y, \hat f(x)) dP(y|x) dP_X,
+\end{equation}
+which is called the \emph{risk} of $\hat f$.
+
+In a regression problem, suppose median or mean of the \emph{unknown}
+distribution $P(.|x)$ is denoted by $f(x)$\marginnote{In the book~\citep{steinwart2008support} the
+real quantity we want is denoted by $f^*$, but I will use just $f$.}, then we can write:
+\begin{equation}
+L_P(x, y, \hat f(x)) = |f(x) - \hat f(x)| ^ p,
+\end{equation}
+where $p>0$. Then the average loss (the risk) of an estimator $\hat f$ then becomes
+\begin{equation}
+\mathcal{R}_{L_p, P}(\hat f) = \int_{X} |f(x) - \hat f(x)| ^ p dP_X(x),
+\end{equation}
+which looks reasonable with clear intuition behind it. And we cannot actually
+compute $L_p$ since we do not know the actual $f$. 
+\marginnote{There is no natural choice for $p$. $p=2$ is in some sense a canonical choice
+for estimating conditional mean (of $y$'s at a given $x$) and under some relatively mild
+assumptions on the conditional distribution $P(.|x)$, $p=1$ is the right choice for estimating the median.}
+
+We can now define the smallest possible risk:
+\begin{equation}
+\mathcal{R}^*_{L, P} = \inf_{\hat f : X \rightarrow \mathbb{R}} \mathcal{R}_{L, P}(\hat f)
+\end{equation}
+\noindent where the infimum is taken over the set of all possible functions. 
+Note that considering all possible functions is in general necessary 
+since we do not make assumptions on the distribution $P$. 
+Nevertheless, for particular loss functions, we can actually consider 
+smaller sets of functions without changing the quantity $\mathcal{R}^*_{L, P}$. 
+\marginnote{For example, in the scenario where we wish to assign ASCII 
+codes to digitalized images, it clearly makes no difference whether 
+we consider all functions or just all functions that take values in 
+the ASCII codes of interest.}
+
+If our estimate function is based on a given training set
+$\tau$ then we denote the estimate by $\hat f_\tau : X \rightarrow \mathbb{R}$ and whose
+risk $\mathcal{R}_{L, P}(\hat f_\tau)$ is close to the minimal risk $\mathcal{R}^*_{L, P}$.
+
+\begin{deff}{}
+\textbf{Universal consistency} requires that for all distributions $P$ on $X \times Y$,
+the functions $\hat f_\tau$ produced by learning method satisfy
+\begin{equation}
+\mathcal{R}_{L, P}(\hat f_\tau) \rightarrow \mathcal{R}^*_{L, P}, \hspace{.2in} n \rightarrow \infty
+\end{equation}
+\end{deff}{}
+in probability.\marginnote{This seems to be shooting for starts, but, for some certain 
+loss functions such methods exist.}\\
+
+Let us assume that the loss function depends on $x$ only 
+through $f(x)$; $L(x, y, f(x)) \equiv L(y, f(x))$ and focus on binary classification.
+The classification loss function commonly used in binary classification only penalized
+misclassifications; $L_{class} = 1$ if $\text{sign}(f(x)) \neq y$.
+
+The goal is to find a function $f^*$ that minimizes the risk function; 
+\begin{equation}\label{eq:ClassificationRisk}
+\mathcal{R}^*_{L,P} = \inf_{\hat f:X \rightarrow \mathbb{R}} \mathcal{R}_{L,P}(\hat f).
+\end{equation}
+Of course we cannot \emph{find} $f^*$ since the distribution $P$ of input and output is
+unknown. Consequently, we replace
+$\mathcal{R}_{L,P}$ in~\cref{eq:ClassificationRisk} by its empirical 
+counterpart
+\begin{equation}\label{eq:EmpiricalClassificationRisk}
+\mathcal{R}_{L, D} = \frac{1}{n} \sum_{i=1}^n L(y_i, \hat f(x_i)).
+\end{equation}
+
+Unfortunately, however, even though the law of large numbers shows
+that $\mathcal{R}_{L, D}$ is an approximation of $\mathcal{R}_{L, P}$
+for each single $f$, solving 
+\begin{equation}\label{eq:infRLD}
+\inf_{\hat f: X \rightarrow \mathbb{R}} \mathcal{R}_{L, D} (\hat f)
+\end{equation}
+\noindent does not in general lead to an approximate minimizer of $\mathcal{R}_{L, P}(.)$. 
+To see this, consider the function that classifies all $x_i$ in $D$ 
+correctly but equals 0 everywhere else. Then this function is clearly a 
+solution of~\ref{eq:infRLD}, but since this function only memorizes $D$, it is 
+in general a very poor approximation of~\ref{eq:ClassificationRisk} (overfitting).
+
+
+
+
+
+
