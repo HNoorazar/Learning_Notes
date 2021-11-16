@@ -40,10 +40,262 @@ scatterplot smoother the cubic smoothing spline.
 
 The point, here, is that scatterplot smoothing is not a
 specific technique. It is an umbrella for a variety
-of techniques that one is used in the Tibshirani's book (see page 297 of Tibshirani's book).
+of techniques that one is used in the Tibshirani's book (see page 297 of Tibshirani's book).\\
+
+\subsection{Smoothing}
+\label{sec:Smoothing}
+A\marginnote{From this point on most thing in this chapter
+will be from Hastie and Tibshirani's book; Generalized 
+Additive Models~\citep{hastiegeneralized}.} \emph{smoother} 
+is a tool for summarizing the trend of a response
+measurement $Y$ as a function of one or more predictor measurements
+$X_1, X_2, \dots X_p$. Smoother is nonparametric. Examples of 
+smoothers are running mean, locally-weighted running-line, 
+kernel and cubic spline smoothers.
+The result of a smoother is called a \emph{smooth}.
+In case of having a single variable the smoother is called a \emph{scatterplot smoother}.
+
+Simples case of smoother is when we have categorial variables; e.g. for males 
+and females just average the $Y$ values. In case of continuous ordered
+predictor $X$ we are doing the same thing except that we do not have
+multiple $Y$ values for a given $X$. So, we compromise. The averaging
+is done in neighborhoods and decisions have to be made\marginnote{The book makes this statement about scatterplot smoothing (i.e. single variable case)! I do not know why.}:
+\begin{enumerate}
+\item how to average the response values in each neighborhood,
+\item how big each neighborhood should be.
+\end{enumerate}
+Formal recommendations on which smoother one should
+use is hard; not too much study in that area by 1990 when the 
+book was written. For the second decision, a big neighborhood
+will have low variance and potentially high bias and conversely for
+small neighborhoods. The size of neighborhood should be an adjustable
+parameter of the smoother.
+
+\subsection{Kernel Smoother}
+\label{sec:KernelSmoother}
+A scatterplot smoother is defined to be a function of
+$\mathbf{x}$ and $\mathbf{y}$, whose result is a function
+$s$ with the same domain as the values in $\mathbf{x}$:
+$\hat f(x_0) = s = \mathcal{S}(\mathbf{y} | \mathbf{x})$. Usually the recipe that
+defined $s(x_0) = \hat f(x_0)$, which is the function $\mathcal{S}(\mathbf{y} | \mathbf{x})$
+evaluated at $x_0$, is defined for all $x_0$, but at other times is defined only
+at $x_1, x_2, \dots, x_n$, the sample values of $X$.
+
+Categorical smoother takes average of $Y$ values in each category.
+Bin smoothers, also known as regressograms,  
+take similar approach; they divide the domain into 
+disjoint and exhaustive regions and take averages in each region.
+In order to make the result somewhat more smooth one can
+consider overlapping partitions of the predictor domain.
+
+For running-mean and running line smoothers please see~\citep{hastiegeneralized},
+pages 15 through 17.
+
+Kernel smoothers use an explicitly defined set of local weights,
+defined by kernel, to produce the estimate at each target value.
+The weights are chosen so that they decrease smoothly as
+one moves away from a target point. The weight given to the $j$th point
+in producing the estimate at $x_0$ is defined by:
+\begin{equation}\label{eq:generalKernelSmoothFunc}
+S_{0j} = \frac{c_0}{\lambda}d \left( \abs{\frac{x_0 - x_j}{\lambda}} \right)
+\end{equation}
+where $d(t)$ is an even function decreasing in $\abs{t}$.
+The parameter $\lambda$ is the window-width, also known as 
+the bandwidth, and the constant $c_0$ is usually chosen so that the weights
+sum to unity. Research has shown that the bandwidth is more important than
+the choice of the kernel function. Some popular kernel functions are
+Gaussian kernel smoother, 
+Epanechnikov kernel~\ref{eq:EpanechnikovKernelSmoother} which minimizes 
+(asymptotic) mean squared
+error, and the minimum variance kernel~\ref{eq:varianceKernelSmoother} 
+which minimizes the asymptotic variance of the estimate.
+
+\begin{equation}\label{eq:EpanechnikovKernelSmoother}
+d(t) = 
+\begin{cases} \frac{3}{4}(1-t^2)            & \text{for }\abs{t} \leq 1\\
+0 & o.w. \\
+\end{cases}
+\end{equation}
+
+\begin{equation}\label{eq:varianceKernelSmoother}
+d(t) = 
+\begin{cases} \frac{3}{8}(3 - 5t^2) & \text{for }\abs{t} \leq 1 \\
+0 & o.w. \\
+\end{cases}
+\end{equation}
+
+Kernel smoothers also exhibit biased endpoint behavior.
+Special kernels are designed to overcome this problem. A simple
+approach is to use kernel weights in a locally-weighted straight-line fit.
+
+\subsection{Smoothing in Detail}
+\label{sec:SmoothinginDetail}
+In previous sections no relation between $Y$ and $X$
+was assumed. Now we start to make such assumptions to
+study  deeper. Assume 
+\begin{equation}\label{eq:GAMFirstAss}
+Y = f(X) + \varepsilon
+\end{equation}
+\noindent where errors are independent with $E[\varepsilon] = 0$ and 
+$var(\varepsilon) = \sigma^2$\marginnote{The assumption of constant variance 
+will be relaxed in weighted smoother discussions}. The goal of the 
+model \ref{eq:GAMFirstAss} is $E[Y|X=x] = f(x)$. It is easier to see why 
+running-mean and locally-weighted running-lines's estimations ($\hat f(x)$) 
+are intended to be close to $E[Y|X=x]$; they are averaging $f(x)$'s. 
+In case of cubic smoothing splines\marginnote{from now on referred to just 
+by smoothing splines} it can be shown that as $n \rightarrow \infty$ and
+$\lambda  \rightarrow 0$, under certain regularity conditions, 
+$\hat f(x) \rightarrow f(x) = E[Y|X=x]$.
 
 
+\begin{description}
+\item [Cross Validation]
+
+Let us introduce some definitions here.
+
+\begin{deff}{}
+Average mean-squared error
+\begin{equation}\label{eq:MSE}
+MSE(\lambda) = \frac{1}{n} \sum_{i=1}^n E\left[  \left(\hat f_{\lambda}(x_i) - f(x_i) \right)^2 \right]
+\end{equation}
+\end{deff}{}
+
+\begin{deff}{}
+Average predictive squared error
+\begin{equation}\label{eq:PSE}
+PSE(\lambda) = \frac{1}{n} \sum_{i=1}^n E\left[  \left( Y_i^* - \hat f_{\lambda}(x_i)  \right)^2  \right]
+\end{equation}
+where $Y_i^* = f(x_i) + \varepsilon_i^*$ where $\varepsilon_i^*$ is independent
+of $\varepsilon_i$. ($PSE = MSE + \sigma^2$)
+\end{deff}{}
+
+\begin{deff}{}
+\begin{equation}\label{eq:CVLOO}
+CV(\lambda) = \frac{1}{n} \sum_{i=1}^n  \left( y_i - \hat f_\lambda^{-i}(x_i) \right)^2
+\end{equation}
+\end{deff}{}
 
 
+\begin{deff}{}
+Average squared residual
+\begin{equation}\label{eq:ASR}
+ASR = \frac{1}{n} \sum_{i=1}^n  \left( y_i - \hat f_\lambda(x_i) \right)^2
+\end{equation}
+is naive estimate of PSE which is not a good estimate.
+\marginnote{They say: We should expect this (not being good estimate) intuitively 
+because minimizing $ASR$ over the smoothing parameter leads to $\hat f(x_i) = y_i$. 
+But how? why?}
+\end{deff}{}
+
+
+\item [The bias-variance trade-off for linear smoothers]
+
+A linear is smoother if 
+$\mathcal{S}(a\mathbf{y}_1 + b\mathbf{y}_2) = a\mathcal{S}(\mathbf{y}_1) + b\mathcal{S}(\mathbf{y}_2)$. If we focus on the fit at observed points $x_i$ we have $\mathbf{\hat f = Sy}.$
+
+Consider a linear smoother $\mathbf{\hat f}_\lambda = \mathbf{S}_\lambda \mathbf{y}$ and
+let $\mathbf{b}_\lambda = \mathbf{f} - E[\mathbf{S}_\lambda \mathbf{y}] = \mathbf{f} - \mathbf{S}_\lambda \mathbf{f}$ denote the bias vector. Then we have
+
+\begin{equation}
+\begin{aligned}
+MSE(\lambda) &=  \frac{1}{n} \sum_{i=1}^n var(\hat f_{\lambda_i}) + \frac{1}{n}\sum_{i=1}^n b_{\lambda_i}^2\\
+&= \frac{tr\left( \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)}{n} \sigma^2 + \frac{\mathbf{b}_\lambda^T\mathbf{b}_\lambda}{n}\\
+PSE(\lambda) &= \sigma^2 \left( 1 + \frac{tr\left( \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)}{n}  \right) + \frac{\mathbf{b}_\lambda^T\mathbf{b}_\lambda}{n}
+\end{aligned}
+\end{equation}
+\hl{In case of least-square regression,} $\mathbf{S}_\lambda$ is idemponent so that
+$tr\left( \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right) = tr\left( \mathbf{S}_\lambda \right) = rank(\mathbf{S}_\lambda )$ which is the number of linearly 
+independent predictors in the model.
+
+\item [Cross-Validation for Linear Smoothers] After a series of equations
+that I cannot follow (page 47 of the book) we have:
+\begin{equation}
+E[CV(\lambda)] \approx PSE(\lambda) + \frac{2}{N} \sum_{i=1}^N S_{ii}b_i^2(\lambda)
+\end{equation}
+\hl{Thus, $CV(\lambda)$ adjusts $ASR(\lambda)$} so that in expectation the variance term
+is correct but in doing so induces an error of $2S_{ii}(\lambda)$ into each 
+of the bias contributions.
+
+\item [$C_p$ Statistics] A more direct way of estimating $PSE$ is
+to correct the average squared residual $ASR$. It is easy to show that
+\begin{equation}
+\label{eq:ASRExpect}
+E[ASR(\lambda)] = \sigma^2 \left( 1 - \frac{tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)}{N} \right) + \frac{\mathbf{b}_\lambda^T \mathbf{b}_\lambda}{N}.
+\end{equation}
+From this we see that $E[ASR(\lambda)]$ differs from $PSE(\lambda)$ by
+$2\sigma^2 tr(\mathbf{S}_\lambda)/N$. Since we do not know $\sigma^2$
+we \hl{might} use 
+\begin{equation*} 
+\hat \sigma^2 = RSS(\lambda^*) \big{/} [ N - tr(2 \mathbf{S}_{\lambda^*}  - \mathbf{S}_{\lambda^*} \mathbf{S}_{\lambda^*} ^T  )   ]
+\end{equation*}
+where $RSS(\lambda^*)$ is the residual sum of squares from a smooth
+$\mathbf{S}_{\lambda^*} \mathbf{y}$ that does relatively little smoothing.
+
+\hl{Other estimates of $\sigma$ is proposed} based on differences of adjacent $Y$
+values. The result is a form of the so-called Mallow's $C_p$ statistic
+\begin{equation*} 
+C_p(\lambda) = ASR(\lambda)  + 2 tr(\mathbf{S}_{\lambda}) \hat \sigma^2/N.
+\end{equation*}
+
+\item [Generalized CV] On page 51 of GAM book\cite{hastiegeneralized}: 
+``For linear smoothers there is little to choose between $C_p$ and cross-validation. 
+For non-linear smoothers the cross-validation is the only simple method available for
+smoothing parameter selection.''
+\end{description}
+
+
+\begin{deff}{}
+Popular definitions of degree of freedom for a linear smoother are
+\begin{equation}\label{eq:dfPop}
+\begin{cases} 
+tr(\mathbf{S}_\lambda)\\
+N - tr(2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T) \\
+tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T)
+\end{cases}
+\end{equation}
+\end{deff}{}
+\noindent For the first $df$ definition they say that both $\lambda$ and
+training samples (but not $y_i$'s) play a role in determining $df$.
+Mostly the $\lambda$ and a small role the training sample have.
+Moreover, all these definitions can be motivated by analogy
+with the linear regression model and are useful for different purposes.
+(At this point I do not know about the different purposes!)
+They can be extended for non-linear models where the $df$
+might also depend on distribution of $Y$.
+
+To be more specific, assume $Y_i = f(X_i) + \varepsilon_i$
+where $\varepsilon_i$s are i.i.d with mean zero and variance $\sigma^2$.
+Then $df = tr(\mathbf{S}_\lambda)$ can be motivated as the $C_p$
+correction for $ASR$.\marginnote{Or mean squared error. In this 
+book they use mean squared error at a given point $x_i$ with 
+different $y_i$'s. And then average of those MSEs is referred to ASR.\\}
+In particular, $C_p$ corrects $ASR$ to make it unbiased for $PSE$ by adding
+$2tr(\mathbf{S}_\lambda) \hat \sigma^2/N$.\marginnote{$df = tr(\mathbf{S}_\lambda)$
+is also popular in smoothing spline literature where $\mathbf{S} \sigma^2$ appears
+as posterior covariance of $\mathbf{f}$, after appropriate Bayesian assumptions
+are made. These assumptions can be found in Section 3.6 and Excercise 3.14}
+
+From~\cref{eq:ASRExpect} we have
+\begin{equation}
+\label{eq:RSSExpect}
+E[RSS(\lambda)] = \sigma^2 \left( N - tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right) \right) + \mathbf{b}_\lambda^T \mathbf{b}_\lambda,
+\end{equation}
+which is motivation for defining degrees of freedom of error as
+\begin{equation}
+\label{eq:errorDF}
+df^{err} (\lambda) =  N - tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)
+\end{equation}
+since in the linear regression case this is $N-p$ where $p$ is number of parameters.
+For a general (non-linear) smoother $df^{err} (\lambda) = N - E[\sum_{i=1}^N y_i^2 - RSS(\lambda)]$.
+
+In a linear model $ \sum_{i=1}^N var[\hat f_\lambda(x_i)] = p\sigma^2$.
+For a linear smoother $\mathbf{\hat  f}_\lambda = \mathbf{S}_\lambda \mathbf{y}$
+and the sum of variances is $tr(\mathbf{S}_\lambda\mathbf{S}_\lambda^T)\sigma^2$.
+Consequently, we have
+\begin{equation}
+\label{eq:dfVar}
+df^{var} (\lambda) = tr(\mathbf{S}_\lambda\mathbf{S}_\lambda^T)
+\end{equation}
+For a general (non-linear) smoother $df^{var} (\lambda) = \frac{\sum_{i=1}^N var[\hat f_\lambda(x_i)] }{\sigma^2}$.
 
 
