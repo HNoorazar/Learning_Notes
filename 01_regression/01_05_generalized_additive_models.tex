@@ -243,6 +243,8 @@ For non-linear smoothers the cross-validation is the only simple method availabl
 smoothing parameter selection.''
 \end{description}
 
+\subsection{Degrees of Freedom of a Smoother}
+\label{sec:Degrees_of_Freedom_of_a_Smoother}
 
 \begin{deff}{}
 Popular definitions of degree of freedom for a linear smoother are
@@ -254,23 +256,25 @@ tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T)
 \end{cases}
 \end{equation}
 \end{deff}{}
-\noindent For the first $df$ definition they say that both $\lambda$ and
-training samples (but not $y_i$'s) play a role in determining $df$.
+\noindent For the first $\df$ definition--at least for $tr(\mathbf{S}_\lambda)$--
+they say that both $\lambda$ and
+training samples (but not $y_i$'s) play a role in determining $\df$.
 Mostly the $\lambda$ and a small role the training sample have.
 Moreover, all these definitions can be motivated by analogy
 with the linear regression model and are useful for different purposes.
-(At this point I do not know about the different purposes!)
+\marginnote{In section 3.9 of the book they show how $\df^{err}$ arises in
+assessment of variance $\hat \sigma^2$ and for comparing models.}
 They can be extended for non-linear models where the $df$
 might also depend on distribution of $Y$.
 
 To be more specific, assume $Y_i = f(X_i) + \varepsilon_i$
 where $\varepsilon_i$s are i.i.d with mean zero and variance $\sigma^2$.
-Then $df = tr(\mathbf{S}_\lambda)$ can be motivated as the $C_p$
+Then $\df = tr(\mathbf{S}_\lambda)$ can be motivated as the $C_p$
 correction for $ASR$.\marginnote{Or mean squared error. In this 
 book they use mean squared error at a given point $x_i$ with 
 different $y_i$'s. And then average of those MSEs is referred to ASR.\\}
 In particular, $C_p$ corrects $ASR$ to make it unbiased for $PSE$ by adding
-$2tr(\mathbf{S}_\lambda) \hat \sigma^2/N$.\marginnote{$df = tr(\mathbf{S}_\lambda)$
+$2tr(\mathbf{S}_\lambda) \hat \sigma^2/N$.\marginnote{$\df = tr(\mathbf{S}_\lambda)$
 is also popular in smoothing spline literature where $\mathbf{S} \sigma^2$ appears
 as posterior covariance of $\mathbf{f}$, after appropriate Bayesian assumptions
 are made. These assumptions can be found in Section 3.6 and Excercise 3.14}
@@ -283,10 +287,10 @@ E[RSS(\lambda)] = \sigma^2 \left( N - tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_
 which is motivation for defining degrees of freedom of error as
 \begin{equation}
 \label{eq:errorDF}
-df^{err} (\lambda) =  N - tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)
+\df^{err} (\lambda) =  N - tr\left( 2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T \right)
 \end{equation}
 since in the linear regression case this is $N-p$ where $p$ is number of parameters.
-For a general (non-linear) smoother $df^{err} (\lambda) = N - E[\sum_{i=1}^N y_i^2 - RSS(\lambda)]$.
+For a general (non-linear) smoother $d\!f^{err} (\lambda) = N - E[\sum_{i=1}^N y_i^2 - RSS(\lambda)]$.
 
 In a linear model $ \sum_{i=1}^N var[\hat f_\lambda(x_i)] = p\sigma^2$.
 For a linear smoother $\mathbf{\hat  f}_\lambda = \mathbf{S}_\lambda \mathbf{y}$
@@ -294,8 +298,13 @@ and the sum of variances is $tr(\mathbf{S}_\lambda\mathbf{S}_\lambda^T)\sigma^2$
 Consequently, we have
 \begin{equation}
 \label{eq:dfVar}
-df^{var} (\lambda) = tr(\mathbf{S}_\lambda\mathbf{S}_\lambda^T)
+\df^{var} (\lambda) = tr(\mathbf{S}_\lambda\mathbf{S}_\lambda^T)
 \end{equation}
-For a general (non-linear) smoother $df^{var} (\lambda) = \frac{\sum_{i=1}^N var[\hat f_\lambda(x_i)] }{\sigma^2}$.
+For a general (non-linear) smoother $\df^{var} (\lambda) =  \sigma^{-2} \sum_{i=1}^N var[\hat f_\lambda(x_i)]$.
+
+If $\mathbf{S}$ is symmetric then $tr(\mathbf{S}_\lambda) = tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T) = tr(2\mathbf{S}_\lambda - \mathbf{S}_\lambda\mathbf{S}_\lambda^T)$ 
+which is the case for linear and polynomial regression smoothers as well as
+regression splines.
+
 
 
