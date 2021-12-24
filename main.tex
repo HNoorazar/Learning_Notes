@@ -71,6 +71,10 @@
 \usepackage{tcolorbox}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{multirow} % needed for cline for example
+
 
 %% HN packages
 % \usepackage{amsfonts}
@@ -84,7 +88,6 @@
 
 % \usepackage{soul}
 % \modulolinenumbers[5]
-% \usepackage{multirow}
 
 % for flowchart
 \usepackage{tikz}
@@ -118,6 +121,9 @@
 \definecolor{proofgreen}{rgb}{0.6,0,0}
 \definecolor{myblue}{rgb}{0,0,0.7}
 \definecolor{mymagenta}{rgb}{0.7,0,0}
+\definecolor{aliceblue}{rgb}{0.94, 0.97, 1.0}
+\colorlet{shadecolor}{gray!40}
+\definecolor{color2}{RGB}{1,2,3}
 
 \newcommand{\df}{d\!f}
 \newcommand{\tblue}{\color{titleblue}}
@@ -230,7 +236,7 @@
     colorlinks=true,
     linkcolor=cyan, % color1 : will be black
     filecolor=cyan,
-    urlcolor=color2,
+    urlcolor=proofgreen,
     citecolor=red,
     %bookmarks=true, % true means bookmarks
     bookmarksnumbered=false, % left window are numbered
@@ -250,8 +256,6 @@
   \crefname{figure}{Fig.}{Figs.}
   \crefname{equation}{Eq.}{Eqs.}
 
-
-\definecolor{color2}{RGB}{0,20,20}
 
 \newenvironment{mylist}{\begin{list}{*}{\itemsep=.01in \parsep=.01in
                   \topsep=.1in \parskip=.01in}}{\end{list}}

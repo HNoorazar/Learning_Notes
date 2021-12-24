@@ -1,0 +1,61 @@
+\section{Graphical Tools}
+\label{sec:Graphical_Tools}
+In this section we expand on graphical tools that
+are briefly mentioned in~\cref{sec:SmoothinginDetail}.
+Some examples that use residual plots for investigations
+are given in~\cref{sec:problems_Interview}.
+Graphical tools are not a way to compare models against each
+other. It is rather a way of model assessment.
+
+\subsection{Residual Plots}
+\label{sec:Residual-Plots}
+From\cite{loader2006local} we have:
+The most important diagnostic component is the residuals. 
+For local regression, the residuals are defined as the difference 
+between observed and fitted values:
+\begin{equation}
+\hat \varepsilon_i = Y_i - \hat f(x_i).
+\end{equation}
+
+One can use the residuals to construct formal tests of 
+goodness of fit or to modify the local regression estimate 
+for nonhomogeneous variance. These topics will be explored 
+more in Chapter 9. For practical purposes, most insight 
+is often gained simply by plotting the residuals in 
+various manners. Depending on the situation, plots 
+that can be useful include:
+\begin{enumerate}
+\item Residuals vs. predictor variables, for detecting lack of fit, such as a trimmed peak.
+
+\item Absolute residuals vs. the predictors, to detect 
+dependence of residual variance on the predictor variables. 
+One can also plot absolute residuals vs. 
+fitted values, to detect dependence of the residual 
+variance on the mean response.
+
+\item Q-Q plots (Wilk and Gnanadesikan 1968), to detect 
+departure from normality, such as skewness or heavy tails, 
+in the residual distribution. If non-normality is found, fitting 
+criteria other than least squares may produce better 
+results. See Section 6.4.
+
+\item Serial plots of $\hat \varepsilon_i $ vs. $\hat \varepsilon_{i-1} $, 
+to detect correlation between residuals.
+
+\item Sequential plot of residuals, in the order the 
+data were collected. In an industrial experiment, 
+this may detect a gradual shift in experimental 
+conditions over time.
+\end{enumerate}
+
+It is important not to look at the residual plots alone, 
+but to use them in conjunction with plots of the fit. 
+The object is to determine whether large residuals 
+correspond to features in the data that have been 
+inadequately modeled. The purpose of the plots can 
+be related to the bias-variance trade-off:
+\begin{itemize}
+\item Plots of the fit help us detect noise in the fit.
+\item Residual plots help us detect bias.
+\end{itemize}
+

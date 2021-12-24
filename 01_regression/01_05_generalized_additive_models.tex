@@ -153,6 +153,14 @@ $\hat f(x) \rightarrow f(x) = E[Y|X=x]$.
 
 Let us introduce some definitions here.
 
+Mean squared-error is defined at one
+single point (at least in this book) 
+$E[(\hat f_{\lambda}(x_i) - f(x_i))^2 ]$,
+and the averages over different $x_i$'s is called 
+average mean-squared error. But, in different
+books/contexts people refer to \textit{average mean-squared error}
+by \textit{mean squared-error}.
+
 \begin{deff}{}
 Average mean-squared error
 \begin{equation}\label{eq:MSE}
@@ -168,7 +176,10 @@ PSE(\lambda) = \frac{1}{n} \sum_{i=1}^n E\left[  \left( Y_i^* - \hat f_{\lambda}
 where $Y_i^* = f(x_i) + \varepsilon_i^*$ where $\varepsilon_i^*$ is independent
 of $\varepsilon_i$. ($PSE = MSE + \sigma^2$)
 \end{deff}{}
-
+In $PSE$, $Y_i^*$ is a new observation. We are measuring how well
+the model predicts the new observations. This is
+where (originally leave-one-out) cross-validation comes into 
+the picture and tries to estimate $PSE$.
 \begin{deff}{}
 \begin{equation}\label{eq:CVLOO}
 CV(\lambda) = \frac{1}{n} \sum_{i=1}^n  \left( y_i - \hat f_\lambda^{-i}(x_i) \right)^2
@@ -241,6 +252,29 @@ C_p(\lambda) = ASR(\lambda)  + 2 tr(\mathbf{S}_{\lambda}) \hat \sigma^2/N.
 ``For linear smoothers there is little to choose between $C_p$ and cross-validation. 
 For non-linear smoothers the cross-validation is the only simple method available for
 smoothing parameter selection.''
+
+\item [Graphical Methods] Sometimes the performance of 
+cross-validation is questionable. \hl{Graphical methods}
+along degrees of freedom can be used to choose proper smoothing parameters.
+Graphical methods: residual plots, degrees of freedom and 
+confidence intervals. ``The ideas for local regression are similar to 
+those used in parametric models. Other books on regression 
+analysis cover these topics in greater detail than we do here; 
+see, for example, chapter 3 of Draper and Smith (1981) 
+or chapters 4, 5 and 6 of Myers (1990). Cleveland (1993) is 
+a particularly good reference for graphical diagnostics.''\citep{loader2006local}. 
+Analytical tools, e.g. $C_p$ or CV can be used to see which 
+features are real and which ones are noise, but they cannot be 
+used to determine bandwidths (for local regression) for 
+(dataset, question) pair!~\citep{loader2006local}.
+It is important to remember that no one diagnostic technique 
+will explain the whole story of a dataset. Rather, using a combination 
+of diagnostic tools and looking at these in conjunction with 
+both the fitted curves and the original data provide insight into the data. 
+What features are real; have these been adequately modeled; 
+are underlying assumptions, such as homogeneity of variance, 
+satisfied?\cite{loader2006local}.
+
 \end{description}
 
 \subsection{Degrees of Freedom of a Smoother}
