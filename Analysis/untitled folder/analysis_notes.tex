@@ -13,7 +13,7 @@
 }{% #3 Tufte
 } 
 
-\select	
+\select
  {% #1 article + archive
   \documentclass[%twocolumn,
                  switch]{article}
@@ -71,28 +71,20 @@
 \usepackage{tcolorbox}
 \usepackage{array}
 \usepackage{tabularx}
-\usepackage{colortbl}
-\usepackage{xcolor}
-\usepackage{multirow} % needed for cline for example
-
 
 %% HN packages
 % \usepackage{amsfonts}
 % \usepackage{tocloft} % trying to put dots in table of content. goes with \renewcommand{\cftdot}{} before \tableofcontents. In Tufte case removing the \renewcommand{\cftdot}{} will generate the dots.
 \usepackage{enumitem,mathtools}
-% \usepackage[ruled,vlined]{algorithm2e}
-\usepackage[ruled,vlined,resetcount,algochapter]{algorithm2e}
 \usepackage{algorithmic}
-%\usepackage{algorithm}
-%\usepackage{algpseudocode}
-
 % \usepackage{soul}
 % \modulolinenumbers[5]
+% \usepackage{multirow}
 
 % for flowchart
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows}
-\usepackage{soul} % for highlightinh
+
 
 % break the damn long references (URL link)
 \usepackage{lineno}
@@ -103,6 +95,9 @@
 
 % \usepackage{comment}
 % \renewenvironment{comment}{}{}
+
+\usepackage[ruled,vlined]{algorithm2e}
+
 
 \providecommand{\bmmax}{0}
 \RequirePackage{bm}
@@ -121,11 +116,7 @@
 \definecolor{proofgreen}{rgb}{0.6,0,0}
 \definecolor{myblue}{rgb}{0,0,0.7}
 \definecolor{mymagenta}{rgb}{0.7,0,0}
-\definecolor{aliceblue}{rgb}{0.94, 0.97, 1.0}
-\colorlet{shadecolor}{gray!40}
-\definecolor{color2}{RGB}{1,2,3}
 
-\newcommand{\df}{d\!f}
 \newcommand{\tblue}{\color{titleblue}}
 \newcommand{\tred}{\color{titlered}}
 \newcommand{\pgreen}{\color{proofgreen}}
@@ -208,6 +199,7 @@
 \newtheorem{exc}{Exercise}[section]
 \newcommand{\Tau}{\mathcal{T}}
 
+\newcommand{\sol}{{\color{red}{\textbf{Solution}.~}}}
 
 %revtex uses \prb...
 %\newtheorem{prb}{Problem}[section]
@@ -217,7 +209,8 @@
 
 \newcommand{\intrr}{\operatorname{int}}
 
-
+\renewcommand{\qedsymbol}{\rule{0.7em}{0.7em}} % end of proof square
+\newcommand{\justif}[2]{&{#1}&\text{#2}}
 % flowchart definitions
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!20]
 
@@ -236,7 +229,7 @@
     colorlinks=true,
     linkcolor=cyan, % color1 : will be black
     filecolor=cyan,
-    urlcolor=proofgreen,
+    urlcolor=color2,
     citecolor=red,
     %bookmarks=true, % true means bookmarks
     bookmarksnumbered=false, % left window are numbered
@@ -256,6 +249,8 @@
   \crefname{figure}{Fig.}{Figs.}
   \crefname{equation}{Eq.}{Eqs.}
 
+
+\definecolor{color2}{RGB}{0,20,20}
 
 \newenvironment{mylist}{\begin{list}{*}{\itemsep=.01in \parsep=.01in
                   \topsep=.1in \parskip=.01in}}{\end{list}}
@@ -384,7 +379,7 @@ font={\color{blue}},
 \begin{document}
 %\raggedright
 
-\title{Learning Notes: Machine Learning, Signal Processing, Image Analysis}
+\title{Analysis Notes}
 \date{\today}
 
 \select
@@ -418,42 +413,19 @@ font={\color{blue}},
 
 
 \setcounter{secnumdepth}{3} % If this commented out. Chapters/Sections are not numbered
-\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
+%\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
 
 \newpage
 
 \vspace{3in}
-
-\begin{figure*}[htb]
-  \centering
-  %\captionsetup{justification=centering}
-  \includegraphics[width=0.5\textwidth]{00_figures/mugShot}
-%  \caption[][1\baselineskip]{}
-  \label{fig:mugShot}
-\end{figure*}
-I dedicate these notes to myself.
 % \newpage
 % \renewcommand{\cftdot}{}
 \tableofcontents
 
 
 \newpage
-\input{./00_Motivation} %
-
-\input{./01_regression_main}
-\input{./02_model_selection}
-\input{./03_classification_main}
-\input{./04_clustering_main}
-\input{./05_SVM_main}
-\input{./06_TDA_main}
-\input{./07_practical_issues_main}
-\input{./08_wavelet_fourier_main}
-\input{./09_model_inference_main}
-\input{./12_signals_main}
-\input{./13_deep_learning_main}
-\input{./zz_Interview_summaries_main}
-
-
+\input{./01_Euclidean_Spaces}
+\input{./02_Elementary_Topology_of_En}
 \bibliography{references}
 
 % \printindex

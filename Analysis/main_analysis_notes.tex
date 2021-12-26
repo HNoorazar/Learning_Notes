@@ -6,7 +6,7 @@
 % #1 article + archive
 % #2 revtex
 % #3 Tufte
-\newcommand{\select}[3]{#2}
+\newcommand{\select}[3]{#3}
 \select
  {% #1 article + preprint
 }{% #2 revtex
@@ -71,20 +71,28 @@
 \usepackage{tcolorbox}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{xcolor}
+\usepackage{multirow} % needed for cline for example
+
 
 %% HN packages
 % \usepackage{amsfonts}
 % \usepackage{tocloft} % trying to put dots in table of content. goes with \renewcommand{\cftdot}{} before \tableofcontents. In Tufte case removing the \renewcommand{\cftdot}{} will generate the dots.
 \usepackage{enumitem,mathtools}
+% \usepackage[ruled,vlined]{algorithm2e}
+\usepackage[ruled,vlined,resetcount,algochapter]{algorithm2e}
 \usepackage{algorithmic}
+%\usepackage{algorithm}
+%\usepackage{algpseudocode}
+
 % \usepackage{soul}
 % \modulolinenumbers[5]
-% \usepackage{multirow}
 
 % for flowchart
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric, arrows}
-
+\usepackage{soul} % for highlightinh
 
 % break the damn long references (URL link)
 \usepackage{lineno}
@@ -95,9 +103,6 @@
 
 % \usepackage{comment}
 % \renewenvironment{comment}{}{}
-
-\usepackage[ruled,vlined]{algorithm2e}
-
 
 \providecommand{\bmmax}{0}
 \RequirePackage{bm}
@@ -116,7 +121,11 @@
 \definecolor{proofgreen}{rgb}{0.6,0,0}
 \definecolor{myblue}{rgb}{0,0,0.7}
 \definecolor{mymagenta}{rgb}{0.7,0,0}
+\definecolor{aliceblue}{rgb}{0.94, 0.97, 1.0}
+\colorlet{shadecolor}{gray!40}
+\definecolor{color2}{RGB}{1,2,3}
 
+\newcommand{\df}{d\!f}
 \newcommand{\tblue}{\color{titleblue}}
 \newcommand{\tred}{\color{titlered}}
 \newcommand{\pgreen}{\color{proofgreen}}
@@ -198,7 +207,6 @@
 \newtheorem{defn}{Definition}[section]
 \newtheorem{exc}{Exercise}[section]
 \newcommand{\Tau}{\mathcal{T}}
-
 \newcommand{\sol}{{\color{red}{\textbf{Solution}.~}}}
 
 %revtex uses \prb...
@@ -206,11 +214,14 @@
 \newtheorem{excse}{Exercise}[section]
 \newcommand{\exercise}[2]{\begin{excse}\label{#1}\color{exerciseblue}\emph{#2}\end{excse}}
 \newcommand{\idef}[1]{\index{#1}{\bf\emph{#1}}}
-
 \newcommand{\intrr}{\operatorname{int}}
 
 \renewcommand{\qedsymbol}{\rule{0.7em}{0.7em}} % end of proof square
 \newcommand{\justif}[2]{&{#1}&\text{#2}}
+
+
+
+
 % flowchart definitions
 \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, draw=black, fill=red!20]
 
@@ -229,7 +240,7 @@
     colorlinks=true,
     linkcolor=cyan, % color1 : will be black
     filecolor=cyan,
-    urlcolor=color2,
+    urlcolor=proofgreen,
     citecolor=red,
     %bookmarks=true, % true means bookmarks
     bookmarksnumbered=false, % left window are numbered
@@ -249,8 +260,6 @@
   \crefname{figure}{Fig.}{Figs.}
   \crefname{equation}{Eq.}{Eqs.}
 
-
-\definecolor{color2}{RGB}{0,20,20}
 
 \newenvironment{mylist}{\begin{list}{*}{\itemsep=.01in \parsep=.01in
                   \topsep=.1in \parskip=.01in}}{\end{list}}
@@ -413,7 +422,7 @@ font={\color{blue}},
 
 
 \setcounter{secnumdepth}{3} % If this commented out. Chapters/Sections are not numbered
-%\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
+\setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
 
 \newpage
 
@@ -426,6 +435,10 @@ font={\color{blue}},
 \newpage
 \input{./01_Euclidean_Spaces}
 \input{./02_Elementary_Topology_of_En}
+\bibliography{references}
+
+
+
 \bibliography{references}
 
 % \printindex
