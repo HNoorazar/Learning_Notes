@@ -1,0 +1,54 @@
+\chapter{Spaces: An Introduction to Analysis}
+%%%%%%
+%%%%%%  01_Exercises
+%%%%%%
+\section{Proofs, Sets, and Functions}
+\label{Proofs-Sets-and-Functions}
+
+\subsection{Families of sets}
+
+\textbf{Problems}
+\begin{enumerate}
+
+\item If $X$ is a nonempty set and $\mathcal{A}$ is a family 
+of subsets of $X$, we call $\mathcal{A}$ an algebra of 
+sets if the following three properties are satisfied:
+
+\begin{enumerate}[label=(\roman*)]
+\item $\emptyset \in \mathcal{A}$.
+\item If $A \in \mathcal{A}$ , then $A^c \in \mathcal{A}$ 
+(all complements are with respect to the universe $X$;
+hence $A^c = X \textbackslash A$). 
+
+\item If $A, B \in \mathcal{A}$, then $A \cup B \in \mathcal{A}$.
+\end{enumerate}
+In the rest of the problem, we assume that $\mathcal{A}$ 
+is an algebra of sets on $X$.
+
+\begin{enumerate}
+\item Show that $X \in \mathcal{A}$.
+\item Show that if $A_1, A_2, \dots, A_n \in \mathcal{A}$ for an $ n \in \mathbb{N}$, then $\cup_{i=1}^n A_i \in  \mathcal{A}$.
+
+\item Show that if $A_1, A_2, \dots, A_n \in \mathcal{A}$ for an $ n \in \mathbb{N}$, then $\cap_{i=1}^n A_i \in \mathcal{A}$.
+\end{enumerate}
+
+\sol
+\begin{enumerate}
+\item By definition--property (i)--we know $\emptyset \in \mathcal{A}$. By property (ii) we have: $X = \emptyset^c  \in \mathcal{A}$.
+\item We know $A_1, A_2 \in \mathcal{A}$. Property (iii) 
+$A_1 \cup A_2 \in \mathcal{A}$. 
+Assume $B=\cup_{i=1}^{n-1} A_i \in \mathcal{A}$.
+Then, by property (iii), again, $B \cup A_n  =  \cup_{i=1}^{n} A_i  \in \mathcal{A}$. 
+
+
+\item Let $A_1, A_2, \dots, A_n \in \mathcal{A}$. By property (ii) we have
+$A_1^c, A_2^c, \dots, A_n^c \in \mathcal{A}$.
+By property (iii) we have $\cup_{i=1}^{n} A_i^c  \in \mathcal{A}$.
+Therefore, by property (ii) we know $(\cup_{i=1}^{n} A_i^c)^c  \in \mathcal{A}$.
+By De Morgan's law 
+$ (\cup_{i=1}^{n} A_i^c)^c = \cap_{i=1}^{n} A_i  \in \mathcal{A}$.
+\end{enumerate}
+
+
+
+\end{enumerate}
