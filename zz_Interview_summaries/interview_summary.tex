@@ -310,7 +310,7 @@ exist between $X$ and $Y$--if the $p$-value is small enough.}
 \item [RSE]
 The RSE is an estimate of the standard deviation of $\varepsilon$ in $y = f(x) + \varepsilon$. 
 \begin{equation}
-RSE = \sqrt{\frac{1}{N-2} RSS} = \sqrt{\frac{1}{N-2}  \sum(y_i - \hat y_i)}
+RSE = \sqrt{\frac{1}{N-2} RSS} = \sqrt{\frac{1}{N-2}  \sum(y_i - \hat y_i)^2}
 \end{equation}
 The RSE is considered a measure of the lack of fit.
 If the predictions obtained using the model are very 
@@ -547,7 +547,7 @@ Residual plots are a useful graphical tool for identifying non-linearity.
 Given a simple linear regression model, we can plot the residuals
 $y_i - \hat y_i$, versus the predictor $x_i$.
 In the case of a multiple regression model,
-residual plot since there are multiple predictors, we 
+since there are multiple predictors, we 
 instead plot the residuals versus
 the predicted (or fitted) values $\hat y_i$. Ideally, the residual plot will 
 show no fitted discernible pattern. The presence of a pattern may indicate a problem with
@@ -692,11 +692,11 @@ example, the out- lier is clearly visible in the residual plot illustrated
 in the center panel of Figure~\ref{fig:outlier}. But in practice, it can be 
 difficult to decide how large a residual needs to be before we 
 consider the point to be an outlier. To address this problem, 
-instead of plotting the residuals, we can plot the studentized 
+instead of plotting the residuals, we can plot the \hl{studentized 
 residuals, computed by dividing each residual $e_i$ by 
 its estimated standard error. Observations whose studentized 
 residuals are greater than 3 in absolute value are possible 
-outliers. In the right-hand panel of Figure~\ref{fig:outlier}, the outlier's 
+outliers.} In the right-hand panel of Figure~\ref{fig:outlier}, the outlier's 
 studentized residual exceeds 6, while all other observations 
 have studentized residuals between -2 and 2.
 If we believe that an outlier has occurred due to an error in data 
@@ -735,6 +735,12 @@ of the full set of predictors.
 
 In order to quantify an observation’s leverage, we 
 compute the leverage statistic.
+
+The leverage statistic $h_i$ is always between $\frac{1}{n}$ and 1, 
+and the average leverage for all the observations is always equal 
+to $(p + 1)/n$. So if a given observation has a leverage statistic 
+that greatly exceeds $(p+1)/n$, then we may suspect that 
+the corresponding point has high leverage.
 
 \item [6. Collinearity] Collinearity refers to the 
 situation in which two or more predictor variables are closely related to one another.
@@ -799,12 +805,144 @@ For instance, we might take the average of standardized versions.
 
 I will stop here, read pages 98-103 of Introduction to Statistical Learning\cite{james2013introduction}.
 \end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
+\section{Bootstrap}
+Bootstrap is a general tool for assessing statistical accuracy.
+First we describe the bootstrap in general, and then show how it 
+can be used to estimate extra-sample prediction error. 
+As with cross-validation, the boot- strap seeks to estimate 
+the conditional error $Err_\tau$ , but typically estimates well 
+only the expected prediction error $Err$.
 
-\section{Random Forest}
+
+Suppose we have a model fit to a set of training data.
+Denote the training set by $\tau = \{(x_1, y_1), (x_2, y_2), \dots, (x_N, y_N)\}$
+The basic idea is to draw samples with replacement from $\tau$ and
+form a set of training sets each of which having the same size as $\tau$.
+Suppose we have $B$ such sets; size of bootstrap is $B$.
+We fit the model to each of the bootstrap dataset and
+examine behavior of the fits over the $B$ replications.
+
+In the~\cref{fig:bootstrap}, $S(Z)$ is any quantity computed 
+from the data $Z$, for example, the prediction at some input point. 
+From the bootstrap sampling we can estimate any 
+aspect of the distribution of $S(Z)$, for example, its variance,
+\begin{equation}
+\label{eq:bootVariance}
+\widehat{Var}[S(Z)] = \frac{1}{B-1} \sum_{b=1}^B (S(Z^{*b}) - \bar S^*)^2,
+\end{equation}
+where $\bar S^* = \sum_b S(Z^{*b})/B$. Note that $\widehat{Var}[S(Z)]$ 
+can be thought of as a Monte-Carlo estimate of the variance $S(Z)$
+under sampling from the empirical distribution function $\hat F$ for the
+data $\Tau = (Z =) \{(x_1, y_1), (x_2, y_2), \dots, (x_N, y_N) \}$.
+
+How can we apply the bootstrap to estimate prediction error? 
+One approach would be to fit the model in question on a 
+set of bootstrap samples, and then keep track of how well 
+it predicts the original training set. If $f^{*b}(x_i)$ is the predicted 
+value at $x_i$, from the model fitted to the bth bootstrap dataset, 
+our estimate is
+\begin{equation}
+\widehat Err_{boot} = \frac{1}{B} \frac{1}{N} \sum_{b=1}^B \sum_{i=1}^N
+L(y_i, \hat f^{*b}(x_i)).
+\end{equation}
+However, it is easy to see that $\widehat Err_{boot}$ does not provide a 
+good estimate in general. The reason is that the bootstrap 
+datasets are acting as the training samples, while the
+original training set is acting as the test sample, and these 
+two samples have observations in common. This overlap 
+can make overfit predictions look unrealistically good, 
+and is the reason that cross-validation explicitly uses 
+non-overlapping data for the training and test samples.
+
+
+\begin{figure*}[h!]
+%  \centering
+  \captionsetup{justification=centering}
+  \includegraphics[width=0.6\textwidth]{00_figures/bootstrap}
+  \caption[][-14\baselineskip]{Schematic of the bootstrap process. In 
+  this plot $\tau$ is replaced with $Z$.
+  We wish to assess the  statistical accuracy of a quantity $S(Z)$ 
+  computed from our dataset. $B$ training sets $Z^{*b}, ~b = 1, \dots, B$ 
+  each of size $N$ are drawn with replacement from the original dataset. 
+  The quantity of interest $S(Z)$ is computed from each bootstrap 
+  training set, and the values $S(Z^{*1}) \dots S(Z^{*B})$ are 
+ used to assess the statistical accuracy of $S(Z)$.}%
+  \label{fig:bootstrap}%
+\end{figure*}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
+\section{Bootstrap Aggregation or Bagging: How to Use Bootstrap}
+To improve the estimate or prediction itself consider the regression
+problem. Suppose we fit a model to our training data 
+$\tau = \{(x_1, y_1), (x_2, y_2), \dots, (x_N, y_N)\}$ obtaining prediction
+$\hat f(x)$ at point $x$.
+Bootstrap aggregation or bagging averages this prediction over a collection of bootstrap samples thereby reducing the variance. For each bootstrap sample
+$\tau^b, ~b=1, \dots, B$ we fit a model giving a prediction $\hat f^b(x)$.
+The bagging estimate is defined by $\hat f_{bagging}(x) = \frac{1}{B}\sum\hat f^b(x)$.
+
+Bagging is a method for reducing the variance of an estimated prediction. Bagging works well for high-variance low-bias procedures such as trees.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
+\section{Decision Tree, Random Forest, and Extra Tree-Bagging}
 \label{sec:Random_Forest_Interview}
-At each node in each tree of a random forest, 
-choose $m < p$ ($m=\sqrt{p}$ or $p/3$) variables randomly to do the
-splittings. Trees have high variance and low bias.
+Advantages of trees:
+\begin{enumerate}
+\item Can handle both numerical and categorical variables.
+\item Easy to interpret.
+\item Internal work can be observed.
+\item Performs well on large datasets.
+\item Fast
+\item Low bias
+\end{enumerate}
+
+\noindent Disadvantages of trees:
+\begin{enumerate}
+\item Choice of good splitting choices at each node; e.g. Hunts algorithm is a good one but does not consider global optimum.
+\item Prone to overfitting.(max depth or pruning can help)
+\item High variance
+\end{enumerate}
+
+Random forest is a substantial modification of bagging
+that builds a large collection of de-correlated trees
+and averages them. On may problems performance of 
+random forests is similar to boosting (coming up next)
+while they are simpler to train and tune.
+
+The idea in bagging is to average over many noisy 
+but approximately unbiased models and hence reduce the
+variance. Trees are ideal for bagging since they can capture
+complex relationships and structures and if grow deep will
+have low bias.  Since each tree in the bagging is identically
+distributed, the expectation of average of $B$ such trees
+is the same as the expectation of any one of them. So,
+the bias of bagged trees is the same as that of one tree and the hope is
+reducing variance. This is in contrast to boosting where
+trees are grown in an adaptive way to improve bias and hence are not
+identically distributed. 
+
+An average of $B$ i.i.d. random variables each with variance $\sigma^2$
+has variance $\frac{1}{B}\sigma^2$. If the variables are simply identically distributed but not necessarily independent, with positive pairwise correlation,
+the variance of average is $\rho \sigma^2 + \frac{1-\rho}{B}\sigma^2$.
+As $B$ increases the second term vanishes. 
+So, in random forest, one tries to reduce variance by reducing
+the correlation between trees through random selection of
+input variables at each node, specifically when growing a tree
+on a bootstrapped dataset.\\
+
+\noindent \hl{\textbf{Summary}}
 
 Random forest is a bagging method to reduce the variance
 of the model. It has more flavor, than just bagging, to it.
@@ -816,6 +954,70 @@ where $\sigma^2$ is variance of each. If they are hust i.d. (not independent),
 then variance of $B$ of them is $\rho \sigma^2 + \frac{1-\rho}{B} \sigma^2$
 where $\rho$ is correlation. Random forest tries to reduce correlation between
 trees.
+
+At each node in each tree of a random forest, 
+choose $m < p$ ($m=\sqrt{p}$ or $p/3$) variables randomly to do the
+splittings. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
+\section{Extra Trees}
+At each node the feature to split is chosen randomly
+and it uses whole learning sample rather than a bootstrap.
+This is done $M$ times. 
+So, we have $M$ trees, each tree uses all training set. At each node,
+similar to random forest, we choose a random subset of 
+features to split on, but the difference is that the cutting points
+are chosen randomly. For example, if we have $(a, b)$ interval the
+cutting point is chosen randomly; not the optimal cut point.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
+\section{Boosting}
+Boosting is different from bagging.
+The motivation for boosting was a procedure that
+combines weak classifiers to produce a powerful committee.
+A weak classifier is one whose error rate is slightly better than
+random. The purpose of boosting is to \emph{sequentially}
+apply the weak classification algorithm to repeatedly modified versions 
+of the data thereby producing a sequence of weak classifiers $G_m(x),~m=1, \dots, M$. The predictions from all of them are then combined through a
+weighted majority vote to produce the final prediction; $G(x) = sign \left(\sum_{m=1}^M \alpha_m G_m(x) \right)$. The $\alpha_i$s are
+computed by the boosting algorithm and their role is to weight contribution
+of each tree to give higher influence power to more accurate trees.
+The data modification at each boosting step consist of applying 
+weights $w_i$ to each training point  $x_i$. At step $m$
+the observations that are misclassified by $G_{m-1}$ have their weights increased so as iteration proceeds the observations that
+are hard to classify receive increasing influence so that
+the next classifier is forced to focus on those observations.
+
+\begin{tcolorbox}
+%  \textbf{Algorithm for gradient descent with momentum is given below}
+  \begin{algorithm}[H]
+\SetAlgoLined
+\KwResult{Powerful output (through reducing bias)}
+  Initialize $w_i = \frac{1}{N}$\;
+ \For{$m=1$ to $M$}{
+  fit a classifier $G_m(x)$ to data using $w_i$s\;
+  Compute $err_m = \frac{\sum w_i I(y_i \neq G_m(x_i))}{\sum w_i}$\;
+  Compute $\alpha_m = log\frac{1-err_m}{err_m}$\;
+  Compute $w_i = w_i ~ exp(\alpha_m I[y_i \neq G_m(x_i)])$ \;
+ }
+\textbf{Output}: $G(x) = sign \left( \sum_{m=1}^M \alpha_m G_m(x) \right)$
+ \caption{Boosting}
+\end{algorithm}
+\end{tcolorbox}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%
+%%%%%
 
 \section{One Liners}
 \begin{itemize}

@@ -30,3 +30,17 @@ even if the distribution of positive and negative examples is highly skewed.
   \caption{An example of ROC curve.}
   \label{fig:ROCCurve}
 \end{marginfigure}
+
+
+ROC and AUC are insensitive to whether your predicted probabilities
+are properly calibrated to actually represent the probability of
+class memberships. i.e., the ROC/AUC would be identical even if
+your predicted probabilities ranged from 0.9 to 1 instead of 0 to 1,
+as long as the ordering of observations by predicted probability remained
+the same. All AUC cares about is how well your classifier separated 
+the two classes and it is only sensitive to rank ordering. 
+AUC can be thought of as representing the probability that a classifier rank a random chosen positive observation higher than a randomly chosen negative 
+observation.
+So, it is useful for highly unbalanced/imbalanced classes.
+
+
