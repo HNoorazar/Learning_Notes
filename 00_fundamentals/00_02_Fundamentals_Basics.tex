@@ -1,0 +1,40 @@
+\section{Basics}
+\label{sec:Fundamentals_Basics}
+
+\begin{deff}{}
+Covariance is a measure of the joint variability of two 
+random variables.
+
+\begin{equation}\label{eq:covarianceDef}
+\begin{aligned}
+cov[X, Y] &= E[(X-\mu_X) (Y - \mu_Y)]\\ 
+               &= E[XY] - E[X]E[Y]
+\end{aligned}
+\end{equation} 
+
+\noindent where $\mu_X \coloneqq E[X]$.
+\end{deff}{}
+
+\noindent For discrete random variables we have
+\begin{equation}\label{eq:covarianceDiscrete}
+\begin{aligned}
+cov[X, Y] &= \sum_{i=1}^N p_i (x_i - \mu_x) (y_i - \mu_y)
+\end{aligned}
+\end{equation} 
+\noindent In special case that the (real) random variable pair $(X,Y)$ 
+can take on the values $(x_i, y_i)$ for $ i=1, \dots , N$, 
+with equal probabilities $p_i=1/N$
+\begin{equation}\label{eq:covarianceDiscreteSpecial}
+\begin{aligned}
+cov[X, Y] &= \frac{1}{N}\sum_{i=1}^N (x_i - \mu_x) (y_i - \mu_y)
+\end{aligned}
+\end{equation} 
+Moreover, $cov (X,X) = var (X) \equiv \sigma^2(X)\equiv \sigma_X^2.$
+
+\iffalse
+\begin{cases} 
+tr(\mathbf{S}_\lambda)\\
+N - tr(2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T) \\
+tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T)
+\end{cases}
+\fi

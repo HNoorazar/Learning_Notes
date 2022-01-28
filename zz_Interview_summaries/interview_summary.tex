@@ -1047,6 +1047,107 @@ their coefficients are not significant. In other words, if the
 interaction between $X_1$ and $X_2$ seems important, then 
 we should include both $X_1$ and $X_2$ in the 
 model even if their coefficient estimates have large $p$-values.
+
+\item Naive Bayes is naive because it assumes variables are
+independent and equally important.
+
+\item TF TF-IDF = TF * IDF where TF is Word Count and IDF is $log(\frac{\text{\# docs}}{1 + \text{ \# docs using the word}})$
+
+\item Distributions used for following events:
+    \begin{enumerate}
+        \item Probability of $k$ people arrival within a 
+        time-window to a place: Poisson
+        \item Probability of people's height: Normal
+        
+        \item Probability of sum of two 6-sided fair dices being $y$
+        
+        \item Probability of having $h$ heads out of $N$ tries.
+        Binomial is number of successes in a fixed number of 
+        independent trials. \[\binom{N}{h}\]
+        Geometric distribution: time between successes in a series of
+        independent trials.
+     \end{enumerate}
+
+\item Decision trees are good for non-linear relations. May not 
+work well with time series which tend to follow linear trends.
+
+\item Some assumptions of regression:
+            \begin{enumerate}
+                  \item In simple linear regression: 
+                           Linear and additive relation between 
+                          dependent and independent variables.
+                          One unit change in $x_i$ cases a constant 
+                          change in $y$. 
+                          
+                          \item Errors should not be correlated.
+                          
+                          \item independent variables should not be correlated.
+                          lack of this assumption is known as multi-collinearity.
+                          variance inflation factor can be used for diagnosis.
+                          
+                          \item  Error terms are assumed to have
+                          constant variance. 
+                          
+                          \item Error terms are assumed to be normally
+                          distributed.
+                  
+            \end{enumerate}
+            
+ \item A Box Cox transformation is a transformation of 
+      non-normal dependent variables into a normal shape. 
+      Normality is an important assumption for many statistical 
+      techniques; if your data isn't normal, applying a Box-Cox 
+     means that you are able to run a broader number of tests.
+     
+     \item Logistic regression evaluation: Precision, Sensitivity, AUC, 
+     $R^2$ statistics computed by McFadden or ``Cox and Shell''. 
+     Likelihood ratio test, $\chi^2$-tests such as Pearson $\chi^2$.
+     
+     McFadden $R^2 = 1 - \frac{ln(L_M)}{ln(L_0)}$ where $L_0$ 
+     is likelihood of the function with no predictor and $L_M$ is likelihood 
+     for the model being evaluated.  $ln(L_0)$ plays the role of RSS.  
+     McFadden test corresponds to proportional reduction in 
+     error variance. Small McFadden is bad.
+     
+     Cox and Shell $R^2 = 1 - \left (\frac{L_M}{L_0}\right )^{2/n}$
+     \[ln(L_0) = n_0 log(n_0/n) + n_1 log(n_1/n) \]
+     \noindent where $n_0$ is number of observations equal to 0,
+     $n_1$ is number of observations equal to 1, and $n = n_0+n_1$.
+     $L_0$ is the model containing only interception 
+     and no regression coefficient.
+     
+     
+     \begin{equation*}
+         \begin{aligned}
+  \mathcal{L(\beta_0, \beta_1)} &= log(\Pi_{i; y_i=1} p(x_i)) + log(\Pi_{i; y_i=0} [1-p(x_i)])\\ 
+               &= \sum_i \{y_i log(p_i) + (1-y_i) log(1-p_i)\}
+           \end{aligned}
+     \end{equation*} 
+     
+      Logit is inverse of logistic function; $logit(p) = log(\frac{p}{1-p})$.
+      The null model assumes homogeneity. 
+      So, the two groups have the same probability and 
+      hence the same logit;  $logit (\pi_1) = \eta$, where $\pi_i$ is probability of being 1.
+      In the null model we only have the intercept $\beta_0 = ln(\frac{\pi}{1-\pi})$
+     
+     
+     \item Collinearity of predictive variables can cause uncertainty in
+              coefficient estimates. A small change in data can cause
+              the the pair of coefficients that resulted in small RSS 
+              change a lot. It reduces accuracy of estimates 
+              of regression coefficients. It causes SE of $\hat \beta$ grow,
+              and therefore, lead to a decline in power of $t-statistic$ test,
+              and therefore, in increase of $p-$value, and hence, we may
+              fail to reject null hypothesis.
+
+      \item Get rid of correlated variables before PCA.
+      
+\end{itemize}
+
+
+\section{DL One Liners}
+\begin{itemize}
+\item 
 \end{itemize}
 
 

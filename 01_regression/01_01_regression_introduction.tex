@@ -5,3 +5,16 @@
 \label{sec:Regression_Introduction}
 In this section we look at the task
 of prediction an output given some inputs.
+Denote the response variable by $Y$
+that depends on independent variables
+$X_1, X_2, \dots, X_p$. Then \emph{one general model}
+is given by $E[Y|X_1=x_1, \dots X_p=x_p] = f(x_1, \dots, x_p)$.
+Linear regression model is of the following form
+\begin{equation}
+f(x_1, \dots, x_p) = \beta_0 + \beta_1x_1 + \dots + \beta_p x_p
+\end{equation}
+\noindent which is \emph{\bf linear in parameters} $\beta_j$s.
+For the  \emph{\bf linear model} the $x_i$s can
+be function of other variables;
+$f(x_1, \dots, x_p) = \beta_0 + \beta_1g(x_1) + \dots + \beta_p g(x_p)$
+where $g(x)$ could be $x^2, sin(x), wz$ for some $w$ and $z$.
