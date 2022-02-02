@@ -1,7 +1,7 @@
 \section{Basics}
 \label{sec:Fundamentals_Basics}
 
-\begin{deff}{}
+\begin{deff}{}\label{def:UnivariateCovarianceDef}
 Covariance is a measure of the joint variability of two 
 random variables.
 
@@ -38,3 +38,139 @@ N - tr(2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T) \\
 tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T)
 \end{cases}
 \fi
+
+Let $Z_{ij},~i \in \{ 1, 2, \dots,  m\},~j \in \{1, 2, \dots, n \}$
+be random variables. Let $\mathbf{Z} = [Z_{ij}]$
+and $E[\mathbf{Z}] = [E[Z_{ij}]]$.
+
+\begin{thm}
+If $\mathbf{A} \in \mathbb{R}^{l \times m}$,
+$\mathbf{B} \in \mathbb{R}^{n \times p}$
+$\mathbf{C} \in \mathbb{R}^{l \times p}$ are matrices of constants,
+then
+\[ E[\mathbf{AZB + C}] = \mathbf{A} E[\mathbf{Z}] \mathbf{B} + \mathbf{C}.\]
+\end{thm}\marginnote{For proofs of theorems, at 
+least most of the theorems in 
+the~\cref{sec:Fundamentals_Basics}, please 
+see~\citep{seber2012linear}.}
+
+In the similar vein if $\mathbf{X}$ and $\mathbf{Y}$
+are vectors of random variables and $\mathbf{A}$ and 
+$\mathbf{B}$ are constant matrices then $E[\mathbf{AX + BY}] = 
+\mathbf{A}E[\mathbf{X}] + \mathbf{B}E[\mathbf{Y}]$.
+
+
+\begin{deff}{}
+$cov[\mathbf{X}, \mathbf{Y}] = [cov(X_i, Y_j)]$
+\end{deff}{}
+
+\begin{thm}\label{thm:vectorRandCovTHM}
+Let $E[\mathbf{X}] = \boldsymbol{\mu}_\mathbf{X}$
+and $E[\mathbf{Y}] = \boldsymbol{\mu}_\mathbf{Y}$
+then
+
+\[cov[\mathbf{X}, \mathbf{Y}] = E[({\bf X} - \boldsymbol{\mu}_\mathbf{X})({\bf Y} - \boldsymbol{\mu}_\mathbf{Y})^T]. \]
+\end{thm}
+
+\begin{deff}{}
+Similar to a single random variable, when $\mathbf{Y} = \mathbf{X}$, 
+$cov (\mathbf{X}, \mathbf{X})$ is denoted by $var (\mathbf{X})$ and
+is called variance (variance-covariance or dispersion) matrix of $\mathbf{X}$:
+
+\begin{equation}\label{eq:varianceCovariance}
+\begin{aligned}
+var[\mathbf{X}] &= [cov(X_i, X_j)] \\ 
+                         &= \begin{bmatrix}
+                              var[X_1] & cov[X_1, X_2] & \dots & cov[X_1, X_n]\\
+                              cov[X_2, X_1] & var[X_2] & \dots & cov[X_2, X_n]\\
+                               \vdots             & \vdots      & \ddots &  \vdots \\
+                               cov[X_n, X_1] & cov[X_n, X_2] & \dots & var[X_n]\\
+                               \end{bmatrix}. \\ 
+\end{aligned}
+\end{equation}
+\end{deff}{}
+
+From Thm.~\ref{thm:vectorRandCovTHM} we see
+\begin{equation}
+var[\mathbf{X}] = E[({\bf X} - \boldsymbol{\mu}_\mathbf{X})({\bf X} - \boldsymbol{\mu}_\mathbf{X})^T]
+\end{equation}
+and by expanding it we get
+\begin{equation}
+var[\mathbf{X}] = E[{\bf X X}^T] - \boldsymbol{\mu}_\mathbf{X} \boldsymbol{\mu}_\mathbf{X}^T.
+\end{equation}
+\noindent which we notice is generalization
+of univariate case (see Def.~\ref{def:UnivariateCovarianceDef}).
+
+\begin{exm}
+Let $\bf a$ be a constant vector. Then $var[{\bf X-a} ] = var[\bf X] - a.$
+\end{exm}
+
+\begin{thm}
+Let ${\bf X} \in \mathbb{R}^{m}$, 
+${\bf Y} \in \mathbb{R}^{n}$ be vectors of random variables while
+${\bf A} \in \mathbb{R}^{l \times m}$ and
+${\bf B} \in \mathbb{R}^{p \times n}$ are constant matrices.
+Then, 
+\begin{equation}
+cov[{\bf AX, BY}] = {\bf A}  ~ cov[{\bf X}, {\bf Y}]  {\bf B}^T.
+\end{equation}
+\end{thm}
+
+Of particular importance is $var[{\bf AX}] = {\bf A}~var[{\bf X}] {\bf A}^T$
+
+\begin{thm}
+Let ${\bf X}$ be a random variable such that none of its
+elements is a linear combination of others. Then, $var[{\bf X}]$ is
+a positive definite matrix and therefore invertible.
+\end{thm}
+
+
+\begin{thm}
+Let ${\bf X} = [X_i] \in \mathbb{R}^{n}$ be a vector of random variables
+and ${\bf A} = {\bf A}^T \in \mathbb{R}^{n \times n}$.
+Denote $E[{\bf X}] = \boldsymbol{\mu}_{\bf X}$
+and $var[{\bf X}] = \boldsymbol{\Sigma} = [\sigma_{ij}].$
+Then, 
+\begin{equation}
+E[{\bf X}^T{\bf AX} ] = tr({\bf A} \boldsymbol{\Sigma} ) + \boldsymbol{\mu}_{\bf X}^T {\bf A}\boldsymbol{\mu}_{\bf X}
+\end{equation}
+\end{thm}
+
+Two important special cases of theorem above
+are 
+
+\begin{enumerate}
+\item Let ${\bf Y = X - b}$ and note that $var [{\bf Y}] = var[{\bf X}]$ then
+we have 
+\begin{equation}
+E[({\bf X-b})^T {\bf A (X-b)}]  = tr({\bf A} \boldsymbol{\Sigma}) + (\boldsymbol{\mu}_{\bf X} - {\bf b} )^T {\bf A (\boldsymbol{\mu}_{\bf X} - {\bf b} )}
+\end{equation}
+
+\item If $\boldsymbol{\Sigma} = {\sigma}^2 {\bf I_n}$, then,
+$tr({\bf A} \boldsymbol{\Sigma}) = \sigma^2 tr({\bf A} )$. 
+Consequently,\marginnote{The book uses the last line and uses it in 
+some example. 
+Perhaps that way of thinking is used later in the book (see page 10 of~\citep{seber2012linear}).}
+\begin{equation}\label{eq:specialCaseWeird}
+\begin{aligned}
+E[{\bf X}^T {\bf A} {\bf X}] &= \sigma^2 tr({\bf A}) + \boldsymbol{\mu}_{\bf X}^T {\bf A}\boldsymbol{\mu}_{\bf X} \\ 
+&= \sigma^2 (\text{sum of coefficients of } X_i^2) + ({\bf X}^T {\bf A} {\bf X})_{{\bf X} = \boldsymbol{\mu}_{\bf X}}
+\end{aligned}
+\end{equation}
+\end{enumerate}
+
+
+\begin{thm}
+Let $X_1, X_2, \dots, X_n$ be independent random variables
+with means $\mu_1, \mu_2, \dots, \mu_n$ and common variance
+$\sigma_2$, common third and fourth moments around their means
+$\sigma_3$ and $\sigma_4$ (i.e. $\sigma_r = E[(X_i - \mu_i)^r]$).
+If ${\bf A} = {\bf A}^T\in \mathbb{R}^{n \times n}$
+and ${\bf a}$ is a column vector of the diagonal elements of ${\bf A}$,
+then
+\[ var [{\bf X}^T{\bf A X}]  =  (\sigma_4 - 3\sigma_2^2) {\bf a}^T {\bf a} + 2\sigma_2^2 tr({\bf A}^2) + 4\sigma_2  \boldsymbol{\mu}^T{ \bf A}^2 \boldsymbol{\mu} + 4 \sigma_3 \boldsymbol{\mu}^T { \bf A a}  \]
+
+\end{thm}
+
+
+

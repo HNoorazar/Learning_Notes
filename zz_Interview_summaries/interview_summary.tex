@@ -1024,6 +1024,13 @@ the next classifier is forced to focus on those observations.
 \item The ridge solutions are not equivariant under scaling of the 
 inputs, and so one normally standardizes the inputs before solving.
 
+\item Feature scaling matters  for $K$-means, $K$-NN, SVM, PCA, LDA, logistic regression, NN.
+
+\item Bias measure how on average the model matches the target. Variance measures
+how much the model fluctuates for different training sets.
+Bias is an error from erroneous assumptions about the model.
+Variance is the error from sensitivity to small changes in training set.
+
 \item Gini index (impurity measurement of node/region $R_m$ in a tree)
 \begin{equation}\label{eq:GiniIndex}
 G = \sum_{k=1}^K \hat p_{mk} (1-\hat p_{mk})
@@ -1136,8 +1143,8 @@ work well with time series which tend to follow linear trends.
               the the pair of coefficients that resulted in small RSS 
               change a lot. It reduces accuracy of estimates 
               of regression coefficients. It causes SE of $\hat \beta$ grow,
-              and therefore, lead to a decline in power of $t-statistic$ test,
-              and therefore, in increase of $p-$value, and hence, we may
+              and therefore, lead to a decline in power of $t$-statistic test,
+              and therefore, in increase of $p$-value, and hence, we may
               fail to reject null hypothesis.
 
       \item Get rid of correlated variables before PCA.
@@ -1147,7 +1154,48 @@ work well with time series which tend to follow linear trends.
 
 \section{DL One Liners}
 \begin{itemize}
-\item 
+\item There is no bias-variance trade-off here. And we can look for problems as follows
+\begin{table}[h!]
+\caption{NN Diagnosis} \label{tab:NNDiagnosis}
+\begin{tabular}{|l|l|l|l|l|l|}
+\hline
+\rowcolor{shadecolor} {\cellcolor{black} } & \multicolumn{4}{c|}{Error Rate}  \\ 
+\hline
+Train & 1\% & 15\%  & 15\% & 0.5\%  \\ 
+\hline
+\rowcolor{aliceblue} 
+Dev. & 11\%  & 16\%   & 30\% & 1\%    \\ \hline
+Problem & var. & bias & bias \& var. & Happy  \\ \hline
+\end{tabular}
+\end{table}
+
+Recipe for attacking the problems:
+\begin{description}
+\item [1. High bias?] 
+$\boldsymbol \cdot $ Try bigger network
+$\boldsymbol \cdot $ Try longer training (GD) or better optimization algorithms.
+$\boldsymbol \cdot $ Maybe other architecture
+
+\item [2. No bias but high variance?] 
+$\boldsymbol \cdot $ Get more data
+$\boldsymbol \cdot $ Regularization
+$\boldsymbol \cdot $ Maybe other architecture
+
+\item [3. No bias and No variance?] Happy days.
+\end{description}
+
+\item Drop out regularization: For each training example, eliminate some neurons 
+in each layer at random. For a given example, this should not be fixed at each epoch.
+
+\item Early stopping can be a form of regularization. In image cases, crop, shift, rotation, 
+and flipping can raise number of training examples.
+
+\item Optimization Algorithms\marginnote{Course 2 - Week 3}(the last two are weighted averages methods): 
+$\boldsymbol \cdot $ Mini-batch GD
+$\boldsymbol \cdot $ GD with momentum
+$\boldsymbol \cdot $ RMS-prop
+$\boldsymbol \cdot $ Adam optimization
+
 \end{itemize}
 
 
