@@ -16,7 +16,7 @@ a response $y_i = 1$ is misclassified, then
 $x_i^T \beta + \beta_0 < 0 $, and the opposite for
 a misclassified response with $y_i = -1$. The goal is to minimize
 \begin{equation}\label{eq:RosenblattsGoal}
-D(\beta, \beta_0) = - \sum_{i \in \mathcal{M}} y_i (x_i^T\beta + \beta_0 )
+D(\boldsymbol{\beta}, \beta_0) = - \sum_{i \in \mathcal{M}} y_i (\mathbf{x}_i^T \boldsymbol{\beta} + \beta_0)
 \end{equation}
 where $\mathcal{M}$ indexes the set of misclassified points. 
 The quantity is non-negative and proportional to the distance 
@@ -26,8 +26,8 @@ is given by
 \begin{gather}
 % gather and aligned leads to having one label for eq.
 \begin{aligned}
-\partial \frac{D(\beta, \beta_0)}{\beta} &= - \sum_{i \in \mathcal{M}} y_ix_i, \\
-\partial \frac{D(\beta, \beta_0)}{\beta_0} &= - \sum_{i \in \mathcal{M}} y_i.\\
+\partial \frac{D(\boldsymbol{\beta}, \beta_0)}{\boldsymbol{\beta}} &= - \sum_{i \in \mathcal{M}} y_i \mathbf{x}_i, \\
+\partial \frac{D(\boldsymbol{\beta}, \beta_0)}{\beta_0} &= - \sum_{i \in \mathcal{M}} y_i.\\
 \end{aligned}
 \end{gather}
 The algorithm in fact uses stochastic gradient descent 
@@ -53,8 +53,8 @@ Consider the optimization problem
 \begin{equation}
 \label{eq:SepHyperOpt}
 \begin{aligned}
-& \max_{\beta, \beta_0, \norm{\beta}=1} M,\\
-\text{subject to } & y_i(x_i^T \beta + \beta_0) \ge M,~i=1, \dots, N.\\
+& \max_{\boldsymbol{\beta}, \beta_0, \norm{\boldsymbol{\beta}}=1} M,\\
+\text{subject to } & y_i(\mathbf{x}_i^T \boldsymbol{\beta} + \beta_0) \ge M,~i=1, \dots, N.\\
 \end{aligned}
 \end{equation}
 
@@ -65,13 +65,13 @@ and associated parameters. We can get rid of the
 $\norm{\beta} = 1$ constraint by replacing the conditions with
 \begin{equation}
 \begin{aligned}
-\frac{1}{\norm{\beta}} y_i (x_i^T \beta + \beta_0) \ge M
+\frac{1}{\norm{\boldsymbol{\beta}}} y_i ({\bf x}_i^T \boldsymbol{\beta} + \beta_0) \ge M
 \end{aligned}
 \end{equation}
 (which redefines $\beta_0$) or equivalently
 \begin{equation}
 \begin{aligned}
-y_i (x_i^T \beta + \beta_0) \ge M \norm{\beta}
+y_i ({\bf x}_i^T \boldsymbol{\beta} + \beta_0) \ge M \norm{\boldsymbol{\beta}}
 \end{aligned}
 \end{equation}
 Since for any $\beta$ and $ \beta_0$ satisfying these inequalities, 
@@ -80,8 +80,8 @@ arbitrarily set $ \beta = 1 / M $. Thus~\ref{eq:SepHyperOpt}
 is equivalent to
 \begin{equation}\label{eq:SepHyperOpt2}
 \begin{aligned}
-& \min_{\beta, \beta_0} \frac{1}{2}\norm{\beta}^2,\\
-\text{subject to } & y_i(x_i^T \beta + \beta_0) \ge 1,~i=1, \dots, N.\\
+& \min_{\boldsymbol{\beta}, \beta_0} \frac{1}{2}\norm{\boldsymbol{\beta}}^2,\\
+\text{subject to } & y_i({\bf x}_i^T \boldsymbol{\beta} + \beta_0) \ge 1,~i=1, \dots, N.\\
 \end{aligned}
 \end{equation}
 The constraints define an empty slab or margin around 
@@ -91,13 +91,13 @@ This is a convex optimization problem (\hl{quadratic criterion with linear inequ
 The Lagrange (primal) function, to be minimized w.r.t. $\beta$ and $\beta_0$, is
 \begin{equation}\label{eq:LagrangeSepHyp}
 \begin{aligned}
-L_p = \frac{1}{2} \norm{\beta}^2 - \sum_{i=1}^N \alpha_i \left[ y_i(x_i^T \beta + \beta_0) - 1  \right]
+L_p = \frac{1}{2} \norm{\boldsymbol{\beta}}^2 - \sum_{i=1}^N \alpha_i \left[ y_i({\bf x}_i^T \boldsymbol{\beta} + \beta_0) - 1  \right]
 \end{aligned}
 \end{equation}
 Setting the derivatives to zero, we obtain:
 \begin{equation}\label{eq:someCond}
 \begin{aligned}
-\beta &= \sum_{i=1}^N\alpha_i y_i x_i,\\
+\boldsymbol{\beta} &= \sum_{i=1}^N\alpha_i y_i {\bf x}_i,\\
     0   &= \sum_{i=1}^N\alpha_i y_i  
 \end{aligned}
 \end{equation}
@@ -116,9 +116,21 @@ In addition the solution must satisfy the Karush–Kuhn–Tucker conditions,
 which include \ref{eq:someCond},~\ref{eq:WolfeSepHyp} and
 \begin{equation}
 \begin{aligned}
-\alpha_i \left[ y_i(x_i^T \beta + \beta_0) - 1  \right] = 0 ~ \forall i.
+\alpha_i \left[ y_i({\bf x}_i^T \boldsymbol{\beta} + \beta_0) - 1  \right] = 0 ~ \forall i.
 \end{aligned}
 \end{equation}
+
+To let points to be on the wrong side:
+\begin{equation}\label{eq:SepHyperWrongSide}
+\begin{aligned}
+& \max_{\boldsymbol{\beta}, \beta_0, \boldsymbol{\varepsilon}} M,\\
+\text{s.t. } & y_i({\bf x}_i^T \boldsymbol{\beta} + \beta_0) \ge M(1- \varepsilon_i) ,~i=1, \dots, N\\
+& \norm{\beta} = 1, \varepsilon_i \ge 0, \sum \varepsilon_i \leq C
+\end{aligned}
+\end{equation}
+The slack variables $\varepsilon_i$ allows for points
+being on the wrong side and $C$ is a hyper-parameter
+to be tuned.
 
 
 

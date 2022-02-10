@@ -46,6 +46,9 @@ are incorrectly predicted positive.
 Specifity = FPR = \frac{FP}{TN + FP}
 \end{equation}
 \end{deff}
+ Lowering the threshold of classification
+ will increase/improve sensitivity and decrease
+ 
 
 \begin{deff}{}
 Adjust $\beta$ for trade off between  precision and recall.
@@ -125,6 +128,22 @@ $
 \item Final decision $\hat y = sign(\sum_1^T \hat w_t f_t(x))$
 \end{enumerate}
 
+\section{Bias and Variance}
+\label{sec:Bias_and_Variance_interview}
+Bias measures how on average the model
+matches the target. It is an error from
+erroneous assumptions. Variance measures
+how much the learning algorithm predictions
+fluctuates for different training set.
+It is the error from sensitivity to small changes 
+in the training set.
+
+\[ E[Y - \hat Y] = E[f(x) + \varepsilon - \hat f(x)] = E[f(x) - \hat f(X)]^2 + var(\varepsilon) \]
+
+\[ E[Y_0 - \hat Y_0] =  var(\hat f(x_0)) + 
+[\text{bias}((\hat f(x_0))]^2 + var(\varepsilon) \]
+
+
 \section{$P$-value}
 \label{sec:P_value_Interview}
 
@@ -194,6 +213,10 @@ $p$-value is small means either $H_0$ is false or $H_0$ is true
 and we observed something unlikely.
 \end{exm}
 
+
+
+Look for $$t = {\bar d} \times \left(\frac{s_d}{\sqrt{N}}\right)^{-1}$$
+
 \section{Coefficient Accuracy}
 \label{sec:Coefficient_Accuracy_Interview}
 In linear regression
@@ -204,7 +227,7 @@ In linear regression
 \begin{equation}
 (N-p-1)\hat \sigma^2 \sim \sigma^2 \chi^2_{N-p-1}
 \end{equation}
-For $\hat \beta_j$, $z_j = \frac{\hat \beta_j - 0}{\hat \sigma \sqrt{v_j}}$ where
+For $\hat \beta_j$, $z_j = \frac{\hat \beta_j - 0}{ v_j^{1/2} \hat \sigma}$ where
 $v_j = (\mathbf{X}^T \mathbf{X})^{-1}_{jj}$. Large $z_j$ reject $H_0 \equiv \beta_j=0$.\\
 
 Suppose we are seeking mean of a population $X$
@@ -247,13 +270,15 @@ where $\sigma$ is the standard deviation of each of the realizations $y_i$
 of $Y$\marginnote{Of course here the $N$ data points are uncorrelated}.
 Roughly speaking, the standard error tells us the average 
 amount that this estimate $\hat \mu$ differs from the actual value of $\mu$.
-Similarly\marginnote{assuming errors $\varepsilon_i$ for each observation have 
+Similarly\marginnote{Assuming errors $\varepsilon_i$ 
+for each observation have 
 common variance $\sigma^2$ and are uncorrelated},
 \begin{equation}
 SE(\hat \beta_0)^2 = \sigma^2 \left[  \frac{1}{N} + \frac{\bar x^2}{\sum (x_i - \bar x)^2}    \right],~~
 SE(\hat \beta_1)^2 = \sigma^2 \left[  \frac{\sigma^2}{\sum (x_i - \bar x)^2}    \right]
 \end{equation}
-The $\sigma$ can be estimated bby \emph{residual standard error} $RSE = \sqrt{\frac{RSS}{N-2}}$.
+The $\sigma$ can be estimated by \emph{residual standard error} $RSE = \sqrt{\frac{RSS}{N-2}}$. Moreover, we see the more the data is spread
+out the smaller $SE(\hat \beta_1)$ will be. 
 
 Standard errors can be used to compute confidence intervals. 
 A 95\% confidence interval is defined as a range of values such that with 95\% 
@@ -285,14 +310,15 @@ null hypothesis. In practice, we compute a t-statistic, given by
 \begin{equation}
 t = \frac{\hat \beta_1 - 0}{SE(\hat \beta_1)}
 \end{equation}
-which measures the number of standard deviations that $\hat \beta_1$ is away from 0.
+which measures the number of standard\marginnote{in linear regression $z-$statistics is used.} 
+deviations that $\hat \beta_1$ is away from zero.
 If there really is no relationship between $X$ and $Y$, 
-then we expect that the equation above will have a t-distribution with $n-2$ 
+then we expect that the equation above will have a t-distribution with $N-2$ 
 degrees of freedom. The t-distribution has a bell shape and 
-for values of n greater than approximately 30 it is quite similar 
+for values of $N$ greater than approximately 30 it is quite similar 
 to the standard normal distribution. Consequently, it is a simple 
 matter to compute the probability of observing any number
-equal to |t| or larger in absolute value, assuming $\beta_1=0$. We call 
+equal to $\abs{t}$ or larger in absolute value, assuming $\beta_1=0$. We call 
 this probability the $p$-value. Roughly speaking, we interpret the 
 $p$-value as follows: a small $p$-value indicates that it is unlikely 
 to observe such a substantial association between the 
@@ -302,6 +328,11 @@ see a small $p$-value, then we can infer that there is
 an association between the predictor and the response.
 We reject the null hypothesis--that is, we declare a relationship to 
 exist between $X$ and $Y$--if the $p$-value is small enough.}
+Typical $p-$value cut offs are 5\% and 1\%. 
+When $N=30$ these correspond to $t-$statistics 
+of around  2 and 2.75, respectively.
+\marginnote{$t-$statistics is the number of 
+standard deviations $\hat \beta_1$ is away from zero.}
 
 \section{Model Accuracy}
 \label{sec:Model_Accuracy_Interview}
@@ -316,8 +347,13 @@ The RSE is considered a measure of the lack of fit.
 If the predictions obtained using the model are very 
 close to the true outcome values--$\hat y_i \approx y_i$-- 
 then RSE will be small, and we can conclude that the model fits the data very well. 
-On the other hand, if $\hat y_i$ is very far from $y_i$ for one or more observations, 
-then the RSE may be quite large, indicating that the model doesn’t fit the data well.
+On the other hand, if $\hat y_i$ is very far from $y_i$ 
+for one or more observations, 
+then the RSE may be quite large, indicating that the 
+model doesn’t fit the data well.
+
+RSS is absolute measure of fit and it depends on
+the scale of $Y$. 
 
 
 \item [$R^2$ Statistic]
@@ -329,7 +365,13 @@ so it always takes on a value between 0 and 1, and is independent of the scale o
 \begin{equation}
 R^2 = \frac{TSS - RSS}{TSS}
 \end{equation}
-where $TSS = \sum(y_i - \bar y)^2$
+where $TSS = \sum(y_i - \bar y)^2$.
+Small $R^2$ can occur because of either 
+linear model was not good or the inherent error $\sigma^2$
+is large or both. Interpreting $R^2$, measure of linear relation between 
+$X$ and $Y$, is easier than
+$RSE$ but still hard and depends on the application.
+\marginnote{In case of simple linear regression $RSE = cor^2(X, Y)$.}
 
 \item [Multiple Regression]
 Below are some important questions.
@@ -348,6 +390,7 @@ and can be answered by F-statistics
 F = \frac{(TSS-RSS) / p}{ RSS / (N - p - 1)}
 \end{equation}
 If the linear model assumptions are correct we can show that
+\marginnote{$RSE = \sqrt{RSS / (N-p-1)}$}
 \begin{equation}
 E[RSS/(N - p - 1)] = \sigma^2
 \end{equation}
@@ -428,6 +471,12 @@ adjusted $R^2$ and plotting residuals.
 To select which variables to include in different models and then
 compare their $C_p$, we can do Forward selection, Backward selection,
 mixed selection.
+\begin{itemize}
+\item Mallow's CP: $\frac{1}{N} (RSS + 2d \hat \sigma^2)$
+\item  AIC: $\frac{1}{N\hat \sigma^2}(RSS + 2d \hat \sigma^2)$
+\item  BIC: $\frac{1}{N\hat \sigma^2}(RSS + log(N) d \hat \sigma^2)$
+\item  Adjusted $R^2$: $1 - \frac{RSS/(N-d-1)}{TSS/(N-1)}$
+\end{itemize}
 
 \item Model fit: RSE and $R^2$. An $R^2$ value close to 1 
 indicates that the model explains a large portion of the 
@@ -459,9 +508,19 @@ Prediction interval for $y_{new} \equiv y_n$
 Graphical summaries can reveal problems with a 
 model that are not visible from numerical statistics.
 
-See 77-83 of Introduction to Statistical Learning\cite{james2013introduction} if you want.
+See 77-83 of Introduction to Statistical 
+Learning\cite{james2013introduction} if you want.
 \end{enumerate}
+
+\item [Confidence Intervals] to see how close $\hat Y$ is
+to $f(X)$. In general confidence interval is defined by
+$\bar x \pm z\frac{s}{N}$.
+
+\item [Prediction Intervals] to see how much $Y$ varies from $\hat Y$.
+Prediction intervals are wider than confidence intervals.
 \end{description}
+
+
 
 \section{Clustering Comparison}
 \label{sec:Clustering_Comparison_Interview}
@@ -1011,7 +1070,56 @@ the next classifier is forced to focus on those observations.
  \caption{Boosting}
 \end{algorithm}
 \end{tcolorbox}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%
+%%%%%   PCA
+%%%%%
+\section{PCA}
+\label{sec:PCA_interview}
 
+Let us begin with sample covariance:
+\begin{equation}
+Q = \text{sample covariance} = \frac{1}{N-1} \sum_{i=1}^{N}
+(x_i - \bar x) (x_i - \bar x)^T
+\end{equation}
+where $\bar x$ is the average.
+
+PCA pays attention to variances; perhaps there are 
+other techniques looking into covariances!
+The goal is to find a direction in which the projection
+of data into it will have highest variance.
+So, we are looking for a map $\alpha$ that
+maps the point $x = (x_1, x_2, \dots, x_p)$
+into a 1-dimensional subspace where
+the set of all such points will have highest variance
+amongst all possible 1-dimensional subspaces.
+So, we want to find the set of points that look like
+\[z_1 = \alpha_1^T x.\]
+subject to maximizing the variance 
+$var[z_1] = var[\alpha_1^T x] = \alpha_1^T \Sigma \alpha_1$
+and $\norm{\alpha_1} = 1$.
+The index 1 above is related to the first dimension in the
+PCA coordinate; i.e. not the first sample in the training set.
+To do so the technique of Lagrange multipliers are used
+\[ \alpha_1^T \Sigma \alpha_1 - \lambda (\alpha_1^T\alpha_1 -1)\]
+where $\lambda$ is Lagrange multiplier.
+Differentiate w.r.t. $\alpha_1$ and setting it to zero gives
+\[\Sigma \alpha_1 - \lambda \alpha_1 = 0\]
+We can see $\alpha_1$ and $\lambda$ are eigen-pairs
+of $\Sigma$; the covariance matrix.
+
+The second direction (basis or PC) in the PCA subspace
+will be the direction that is perpendicular to direction of
+$\alpha_1$ and the projection of sample points in this space
+must have second largest variance amongst all other directions.
+Similarly, such direction will be given by another eigen-pair of
+$\Sigma$ where $\lambda_2$ is the second largest
+eigenvalue of $\Sigma$; $\lambda_2 < \lambda_1$.
+
+Some assumptions made here are that
+none of the variances of PC's are equal, nor they
+are zero.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1126,7 +1234,7 @@ work well with time series which tend to follow linear trends.
      
      \begin{equation*}
          \begin{aligned}
-  \mathcal{L(\beta_0, \beta_1)} &= log(\Pi_{i; y_i=1} p(x_i)) + log(\Pi_{i; y_i=0} [1-p(x_i)])\\ 
+  \mathcal{L}(\beta_0, \beta_1) &= log(\Pi_{i; y_i=1} p(x_i)) + log(\Pi_{i; y_i=0} [1-p(x_i)])\\ 
                &= \sum_i \{y_i log(p_i) + (1-y_i) log(1-p_i)\}
            \end{aligned}
      \end{equation*} 

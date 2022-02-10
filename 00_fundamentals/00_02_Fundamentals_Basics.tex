@@ -1,6 +1,21 @@
 \section{Basics}
 \label{sec:Fundamentals_Basics}
 
+\begin{deff}{}\label{def:ChiSquareDef}
+If $Z_1, \dots, Z_k$ are independent, standard normal random 
+variables, then the sum of their squares, is distributed according 
+to the chi-squared distribution with k degrees of freedom
+\[Q = \sum_{i=1}^K Z_i^2\]
+This is denoted by $Q \sim \chi^2_K$.
+\end{deff}{}
+\noindent The chi-squared	 distribution is used primarily in hypothesis testing, and to a lesser extent for confidence intervals for population variance when the underlying distribution is normal. Unlike more widely known distributions such as the normal distribution and the exponential distribution, the chi-squared distribution is not as often applied in the direct modeling of natural phenomena. It arises in the following hypothesis tests, among others [Wikipedia]:
+\begin{itemize}
+\item Chi-squared test of independence in contingency tables
+\item Chi-squared test of goodness of fit of observed data to hypothetical distributions
+\item Likelihood-ratio test for nested models
+\end{itemize}
+
+
 \begin{deff}{}\label{def:UnivariateCovarianceDef}
 Covariance is a measure of the joint variability of two 
 random variables.
@@ -169,8 +184,74 @@ If ${\bf A} = {\bf A}^T\in \mathbb{R}^{n \times n}$
 and ${\bf a}$ is a column vector of the diagonal elements of ${\bf A}$,
 then
 \[ var [{\bf X}^T{\bf A X}]  =  (\sigma_4 - 3\sigma_2^2) {\bf a}^T {\bf a} + 2\sigma_2^2 tr({\bf A}^2) + 4\sigma_2  \boldsymbol{\mu}^T{ \bf A}^2 \boldsymbol{\mu} + 4 \sigma_3 \boldsymbol{\mu}^T { \bf A a}  \]
-
 \end{thm}
+
+\subsection{Distributions of Functions of Random Variables}
+\warn First thing we need to remember is the following: $E[f(X)] \neq f(E[X])$.
+We need to learn \emph{distribution function technique}, \emph{the change-of-variable technique} and the \emph{moment-generating function technique}.
+
+\begin{tcolorbox}
+Summary of change of variable:
+
+Let $X$ be a random variable with distribution function $f_X(x)$. 
+Let $Y = g(X)$. Then
+
+\[E[g(X)] = \int_{-\infty}^{\infty} y f_{Y}(y) dy =  \int_{-\infty}^{\infty} g(x) f_{X}(x) dx \]
+
+In case monotonic $g: \Rto 1 1$ the density function is 
+\[ f_Y(y) =f_X\left(g^{-1}(y) \right) \left\lvert \frac{d}{dy} g^{-1}(y) \right \rvert\]
+
+In case of vectors and invertible function $H: \Rto n n$, $\mathbf{y} = H(\mathbf{x})$:
+\[  g({\bf y}) = f(H^{-1} ({\bf y})) \left\lvert   det \left (\frac{\partial H^{-1}}{\partial{y}} \right )      \right \rvert \]
+\end{tcolorbox}
+
+\noindent \textbf{Distribution Function Technique}
+\begin{enumerate}
+\item Find cumulative distribution function $F_Y(y) = P(Y \le y)$.
+\vspace{-0.5in}
+\item Differentiate $F(y)$ to get $f(y)$.
+\end{enumerate}
+
+\begin{exm}
+Let $f_X(x) = 3x^2$ on $[0, 1]$. 
+Find the probability density function of $Y=X^2$.\\
+
+\noindent {\color{red}{Solution.}} For $y \in [0, 1]$
+\begin{equation}
+\begin{aligned}
+F_Y(y) &= p(Y \le y) \\
+            &= p(X^2 \le y) \\
+            &= p(X \le \sqrt{y}) \\
+            &= F_X(\sqrt{y}) \\
+            &= \int_{0}^{\sqrt{y}} 3t^2 dt \\
+            &=  y^{3/2} \\ 
+\end{aligned}
+\end{equation} 
+So, $f_Y(y) = F_Y'(y) = \frac{3}{2} y^{1/2}$.
+\end{exm}
+
+\iffalse
+\begin{exm}
+Let $f_X(x) = 3(1-x)^2$ on $[0, 1]$. 
+Find the probability density function of $Y=(1-X)^3$.\\
+
+\noindent {\color{red}{Solution.}} 
+\begin{equation}
+\begin{aligned}
+F_Y(y) &= p(Y \le y) \\
+            &= p[(1-X)^3 \le y] \\
+            &= p(X >  1 - y^{1/3}) \\
+            &= 1 - p(X \le  1 - y^{1/3})  \\
+            &= 1 - \int_{0}^{1 - y^{1/3}}  3(1-t)^2 dt \\
+            &= 1 - \left[ - (1-t)^3 \right]_0^{1 - y^{1/3}} \\ 
+            &= 1 + \left[ (1 - 1 + y^{1/3})^3 - 1  \right]\\ 
+            &= y \\ 
+\end{aligned}
+\end{equation} 
+So, $f_Y(y) = F'_Y(y) = 1$.
+\end{exm}
+\fi 
+\noindent \textbf{Change-of-Variable Technique}
 
 
 
