@@ -1,9 +1,239 @@
 \section{Linear Regression}
 \label{sec:Linear_Regression}
 
+Let us assume we have $N$ observations/examples
+where in each example there are $p$ measurements and one
+response; i.e. there are $p$ independent variables.
+We believe the response is a function of these variables; 
+$y = f(x_1, x_2, \dots, x_p)$. However, in practice
+this will not happen. There will be noise present and 
+the $y$ values will be random variables. If our assumption ($y$ being function of
+$x_i$s) is correct (i.e. we did not miss anything), 
+$y$ will fluctuate about $f(\bm x)$ and we will model it via random 
+variable concept and in practice we will have 
+$y = f(x_1, x_2, \dots, x_p) + \varepsilon$ where $\varepsilon$
+is out of our control. Please note I already abused the notation
+and used $y$ to present both $f(\bm x)$ and $f(\bm x) + \varepsilon$\marginnote{So, we 
+try to model $y$ is the same as saying we are modeling $f(\bm x)$.}.
+Thus, even if $(x_1, x_2, \dots, x_p)$ is fixed, the $y$ values we
+observe over time or at different experiment trials will be
+different. $y$ is a random variable because the out-of-control-variable
+$\varepsilon$ is.
+
+Then, we have $y_i = \beta_0 + \beta_1x_{11} + \dots + \beta_p x_{1p} + \varepsilon_i$.
+In the matrix form we have $\bm y = \bm X \bbeta+ {\bm \varepsilon}$
+where $\bm X \in \mathbb{R}^{N \times (p+1)}$. Here we assume
+$\bm X$ is full rank. Consider a scenario in which we
+repeat each training example twice. Then, our model
+thinks as if each training example is very confident.
+Therefore, our testing tools will be undermined and the
+power of tests will be reduced. Wrongfully we would think
+the model is a good model.\marginnote{In some cases the matrix $\bm X$
+will contain only zeros and ones and is referred to by design matrix. In these
+cases $\bm X$ may not be full rank and we ignore them here.}
+
+Let us carry on with the modeling. Let me add that
+we try to model 
+\begin{equation}\label{eq:overDeterminedSystem}
+{\bm y} = {\bm X} \bbeta
+\end{equation}
+ as closely as we can
+as opposed to ${\bm y} = {\bm X} \bbeta + {\bm \varepsilon}$ because
+well clearly $\bm \varepsilon$ varies independent of 
+$\bm x$ in the sense that even if $\bm x$ is fixed
+we will have different values of $\bm \varepsilon$ and
+consequently $y$ at different datasets/experiments.
+Please note here in linear regression we are also assuming 
+$\varepsilon$ is independent of $\bm x$ in the sense that
+$\varepsilon$ is i.i.d. for all $\bm x$.
+
+The system of linear equations  $\bm y = \bm X \bbeta$
+is an overdetermined system; number of equations is more than
+number of independent variables (features/regressors) i.e., 
+$\bm X \in \mathbb{R}^{N \times p},~ N > p$.
+The right-hand side is a vector in the space spanned by 
+by the columns of $\bm X$. So, if $\bm y$ does not lie in this space,
+then \cref{eq:overDeterminedSystem} does not have an exact solution!\sidenote{If we 
+had 2 points, we could find a 1-dimensional line that passes through 
+them. If we had 3 points, we could find a 2-dimensional place that passes through them,
+and so on, But in Eq.~\ref{eq:overDeterminedSystem} we
+are expecting to find a plane of $p-$dimension such that
+$N >>p$ points lie on it. In practice, those $N$ points will
+not all lie on the $p-$dimensional space/surface!}
+In other words, such an ``\emph{equality/equation}'' does not exist, 
+even though we write it like an equation. Thus, we must
+settle with an approximation. The chosen/popular approach
+is to solve this system by least square method.
+Since we assumed $\bm X$ is full rank there is a unique
+\emph{solution} for the least square problem, i.e. minimizing squared 
+sum of residuals\marginnote{In this notes mostly the second norm is used, so, I will use $\norm{.}$
+for $\norm{.}_2$.}
+$ r_i = y_i -  \bm x_i^T \bbeta$; 
+\[ \norm{\bm y - \bm X {\bbeta}}_2 =\min_{\bbeta \in \mathbb{R}^p} \norm{\bm y - \bm X \bbeta}_2.\]
+
+This problem is explained geometrically as well as algebraically
+in the beautiful and smooth book by Watkins\cite{watkinsfund}.
+The latter is done via $QR$ decomposition as well as SVD decomposition
+which is one of the strongest tools in matrix computation toolbox. 
+
+We know the shortest distance between a point and a line
+is the one that connects the point perpendicularly to the line.
+We generalize that idea to a higher dimension here.
+Suppose $\bm y$ is the point and column space of 
+$\bm X$, $\mathcal{R}(\bm X) = col(\bm X)$, is the line.
+The shortest distance between the two is orthogonal
+projection of $\bm y$ onto $\mathcal{R}(\bm X)$; $proj_{\mathcal{R}(\bm X)}(\bm y)$.
+Then the distance between $\bm y$ and $\mathcal{R}(\bm X)$
+is $\norm{\bm y - proj_{\mathcal{R}(\bm X)}(\bm y)}$.
+We also know the vector $\bm X \bm \beta$ is in column space of $\bm X$.
+So, the $\bm \beta$ for which $\norm{\bm y - \bm X \bm \beta}$ is minimized
+is the one that gives us $proj_{\mathcal{R}(\bm X)}(\bm y)$.
+Denote that $\bm \beta$ by $\hat {\bm \beta}$. Then, 
+since $\bm y - \bm X \hat{\bm \beta}$ is orthogonal to 
+$\mathcal{R}(\bm X)$, it is orthogonal to all columns of $\bm X$;
+$\langle \bm y - \bm X \hat{\bm \beta}, \bm X_{k} \rangle = 0$
+where $\bm X_k$ is the $k^{\text{th}}$ column of $\bm X$.
+In matrix notation $\bm X^T (\bm y - \bm X \hat{\bm \beta}) = 0$.
+Therefore, 
+\[
+\bm X^T \bm X \hat{\bm \beta} = \bm X^T \bm y.
+\]
+Since we assumed $\bm X$ is full rank, $\bm X^T \bm X$
+is positive definite and consequently invertible and we have
+\[ \hat{\bbeta} = (\bm X^T \bm X)^{-1} \bm X^T \bm y.\]
+Now, $\bm y \approx \hat {\bm y} = \bm X \hat {\bbeta} = \bm X (\bm X^T \bm X)^{-1} \bm X^T \bm y = \bm H \bm y$
+where $\hat {\bm y}$ is orthogonal projection of $\bm y$
+onto $\mathcal{R}(\bm X)$ and $\hat {\bm y} = \bm X \hat {\bbeta}$
+actually is an equality. The matrix $\bm H$ is called the hat matrix.
+Even if $\bm X$ is not full rank, i.e. it is rank deficient, 
+the least square problem given by overdetermined system 
+${\bm y} = {\bm X \bm \beta}$
+will have a solution/best approximation (in the sense of minimizing
+the residuals) except that is not unique. There will
+be infinitely many solutions~\citep{watkinsfund}.
+
+\begin{thm}
+Let $\bm X \in \mathbb{R}^{N \times p}$ be full rank and
+$\bm H = \bm X (\bm X^T \bm X)^{-1} \bm X^T$. Then 
+\begin{enumerate}[label=(\alph*)]
+\item $\bm H$ and $\bm I_N - \bm H$ are symmetric and idempotent.
+\item $rank(\bm I_N - \bm H) = tr(\bm I_N - \bm H) = N - p$.
+\end{enumerate}
+\end{thm}
+
+\begin{exc}
+Prove the followings.
+\begin{enumerate}[label=(\alph*)]
+\item  $\forall \bm X,~ \bm X^T \bm X$ is positive definite.
+\item A positive definite matrix $\bm M$ is invertible.
+\end{enumerate}
+\end {exc}
+
+\subsection{Lest Square Problem; A Numerical Analyst View}
+\label{sec:Lest-Square-Problem-A-Numerical-Analyst-View}
+I would present a very short presentation of solving the
+least square problem algebraically. I refer
+the reader to~\citep{watkinsfund} for the details and even
+for painting the geometric picture.
+
+Before moving forward recall that if $\bm v \in \mathbb{R}^k$,
+and $\bm Q \in \mathbb{R}^{k \times k}$ is an orthogonal matrix, 
+i.e. $\bm Q^{-1} = \bm Q^T$, then $\norm{\bm Q \bm v} = \norm{\bm v}$.
+
+
+Let $\bm X \bbeta = \bm y$ be an overdetermined system
+where  $\bm X \in \mathbb{R}^{N \times p}, N > p, \bbeta \in  \mathbb{R}^p$, 
+and  $\bm y \in \mathbb{R}^N$. Then, $\bm X$ has a QR decomposition
+with an orthogonal $\bm Q \in \mathbb{R}^{N \times N}$ and 
+$\bm R \in \mathbb{R}^{N \times p}$:
+\[ \bm X = \bm Q \bm R = \bm Q \begin{bmatrix} \hat{\bm R} \\ \bm 0 \end{bmatrix}\]
+where $\hat {\bm R} \in  \mathbb{R}^{p \times p}$ is upper triangular.
+This decomposition exist whether $\bm X$ is full rank or not.
+
+Now consider the full rank case.
+We can re-write the system as $\bm Q \bm R \bbeta = \bm y$ 
+and consequently, $\bm R \bbeta = \bm Q^T \bm y$. 
+Let $\bm c = \bm Q^T \bm y$, then $\bm R \bbeta = \bm c$.
+Since $\bm Q$ is orthogonal the vectors $\bm r = \bm y - \bm X \bbeta$
+and $\bm Q^T \bm r = \bm Q^T (\bm y - \bm X \bbeta) = \bm c - \bm R \bbeta$
+are of the same size; i.e. minimizing $\norm{\bm r}$ is the same as
+minimizing $\norm{\bm c - \bm R \bbeta}$.
+Write $\bm c = \begin{bmatrix} \hat {\bm c} & \bm d \end{bmatrix}^T$,
+then
+
+\[ \bm c - \bm R \bbeta =  
+\begin{bmatrix} \hat {\bm c} \\ \bm d  \end{bmatrix}  - \begin{bmatrix} \hat{\bm R} \\ \bm 0 \end{bmatrix} \bbeta = \begin{bmatrix} \hat {\bm c} - \hat{\bm R} \bbeta \\ \bm d  \end{bmatrix}.
+\]
+Therefore, 
+\[\norm {\bm c - \bm R \bbeta}^2 = \norm{\hat {\bm c} - \hat{\bm R} \bbeta }^2 + \norm{\bm d}^2.\]
+Obviously $\norm{\bm d}$ is independent of $\bbeta$.
+Therefore, $\norm {\bm c - \bm R \bbeta}$ is minimized when
+$\norm{\hat {\bm c} - \hat{\bm R} \bbeta } \ge 0$ is minimized.
+Since we assumed $\bm X$ is full rank, $\hat{\bm R}$ is nonsingular
+and the system $\hat{\bm R} \bbeta = \hat {\bm c} $ has a unique 
+solution that can be found easily by back substitution.
+
+
+
+
+\subsection{Properties of Least Square Estimates}
+\label{sec:Properties-of-Least-Square-Estimates}
+Assume $\bm X$ is full rank and $E[\varepsilon_i] = 0$, 
+i.e. errors are unbiased, then least square estimates $\hat \bbeta$ of $\bbeta$
+is unbiased:
+\begin{equation*}
+\begin{aligned}
+E[\hat \bbeta] &= E[\bm H \bm y]\\
+                      &= \bm H E[ \bm y]\\
+                      &= \bm H \bm X \bbeta \\
+                      &= \hatM \bm X \bbeta \\
+                      &= \bbeta.
+\end{aligned}
+\end{equation*}
+Further, if we assume $cov[\varepsilon_i, \varepsilon_j] = 0$ if $i \neq j$ and 
+$cov[\varepsilon_i, \varepsilon_i] =  var[\varepsilon_i] = \sigma^2$ then 
+$var[\bm \varepsilon] = \sigma^2 {\bm I}_N$ and
+
+\[var[\bm Y] = var[\bm Y - \bm X \bbeta ] = var[ \bm \varepsilon ]\]
+Consequently, 
+\begin{equation}
+\begin{aligned}
+var[\hat \bbeta] &= var[\bm H \bm Y]\\
+                         &= \bm H var[ \bm Y] \bm H^T\\
+                         &= \bm H \sigma^2 \bm I_N \bm H^T\\
+                         &= \sigma^2 \hatM (\hatM)^T \\
+                         &= \sigma^2 \hatM \bm X (\bm X^T \bm X)^{-1} \\
+                         &= \sigma^2 (\bm X^T \bm X)^{-1}.
+\end{aligned}
+\end{equation}
+
+\begin{thm}
+Let $\bm X$ be full rank or rank deficient.
+Let $\hat {\bm Y}$ be the least square estimate of ${\bm Y}$
+from the over determined system $\bm X \bbeta = \bm Y$ and 
+$\tilde {\bm Y}$ be an estimation obtained by any linear unbiased estimator/method.
+Then, $var[\bm v^T \hat {\bm Y}] <  var[\bm v^T \tilde {\bm Y}]$ 
+and it is unique; of course this is implied by ``$<$'' as opposed to ``$\le$''.
+\end{thm}
+
+If $\varepsilon_i$s are i.i.d with $\varepsilon_i \sim N(0, \sigma^2)$, i.e., 
+$\bm \varepsilon \sim N(\bm 0, \sigma^2 \bm I)$,
+i.e., $\bm Y \sim N(\bm X \bbeta, \sigma^2 \bm I)$,
+then $\bm v^T \hat \bbeta$ has minimum variance for entire class 
+of estimates of $\bbeta$, not only linear estimations.\sidenote{
+Seber uses $\hat \bbeta$ when $\bm X$ is full rank. So, I am not sure
+whether this is true for rand deficient $\bm X.$}
+Moreover, $\hat \beta_j$s will be the maximum likelihood estimations of $\beta_j$s
+as well.
+
+
+\vspace{1in}
+
 If the \textit{best} is measured by average square error
-then linear regression leads to the solution $f(x) = E[Y |X = x]$.
-The NN methods attempt fo fit the data by
+then linear regression leads to the solution $f(x) = E[Y |X = x]$.\iffalse\marginnote{Please
+note the $f(X)$ here is our estimate of $Y$. Perhaps a better
+notation is $\hat f(X)$.... statisticians and their notations, again! }\fi
+ The NN methods attempt fo fit the data by
 finding the averages at each point in the input space.
 Two approximations are happening here:
 \begin{itemize}
@@ -65,7 +295,7 @@ method is least squares, in which we pick the coefficients $\beta$
 to minimize the residual sum of squares
 \begin{gather} % gather and aligned leads to having one label for eq.
 \begin{aligned}
-RSS(\bm \beta) &=  \sum_{i=1}^N (y_i - f(x_i))^2 \\ 
+RSS(\bbeta) &=  \sum_{i=1}^N (y_i - f(x_i))^2 \\ 
                    &=  \sum_{i=1}^N (y_i - \beta_0  - \sum_{j=1}^N x_{ij}\beta_j)^2\\ 
 \end{aligned}
 \end{gather} 

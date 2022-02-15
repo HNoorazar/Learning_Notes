@@ -35,7 +35,7 @@ Examples of $g$ are $g(\mu) = \mu$, $g(\mu) = logit(\mu)$, $g(\mu) = log(\mu)$.
 In this section we describe a modular algorithm 
 for fitting additive models and their generalizations. The 
 building block is the scatterplot smoother for fitting nonlinear 
-effects in a flexible way. For concreteness\marginnote{what the hell does correctness mean?} we use as our 
+effects in a flexible way. For concreteness\sidenote{what the hell does correctness mean?} we use as our 
 scatterplot smoother the cubic smoothing spline.
 
 The point, here, is that scatterplot smoothing is not a
@@ -44,7 +44,7 @@ of techniques that one is used in the Tibshirani's book (see page 297 of Tibshir
 
 \subsection{Smoothing}
 \label{sec:Smoothing}
-A\marginnote{From this point on most thing in this chapter
+A\sidenote{From this point on most thing in this chapter
 will be from Hastie and Tibshirani's book; Generalized 
 Additive Models~\citep{hastiegeneralized}.} \emph{smoother} 
 is a tool for summarizing the trend of a response
@@ -59,7 +59,7 @@ Simples case of smoother is when we have categorial variables; e.g. for males
 and females just average the $Y$ values. In case of continuous ordered
 predictor $X$ we are doing the same thing except that we do not have
 multiple $Y$ values for a given $X$. So, we compromise. The averaging
-is done in neighborhoods and decisions have to be made\marginnote{The book makes this statement about scatterplot smoothing (i.e. single variable case)! I do not know why.}:
+is done in neighborhoods and decisions have to be made\sidenote{The book makes this statement about scatterplot smoothing (i.e. single variable case)! I do not know why.}:
 \begin{enumerate}
 \item how to average the response values in each neighborhood,
 \item how big each neighborhood should be.
@@ -137,12 +137,12 @@ study  deeper. Assume
 Y = f(X) + \varepsilon
 \end{equation}
 \noindent where errors are independent with $E[\varepsilon] = 0$ and 
-$var(\varepsilon) = \sigma^2$\marginnote{The assumption of constant variance 
+$var(\varepsilon) = \sigma^2$\sidenote{The assumption of constant variance 
 will be relaxed in weighted smoother discussions}. The goal of the 
 model \ref{eq:GAMFirstAss} is $E[Y|X=x] = f(x)$. It is easier to see why 
 running-mean and locally-weighted running-lines's estimations ($\hat f(x)$) 
 are intended to be close to $E[Y|X=x]$; they are averaging $f(x)$'s. 
-In case of cubic smoothing splines\marginnote{from now on referred to just 
+In case of cubic smoothing splines\sidenote{from now on referred to just 
 by smoothing splines} it can be shown that as $n \rightarrow \infty$ and
 $\lambda  \rightarrow 0$, under certain regularity conditions, 
 $\hat f(x) \rightarrow f(x) = E[Y|X=x]$.

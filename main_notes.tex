@@ -1,7 +1,6 @@
 %\documentclass[12pt]{article}
 %\documentclass{tufte-book}
 \providecommand{\exclude}[1]{}
-
 % Simple approach for selecting styles
 % #1 article + archive
 % #2 revtex
@@ -34,7 +33,13 @@
   \documentclass[notitlepage, justified, openany]{tufte-book} % notitlepage
   \usepackage[caption=false]{subfig}
   \bibliographystyle{unsrt} % plainnat # HN: I changed this from plainnat to plain. This way \citep works nicer (in my opinion and the citations at the end are numbered as well; easier to navigate). Feel free to change it back
-  
+  \usepackage{fancyhdr} 
+  \pagestyle{fancy}
+  \renewcommand{\sectionmark}[1]{\markright{#1}} % remove section number from header of pages.
+\renewcommand{\chaptermark}[1]{\markboth{#1}{#1}}
+\fancyhead[RO]{\rightmark\  \ \  \ \  \thepage} % RO can be replaced by R. R means right O means odd. "\ \" adds space between the items in the header
+ % \fancyhead[L]{\chaptername\ \thechapter\ --\ \leftmark}
+\fancyhead[LE]{ \thepage\   \ \  \ \  \leftmark }
 } 
 
 \providecommand{\captionsetup}[1]{}
@@ -107,12 +112,14 @@
 \providecommand{\bmmax}{0}
 \RequirePackage{bm}
   
-%\usepackage[margin=1.5in]{geometry}
+% \usepackage[margin=1.5in]{geometry}
 %\setlength{\textwidth}{6.0in}
 %\setlength{\textheight}{7.0in}
 %\setlength{\topmargin}{0.5in}
 %\setlength{\oddsidemargin}{0.0in}
 %\setlength{\evensidemargin}{0.0in}
+
+
 \DeclareMathOperator{\transverse}{\cap\kern-7.75pt\top}
 
 \definecolor{titlered}{rgb}{.6,0,0}
@@ -157,6 +164,8 @@
 \newcommand{\cnv}{\operatorname{cnv}}
 \newcommand{\R}{\Bbb{R}}
 \newcommand{\Z}{\Bbb{Z}}
+\newcommand{\bbeta}{\bm \beta }
+\newcommand{\hatM}{{(\bm X^T \bm X)^{-1} \bm X^T}}
 %\newcommand{\R}{\mathbf{R}}
 %\newcommand{\R}[1]{\mathbb{R}^{#1}}
 \newcommand{\Hd}{\mathcal{H}}
@@ -195,20 +204,18 @@
 \newcommand{\vect}[1]{\vec{#1}}
 \newcommand{\braket}[1]{\langle{#1}\rangle}
 
-\newtheorem{thm}{Theorem}[section]
-\newtheorem{lem}{Lemma}[section]
-\newtheorem{con}{Conjecture}[section]
-\newtheorem{conj}{Conjecture}[section]
-\newtheorem{Coro}{Corollary}[section]
-\newtheorem{fact}{Fact}[section]
-\newtheorem{claim}{Claim}[section]
-\newtheorem{cond}{Condition}[section]
-\newtheorem{rem}{Remark}[section]
-\newtheorem{exm}{Example}[section]
-\newtheorem{deff}{Definition}[section]
-\newtheorem{defn}{Definition}[section]
-\newtheorem{exc}{Exercise}[section]
+\newtheorem{thm}{Theorem}[section] % "[section]" restarts the theorem counter at every new section.
+\newtheorem{Coro}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{rem}[thm]{Remark}
+\newtheorem{exm}[thm]{Example}
+\newtheorem{deff}[thm]{Definition}
+\newtheorem{exc}[thm]{Exercise} % "[thm]" in the middle will use the same counter as the theorem environment. if "[thm]" was at the end, then  the counter of this new environment will be reset every time a new theorem environment is used.
+\newtheorem{claim}[thm]{Claim}
+\newtheorem{cond}[thm]{Condition}
+
 \newcommand{\Tau}{\mathcal{T}}
+\renewcommand\qedsymbol{$\blacksquare$}
 
 
 %revtex uses \prb...
@@ -241,7 +248,7 @@
     urlcolor=proofgreen,
     citecolor=red,
     %bookmarks=true, % true means bookmarks
-    bookmarksnumbered=false, % left window are numbered
+     bookmarksnumbered=false, % left window are numbered
     bookmarksopen=false,
     pdftitle={Title},
     pdfauthor={Author},
@@ -386,7 +393,7 @@ font={\color{blue}},
 \begin{document}
 %\raggedright
 
-\title{Learning Notes: Machine Learning, Signal Processing, Image Analysis}
+\title{Notes on Machine Learning, Signal Processing, and Image Analysis}
 \date{\today}
 
 \select
@@ -417,8 +424,6 @@ font={\color{blue}},
 \providecommand{\marginnote}[1]{Sidebar: {#1}}
 
 \maketitle
-
-
 \setcounter{secnumdepth}{3} % If this commented out. Chapters/Sections are not numbered
 \setcounter{tocdepth}{3} % If this commented out. Sections are not included in ToC
 
