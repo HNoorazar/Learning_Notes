@@ -88,22 +88,22 @@ is $\norm{\bm y - proj_{\mathcal{R}(\bm X)}(\bm y)}$.
 We also know the vector $\bm X \bm \beta$ is in column space of $\bm X$.
 So, the $\bm \beta$ for which $\norm{\bm y - \bm X \bm \beta}$ is minimized
 is the one that gives us $proj_{\mathcal{R}(\bm X)}(\bm y)$.
-Denote that $\bm \beta$ by $\hat {\bm \beta}$. Then, 
-since $\bm y - \bm X \hat{\bm \beta}$ is orthogonal to 
+Denote that solution by $\hat {\bm \beta_{LS}}$. Then, 
+since $\bm y - \bm X \hat{\bm \beta_{LS}}$ is orthogonal to 
 $\mathcal{R}(\bm X)$, it is orthogonal to all columns of $\bm X$;
-$\langle \bm y - \bm X \hat{\bm \beta}, \bm X_{k} \rangle = 0$
+$\langle \bm y - \bm X \hat{\bm \beta}_{LS}, \bm X_{k} \rangle = 0$
 where $\bm X_k$ is the $k^{\text{th}}$ column of $\bm X$.
-In matrix notation $\bm X^T (\bm y - \bm X \hat{\bm \beta}) = 0$.
+In matrix notation $\bm X^T (\bm y - \bm X \hat{\bm \beta_{LS}}) = 0$.
 Therefore, 
 \[
 \bm X^T \bm X \hat{\bm \beta} = \bm X^T \bm y.
 \]
 Since we assumed $\bm X$ is full rank, $\bm X^T \bm X$
 is positive definite and consequently invertible and we have
-\[ \hat{\bbeta} = (\bm X^T \bm X)^{-1} \bm X^T \bm y.\]
-Now, $\bm y \approx \hat {\bm y} = \bm X \hat {\bbeta} = \bm X (\bm X^T \bm X)^{-1} \bm X^T \bm y = \bm H \bm y$
-where $\hat {\bm y}$ is orthogonal projection of $\bm y$
-onto $\mathcal{R}(\bm X)$ and $\hat {\bm y} = \bm X \hat {\bbeta}$
+\[ \hat{\bbeta}_{LS} = (\bm X^T \bm X)^{-1} \bm X^T \bm y.\]
+Now, $\bm y \approx \hat {\bm y}_{LS} = \bm X \hat {\bbeta}_{LS} = \bm X (\bm X^T \bm X)^{-1} \bm X^T \bm y = \bm H \bm y$
+where $\hat {\bm y}_{LS}$ is orthogonal projection of $\bm y$
+onto $\mathcal{R}(\bm X)$ and $\hat {\bm y}_{LS} = \bm X \hat {\bbeta}$
 actually is an equality. The matrix $\bm H$ is called the hat matrix.
 Even if $\bm X$ is not full rank, i.e. it is rank deficient, 
 the least square problem given by overdetermined system 
@@ -126,6 +126,7 @@ Prove the followings.
 \begin{enumerate}[label=(\alph*)]
 \item  $\forall \bm X,~ \bm X^T \bm X$ is positive definite.
 \item A positive definite matrix $\bm M$ is invertible.
+\item If $\bm M$ is idempotent then $tr(\bm M) = rank(\bm M)$.
 \end{enumerate}
 \end {exc}
 
@@ -183,7 +184,7 @@ i.e. errors are unbiased, then least square estimates $\hat \bbeta$ of $\bbeta$
 is unbiased:
 \begin{equation*}
 \begin{aligned}
-E[\hat \bbeta] &= E[\bm H \bm y]\\
+E[\hat \bbeta_{LS}] &= E[\bm H \bm y]\\
                       &= \bm H E[ \bm y]\\
                       &= \bm H \bm X \bbeta \\
                       &= \hatM \bm X \bbeta \\
@@ -198,7 +199,7 @@ $var[\bm \varepsilon] = \sigma^2 {\bm I}_N$ and
 Consequently, 
 \begin{equation}
 \begin{aligned}
-var[\hat \bbeta] &= var[\bm H \bm Y]\\
+var[\hat \bbeta_{LS}] &= var[\bm H \bm Y]\\
                          &= \bm H var[ \bm Y] \bm H^T\\
                          &= \bm H \sigma^2 \bm I_N \bm H^T\\
                          &= \sigma^2 \hatM (\hatM)^T \\
@@ -226,8 +227,97 @@ whether this is true for rand deficient $\bm X.$}
 Moreover, $\hat \beta_j$s will be the maximum likelihood estimations of $\beta_j$s
 as well.
 
+\subsection{Unbiased Estimation of $\sigma^2$}
+\label{sec:Unbiased-Estimation-of-sigma-regression}
+Let $var[\varepsilon_i] = \sigma^2$.
 
-\vspace{1in}
+\begin{thm}
+If $E[\bm Y] = \bm X \bbeta$ where $\bm X \in \mathbb{R}^{N \times p}$
+matrix of rank $r \le p$, $var[\bm Y] = \sigma^2 \bm I$, and
+$\hat{\bm Y}$ is the predictions obtained by least square approach
+then
+\[ S^2 = \frac{(\bm Y - \hat {\bm Y})^T (\bm Y - \hat {\bm Y})}{N -r} = \frac{RSS}{N-r} \]
+is unbiased estimate of $\sigma^2$.
+\end{thm}
+
+\begin{thm}
+Let $\bm Y \sim N_N(\bm X \bbeta, \sigma^2 \bm I)$.
+Let $X \in \mathbb{R}^{N \times p}$ and $rank(\bm X) = p$.
+Assume $\varepsilon_i \sim N(0, \sigma^2)$ so that
+$\bm \varepsilon \sim N_N(\bm 0, \sigma^2 \bm I)$ and hence
+$\bm Y \sim N_N(\bm X \bbeta, \sigma^2 \bm I)$. Then,
+\begin{enumerate}[label=(\alph*)]
+\item $\hat \bbeta_{LS} \sim N_p(\bbeta, \sigma^2 (\bm X^T\bm X)^{-1})$.
+
+\item $\sigma^{-2} (\hat \bbeta_{LS} -\bbeta)^T \bm X^T \bm X (\hat \bbeta_{LS} -\bbeta) \sim \chi_p^2.$
+
+\item $\hat \bbeta_{LS}$ is independent of $S^2$.
+
+\item $RSS/\sigma^2 = (N-p) S^2 \sigma^{-2} \sim \chi_{N - p}^2$.
+\end{enumerate}
+\end{thm}
+
+\subsection{Maximum Likelihood Estimation}
+\label{sec:Maximum-Likelihood-Estimation-Regression}
+\begin{deff}[Likelihood]
+The function $\mathcal{L}(\Tau, \bm \theta)$ 
+(also denoted by $\mathcal{L}(\Tau; \bm \theta)$ or 
+simply $\mathcal{L} (\bm \theta)$), 
+which is a function of 
+parameter(s) $\bm \theta$, is known as the 
+likelihood of the data $\Tau$.
+\end{deff}
+\noindent The likelihood function describes the joint probability 
+of the observed data as a function of the parameters.
+For each specific parameter value $\theta$  in the parameter space, the likelihood function $p(\Tau | \bm \theta )$ therefore assigns a probabilistic prediction to the observed data $\Tau$.\\
+
+If we assume $\varepsilon_i \sim N(0, \sigma^2)$ just like
+the section above, \cref{sec:Unbiased-Estimation-of-sigma-regression} 
+then the likelihood function $\mathcal{L}(\bbeta, \sigma^2)$
+for the full rank $\bm X$ is the probability density of $\bm Y$:
+\[\mathcal{L}(\bbeta, \sigma^2) = (2\pi\sigma^2)^{-N/2} 
+exp \left \{ -\frac{1}{2\sigma^2} \norm{\bm y - \bm X \bbeta}^2 \right \}\]
+Let 
+\[
+\ell(\bbeta, \sigma^2) = log[\mathcal{L}(\bbeta, \sigma^2)] 
+ = -\frac{N}{2}log(2\pi\sigma^2) - \frac{1}{2\sigma^2} \norm{\bm y - \bm X \bbeta}^2,
+ \]
+then it follows that
+
+
+\begin{equation}
+\begin{cases} 
+\frac{\partial \ell}{\partial \bbeta} = -\frac{1}{2\sigma^2} (-2\bm X^T \bm y + 2\bm X^T \bm X \bbeta) \\ \\
+\frac{\partial \ell}{\partial \sigma^2} = -\frac{N}{2\sigma^2} + 
+\frac{1}{2\sigma^4} \norm{\bm y - \bm X \bbeta}^2
+\end{cases}
+\end{equation}
+Letting $\frac{\partial \ell}{\partial \bbeta} = 0$ gives us the
+least square estimation of $\bbeta$, $\hat \bbeta_{LS}$,
+which maximizes $\ell(\bbeta, \sigma^2)$ for \emph{any} $\sigma^2$;
+$\mathcal{L}(\bbeta, \sigma^2) \le \mathcal{L}(\hat \bbeta_{LS}, \sigma^2)$
+with equality if and only if $\bbeta = \hat \bbeta_{LS}$.
+Let us maximize $\ell(\hat \bbeta_{LS}, \sigma^2)$.
+Setting $\frac{\partial \ell}{\partial \sigma^2} = 0$ we get
+$\hat \sigma^2 = \norm{\bm y - \bm X \hat \bbeta_{LS}}^2/N$.
+Consequently,
+\[\ell(\hat \bbeta_{LS}, \hat \sigma^2) - \ell(\hat \bbeta_{LS}, \sigma^2) = -\frac{N}{2}\left[log\left(\frac{\hat\sigma^2}{\sigma^2} \right) + 1 -\frac{\hat\sigma^2}{\sigma^2}\right] \ge 0. \]
+For $x\ge 0$ we have $log(x) \le x-1$. Thus, for all $\sigma^2$
+\[ \mathcal{L}(\bbeta, \sigma^2) \le \mathcal{L}(\hat \bbeta, \hat \sigma^2),\]
+with equality \ifft $(\bbeta, \sigma^2) = (\hat \bbeta_{LS}, \hat \sigma^2)$.
+Therefore, $(\hat \bbeta_{LS}, \hat \sigma^2)$ is the maximum
+likelihood estimates of $(\bbeta, \sigma^2)$.
+We will use the following fact later
+\begin{equation}
+\mathcal{L}(\hat \bbeta, \hat \sigma^2) = (2 \pi \hat \sigma^2)^{-N/2} e^{-N/2}.
+\end{equation}
+
+
+
+
+
+
+\vspace{1.5in}
 
 If the \textit{best} is measured by average square error
 then linear regression leads to the solution $f(x) = E[Y |X = x]$.\iffalse\marginnote{Please
