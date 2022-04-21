@@ -164,7 +164,12 @@ In terms of machine learning, one can start with
 \emph{\textbf{The Elements of Statistical Learning}}~\citep{Hastie2001elements}
 and \emph{\textbf{Support Vector Machines}}~\citep{steinwart2008support}.
 These two books can reveal the holes in one's knowledge
-and therefore, be a guide for finding what one needs to learn.
+and therefore, be a guide for finding what one 
+needs to learn. By spending quite some effort
+I have come up with a blueprint;~\cref{fig:BluePrint}.
+I will expand on why/how the blueprint is created 
+shortly.
+
 \emph{\textbf{The Elements of Statistical Learning}} is 
 verbose at times and yet does not provide fundamental details. It is more
 of a reference book. And for some topics there is very little
@@ -233,6 +238,109 @@ by Lindstr{\o}m~\citep{lindstrom},
 \emph{\textbf{Functions of several variables}}
 by Fleming~\citep{fleming2012functions}, and a graduate level
 book \emph{\textbf{Analysis for Applied Mathematics}}~\citep{cheney2001analysis} are good reads.
+
+Back to the blueprint (\cref{fig:BluePrint}).
+In machine learning we need to test
+hypothesis. We need to know how reliable
+the coefficients of regression model are.
+So, we need to know the probability,
+distribution functions, moments,
+moment generating functions, etc.
+So, we start with Sheldon Ross' book.
+Then we look at linear regression topic.
+There is a book in the blueprint but more 
+are suggested in~\cref{tab:GoodBooks}.
+Linear regression is a classical tool,
+perhaps still being used widely. A lot
+of ideas were initiated in this area. 
+The tests for reliability of the model,
+degrees of freedom of the model, etc.
+These ideas pop up in other places
+such as Generalized Linear Models,
+Generalized Additive Models, Local
+Regression and Likelihood. 
+These books may not explain in detail
+why and how these ideas came about.
+So, the goal is to make a strong foundation.
+We can simultaneously read Real Analysis and Probability\cite{dudley2018real}.
+Again, this is a book that is aligned with our
+goal, building a good foundation.
+There are functional analysis topic,
+measure theory, topology topics in it.
+These are important topics in mathematics
+and needed in statistical learning. We need
+all of these to understand SVM, for example.
+And so on.
+
+In the Mathematics part of the 
+blueprint~\cref{fig:BluePrint} we start with
+undergraduate level analysis and calculus.
+These, as well as Fleming, are essential, 
+so I will not go through ``why'' except for a
+little in the margin note\marginnote{Integration
+is needed in measure theory, probability (e.g. density functions and change of variables).}.
+I need to do some exploration and find
+more resources and have a better understanding
+of the landscape; what I want to do and what
+is a good way for doing it.
+So, I will stop there. However, I like SVM
+and want to understand it. The SVM 
+book~\citep{steinwart2008support} reveals
+a lot of holes in one's knowledge. There are
+topology, measure theory, functional analysis, 
+etc.\marginnote{Look at the Appendices of ~\citep{steinwart2008support} to see what is needed.}
+needed to get a grasp of SVM. So, that order in the
+blueprint.
+ 
+
+\begin{table}
+\caption{Good Books} 
+\label{tab:GoodBooks}
+\begin{tabular}{llr}
+\cline{1-3}
+\hline
+\rowcolor{shadecolor} \textbf{Topic}  & \textbf{Book} \\
+\hline
+\rowcolor{shadecolor} \textbf{Analysis}  & Spaces  \\
+                            &\cellcolor{aliceblue}Fleming \\
+                            &Cheney \\
+
+\rowcolor{shadecolor}\textbf{Topology} & Intro. to Topological Manifolds (Lee)\\
+&\cellcolor{aliceblue}Intro. to Smooth Manifolds (Lee)\\
+
+         
+\rowcolor{shadecolor} \textbf{Measure Theory} &  Evans and Gariepy   \\
+                                        & \cellcolor{aliceblue}Cohn \\
+                                        & Shakarchi  \\
+
+\rowcolor{shadecolor} \textbf{Statistical Learning} & SVM (Steinwart) \\
+          &  A First Course in Probability (Sheldon Ross)\\
+                             &\cellcolor{aliceblue}Linear Regression Analysis (Seber) \\
+                             &Linear Regression Analysis (Montgomery) \\
+                             &\cellcolor{aliceblue}Modern Regression Methods (Ryan) \\
+                             &Generalized Linear Models (McCullagh) \\
+                             &\cellcolor{aliceblue}Nonparametric Regression and \\&\cellcolor{aliceblue}Generalized Linear Models (Silverman)\\
+                             & some stuff about splines, classifications etc.\\
+
+\rowcolor{shadecolor}\textbf{Image Analysis} & 
+        Lots of papers \\
+        &\cellcolor{aliceblue}Variational Methods in Image Processing \\
+        &\cellcolor{aliceblue}(Vesse)  \\
+        &Variational Methods in Image Segmentation\\
+        &(Morel) \\
+\rowcolor{shadecolor}\textbf{Fourier and Wavelets} & some stuff!\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure*}[ht!]
+%  \centering
+  \captionsetup{justification=centering}
+  \includegraphics[width=1\textwidth]{00_figures/plan}
+  \caption[][-22\baselineskip]{Blue Print.}%
+  \label{fig:BluePrint}%
+  \setfloatalignment{t}
+\end{figure*}
 
 
 

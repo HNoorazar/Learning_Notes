@@ -1,6 +1,44 @@
 \section{Basics}
 \label{sec:Fundamentals_Basics}
 
+\begin{deff}{}\label{def:independentEvents}
+Two events $E_1$ and $E_2$
+are independent when \[P(E_1 \cap  E_2) = P(E_1)P(E_2).\]
+
+\noindent Equivalently, $P(E_1 | E_2) = P(E_1 \cap E_2)/P(E_2) = P(E_1).$
+\end{deff}{}
+
+\begin{deff}{}\label{def:independentVariables}
+The random variables $X$ and $Y$ are 
+said to be independent if, for any two sets of real numbers $A$ and $B$,
+\begin{equation}\label{eq:indpVar}
+P(X \in A,Y \in B) = P(X \in A) P(Y \in B)
+\end{equation}
+In other words, $X$ and $Y$ are independent 
+if, for all $A$ and $B$, the events $E_A = \{X \in A\}$
+ and $E_B = \{Y \in B \}$ are independent.
+
+It can be shown by using the three axioms 
+of probability that~\cref{eq:indpVar} will 
+follow if and only if, for all $x$, $y$,
+\[P(X \leq x,Y \leq y)=P(X \leq a) P(Y \leq y)\]
+Hence, in terms of the joint distribution function 
+$F$ of $X$ and $Y$, $X$ and $Y$ are 
+independent if
+\[ F_{X,Y}(x,y) = F_X(x) F_Y(y),\]
+where $F_X(x)$ is cumulative distribution function.
+Equivalently, if the probability densities
+$f_X(x)$, $f_Y(y)$ and the joint probability density 
+$f_{X,Y}(x,y)$ exist,
+\[ f_{X,Y}(x, y) = f_X(x) f_Y(y).\]
+
+
+\end{deff}{}
+
+
+
+
+
 \begin{deff}{}\label{def:ChiSquareDef}
 If $Z_1, \dots, Z_k$ are independent, standard normal random 
 variables, then the sum of their squares, is distributed according 
@@ -15,6 +53,45 @@ This is denoted by $Q \sim \chi^2_K$.
 \item Likelihood-ratio test for nested models
 \end{itemize}
 
+\begin{deff}{}\label{def:randomVarIndependence}
+Two random variables are independent when 
+$F_{XY}(x, y) = F_X(x) F_Y(y)$ where $F$ is cumulative distribution function. 
+Equivalently, when $f_{XY}(x, y) = f_X(x) f_Y(y)$ 
+with $f$ being
+the probability densities.
+\end{deff}{}
+
+\begin{lem}{}
+In general, $E[XY] \neq E[X] E[Y]$.
+If $X$ and $Y$ are independent then
+$E[XY] = E[X] E[Y]$. But the reverse is not true.
+\end{lem}{}
+
+\begin{lem}{}
+Independency is stronger than uncorrelatedness. 
+\end{lem}{}
+
+\begin{lem}{}
+If $X_1, X_2, \dots, X_N$ are uncorrelated (or
+independet) then
+\[var\left [\sum X_i \right ] = \sum var[X_i]\]
+and thus, if $var[X_i] = \sigma^2$
+\[var\left [\overline X \right ] = \sigma^2/N.\]
+In general, for correlated variables we have
+\[ var\left [\sum X_i \right ] = \sum \sum Cov(X_i, X_j) 
+= \sum var[X_i] + 2 \sum_{1 \leq i < j \leq N} Cov[X_i, X_j]\]
+So if the variables have equal variance $\sigma^2$ 
+and the average correlation of distinct 
+variables is $\rho$, then the variance of 
+their mean is
+\[var\left [\overline X \right ] = \sigma^2/N + \frac{N-1}{N}\rho \sigma^2.\]
+\end{lem}{}
+
+\begin{lem}{}
+For any pair of random variables, independence implies
+that the pair are uncorrelated. For normal distributions the
+converse is also true.
+\end{lem}{}
 
 \begin{deff}{}\label{def:UnivariateCovarianceDef}
 Covariance is a measure of the joint variability of two 
@@ -26,7 +103,6 @@ cov[X, Y] &= E[(X-\mu_X) (Y - \mu_Y)]\\
                &= E[XY] - E[X]E[Y]
 \end{aligned}
 \end{equation} 
-
 \noindent where $\mu_X \coloneqq E[X]$.
 \end{deff}{}
 
@@ -46,55 +122,78 @@ cov[X, Y] &= \frac{1}{N}\sum_{i=1}^N (x_i - \mu_x) (y_i - \mu_y)
 \end{equation} 
 Moreover, $cov (X,X) = var (X) \equiv \sigma^2(X)\equiv \sigma_X^2.$
 
+\begin{lem}{}
+Here we present some of the results about covariance and independence.
+\begin{itemize}
+\item $cov[X, Y] = 0$ does not imply that $X$ and $Y$ are independent.
+\item In the bivariate normal distribution $X$ and $Y$
+are independent \ifft $cov[X, Y] = 0$.
+
+\item In case of multivariate normal distribution the variables
+are mutually independent \ifft they are pairwise independent.
+But in general, for other distributions, pairwise independence
+does not imply mutual independence.
+\end{itemize}
+\end{lem}{}
+
+\begin{exm}
+Let $X$ and $Y$ be independent binomial $(n, 1/2)$.
+So, they have the same variance which implies 
+$cov[X+Y, X-Y]=0$.
+However, we have 
+$0=p(X+Y=1 , X-Y=0) \neq p(X+Y=1)p(X-Y=0)$.
+i.e. $X+Y$ and $X-Y$ are not independent.
+\end{exm}
+
 \iffalse
 \begin{cases} 
-tr(\mathbf{S}_\lambda)\\
-N - tr(2\mathbf{S}_\lambda - \mathbf{S}_\lambda \mathbf{S}_\lambda^T) \\
-tr(\mathbf{S}_\lambda \mathbf{S}_\lambda^T)
+tr({\bf S}_\lambda)\\
+N - tr(2{\bf S}_\lambda - {\bf S}_\lambda {\bf S}_\lambda^T) \\
+tr({\bf S}_\lambda {\bf S}_\lambda^T)
 \end{cases}
 \fi
 
 Let $Z_{ij},~i \in \{ 1, 2, \dots,  m\},~j \in \{1, 2, \dots, n \}$
-be random variables. Let $\mathbf{Z} = [Z_{ij}]$
-and $E[\mathbf{Z}] = [E[Z_{ij}]]$.
+be random variables. Let ${ \bf  Z} = [Z_{ij}]$, then
+we define $E[{\bf Z}] \coloneqq  [E[Z_{ij}]]$.
 
 \begin{thm}
-If $\mathbf{A} \in \mathbb{R}^{l \times m}$,
-$\mathbf{B} \in \mathbb{R}^{n \times p}$
-$\mathbf{C} \in \mathbb{R}^{l \times p}$ are matrices of constants,
+If ${\bf  A} \in \mathbb{R}^{l \times m}$,
+${\bf  B} \in \mathbb{R}^{n \times p}$
+${\bf C} \in \mathbb{R}^{l \times p}$ are matrices of constants,
 then
-\[ E[\mathbf{AZB + C}] = \mathbf{A} E[\mathbf{Z}] \mathbf{B} + \mathbf{C}.\]
+\[ E[{\bf AZB + C}] = {\bf A} E[{\bf Z}] {\bf  B} + {\bf  C}.\]
 \end{thm}\marginnote{For proofs of theorems, at 
 least most of the theorems in 
 the~\cref{sec:Fundamentals_Basics}, please 
 see~\citep{seber2012linear}.}
 
-In the similar vein if $\mathbf{X}$ and $\mathbf{Y}$
-are vectors of random variables and $\mathbf{A}$ and 
-$\mathbf{B}$ are constant matrices then $E[\mathbf{AX + BY}] = 
-\mathbf{A}E[\mathbf{X}] + \mathbf{B}E[\mathbf{Y}]$.
+In the similar vein, if $\bf X$ and $\bf Y$
+are vectors of random variables and $\bf A$ and 
+$\bf B$ are constant matrices then $E[{\bf AX + BY}] = 
+{\bf A}E[{\bf  X}] + {\bf B}E[{\bf Y}]$.
 
 
 \begin{deff}{}
-$cov[\mathbf{X}, \mathbf{Y}] = [cov(X_i, Y_j)]$
+$cov[{\bf X, Y}] = [cov(X_i, Y_j)]$
 \end{deff}{}
 
 \begin{thm}\label{thm:vectorRandCovTHM}
-Let $E[\mathbf{X}] = \bm{\mu}_\mathbf{X}$
-and $E[\mathbf{Y}] = \bm{\mu}_\mathbf{Y}$
+Let $E[\bf X] = \bm{\mu}_{\bf X}$
+and $E[\bf  Y] = \bm{\mu}_{\bf Y}$
 then
 
-\[cov[\mathbf{X}, \mathbf{Y}] = E[({\bf X} - \boldsymbol{\mu}_\mathbf{X})({\bf Y} - \boldsymbol{\mu}_\mathbf{Y})^T]. \]
+\[cov[{\bf  X, Y}] = E[({\bf X} - \bm {\mu}_{\bf  X})({\bf Y} - \bm{\mu}_{\bf Y})^T]. \]
 \end{thm}
 
 \begin{deff}{}
-Similar to a single random variable, when $\mathbf{Y} = \mathbf{X}$, 
-$cov (\mathbf{X}, \mathbf{X})$ is denoted by $var (\mathbf{X})$ and
-is called variance (variance-covariance or dispersion) matrix of $\mathbf{X}$:
+Similar to a single random variable, when ${\bf Y = X}$, 
+$cov ({\bf X, X})$ is denoted by $var ({\bf X})$ and
+is called variance (variance-covariance or dispersion) matrix of $\bf X$:
 
 \begin{equation}\label{eq:varianceCovariance}
 \begin{aligned}
-var[\mathbf{X}] &= [cov(X_i, X_j)] \\ 
+var[{\bf X}] &= [cov(X_i, X_j)] \\ 
                          &= \begin{bmatrix}
                               var[X_1] & cov[X_1, X_2] & \dots & cov[X_1, X_n]\\
                               cov[X_2, X_1] & var[X_2] & \dots & cov[X_2, X_n]\\
@@ -104,20 +203,20 @@ var[\mathbf{X}] &= [cov(X_i, X_j)] \\
 \end{aligned}
 \end{equation}
 \end{deff}{}
-
 From Thm.~\ref{thm:vectorRandCovTHM} we see
 \begin{equation}
-var[\mathbf{X}] = E[({\bf X} - \boldsymbol{\mu}_\mathbf{X})({\bf X} - \boldsymbol{\mu}_\mathbf{X})^T]
+var[{\bf X}] = E[({\bf X} - \bm{\mu}_{\bf  X})({\bf X} - \bm{\mu}_{\bf  X})^T]
 \end{equation}
 and by expanding it we get
 \begin{equation}
-var[\mathbf{X}] = E[{\bf X X}^T] - \boldsymbol{\mu}_\mathbf{X} \boldsymbol{\mu}_\mathbf{X}^T.
+var[{\bf  X}] = E[{\bf X X}^T] - \bm{\mu}_{\bf X} \bm{\mu}_{\bf X}^T.
 \end{equation}
 \noindent which we notice is generalization
 of univariate case (see Def.~\ref{def:UnivariateCovarianceDef}).
 
 \begin{exm}
-Let $\bf a$ be a constant vector. Then $var[{\bf X-a} ] = var[\bf X] - a.$
+Let $\bf  v$ be a constant vector. Then
+$var[{\bf  X -  v} ] = var[\bf X] - v.$
 \end{exm}
 
 \begin{thm}
@@ -127,11 +226,12 @@ ${\bf A} \in \mathbb{R}^{l \times m}$ and
 ${\bf B} \in \mathbb{R}^{p \times n}$ are constant matrices.
 Then, 
 \begin{equation}
-cov[{\bf AX, BY}] = {\bf A}  ~ cov[{\bf X}, {\bf Y}]  {\bf B}^T.
+cov[{\bf  AX, BY}] = {\bf A}~cov[{\bf X, Y}]  {\bf B}^T.
 \end{equation}
 \end{thm}
 
-Of particular importance is $var[{\bf AX}] = {\bf A}~var[{\bf X}] {\bf A}^T$
+\noindent Of particular importance is 
+$var[{\bf AX}] = {\bf A}~var[{\bf X}] {\bf A}^T$.
 
 \begin{thm}
 Let ${\bf X}$ be a random variable such that none of its
@@ -150,10 +250,8 @@ Then,
 E[{\bf X}^T{\bf AX} ] = tr({\bf A} \boldsymbol{\Sigma} ) + \boldsymbol{\mu}_{\bf X}^T {\bf A}\boldsymbol{\mu}_{\bf X}
 \end{equation}
 \end{thm}
-
-Two important special cases of theorem above
+\noindent Two important special cases of theorem above
 are 
-
 \begin{enumerate}
 \item Let ${\bf Y = X - b}$ and note that $var [{\bf Y}] = var[{\bf X}]$ then
 we have 
@@ -201,7 +299,7 @@ Let $Y = g(X)$. Then
 In case monotonic $g: \Rto 1 1$ the density function is 
 \[ f_Y(y) =f_X\left(g^{-1}(y) \right) \left\lvert \frac{d}{dy} g^{-1}(y) \right \rvert\]
 
-In case of vectors and invertible function $H: \Rto n n$, $\mathbf{y} = H(\mathbf{x})$:
+In case of vectors and invertible function $H: \Rto n n$, ${\bf y} = H({\bf  x})$:
 \[  g({\bf y}) = f(H^{-1} ({\bf y})) \left\lvert   det \left (\frac{\partial H^{-1}}{\partial{y}} \right )      \right \rvert \]
 \end{tcolorbox}
 
@@ -251,6 +349,108 @@ So, $f_Y(y) = F'_Y(y) = 1$.
 \end{exm}
 \fi 
 \noindent \textbf{Change-of-Variable Technique}
+
+
+\subsection{$\chi^2$-distribution in Regression}
+Roots of $\chi^2$ distribution appearance
+is the following.
+
+Let ${\bf X}\sim N(\boldsymbol{\mu}, \boldsymbol{\Sigma})$ with $\boldsymbol{\Sigma}$
+being positive definite.
+Consider ${\bf X}^T {\bf A} {\bf X}$
+and assume $\bf{A}$ is symmetric; otherwise,
+we can use 
+$\frac{1}{2}(\bf{A}+\bf{A}^T)$ without changing
+the value of quadratic form. Since ${\bf A}={\bf A}^T$
+we can diagonalize it via orthogonally; $\bf{A} = \bf{UDU}^T$.
+
+Let us assume ${\bf X}\sim N({\bf 0}, {\bf I}_N)$.
+The general case can be reduced to this
+by transformations. Then, 
+${\bf Z} = {\bf U }^T{\bf X} \sim N({\bf 0}, {\bf I}_N)$.
+\marginnote{Thm 2.2 of~\citep{seber2012linear}. Let ${\bf X}\sim N_N(\boldsymbol{\mu}, \boldsymbol{\Sigma})$ and ${\bf C} \in \mathbb{R}^{m\times N}$ with rank $m$, ${\bf d}\in \mathbb{R}^N$.
+Then, ${\bf C X + d} \sim N_m({\bf C}\boldsymbol{\mu} +  {\bf C}, {\bf C} \boldsymbol{\Sigma} {\bf C}^T )$. Proof is 
+done via Moment Generating Functions.}
+Therefore, 
+\begin{equation}
+{\bf X}^T {\bf A} {\bf X} = {\bf X}^T {\bf U D U}^T {\bf X}
+= {\bf Z}^T {\bf D} {\bf Z}  = \sum_{i=1}^N d_i Z_i^2,
+\end{equation}
+so the distribution of ${\bf X}^T {\bf A} {\bf X}$
+is linear combination of independent $\chi_1^2$
+random variables.
+
+Now, we have the following theorem.
+\begin{thm}
+Let ${\bf X}\sim N({\bf 0}, {\bf I}_N)$ and
+let ${\bf A}={\bf A}^T$.
+Then, ${\bf X}^T {\bf A} {\bf X}$ is $\chi_r^2$ if
+and only if ${\bf A}$ is idempotent and of rank $r$.
+\marginnote{Let ${\bf A}$ be symmetric. Then
+${\bf A}$ has $r$ eigenvalues equal to 1 and the rest is 
+zero if and only if ${\bf A}$ is idempotent and of rank $r$.}
+\end{thm}
+
+\begin{exm}
+Let ${\bf Y}\sim N( \boldsymbol{\mu},  \sigma^2{\bf I}_N)$ and 
+$S^2 = \frac{1}{N-1} \sum (Y_i - \overline Y)^2$ 
+be the sample variance. 
+Then $(N-1)S^2/\sigma^2 \sim \chi_{N-1}^2$.
+To see why see Example 2.10 on page 28
+of~\citep{seber2012linear}.\marginnote{$S^2$ here
+is called sample variance. Later on we use $S^2$
+to denote $S^2 = \frac{RSS}{N-1} = \frac{(Y-\hat Y)^T(Y-\hat Y)}{N-1}$. In this sense the sample variance can be obtained by $Y_i=\mu+\varepsilon_i$ where $\mu=E[Y]$, is a regression model with
+$\beta_0=\mu$, so that $\hat Y_i = \bar Y$.}
+\end{exm}
+
+\begin{deff}
+Random variable ${\bf Y}$ with mean
+${\boldsymbol \mu}$ and variance $\boldsymbol{\Sigma}$
+has a multivariate normal distribution if it has the same
+distribution as ${\bf R}{\bf Z} + {\boldsymbol \mu}$
+where ${\bf R}\in \mathbb{R}^{N\times m}$ satisfies
+$\boldsymbol{\Sigma} = {\bf R}{\bf R}^T$
+and ${\bf Z} \sim N_m({\bf 0}, {\bf I}_m)$.
+\end{deff}
+
+\begin{thm}
+Let ${\bf Y}\sim N_N({\bf 0}, \boldsymbol{\Sigma})$
+and ${\bf A}={\bf A}^T$. Then,
+${\bf Y}^T {\bf A}{\bf Y}$ is $\chi^2_r$ \ifft
+$r$ of the eigenvalues of ${\bf A}\boldsymbol{\Sigma}$
+are 1 and the rest are zero.
+\end{thm}
+
+\begin{thm}
+Let ${\bf Y}\sim N_N(\boldsymbol{\mu}, \boldsymbol{\Sigma})$ where $\boldsymbol{\Sigma}$
+is positive definite. Then $Q = ({\bf Y} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} ({\bf Y} - \boldsymbol{\mu}) \sim \chi^2_N$.
+\end{thm}
+
+
+\begin{thm}
+Let ${\bf Y} = {\bf X}{\boldsymbol \beta} + {\boldsymbol \varepsilon}$.
+Assume $\varepsilon_i \sim N(0, \sigma^2)$, i.e.
+${\boldsymbol \varepsilon}\sim N({\bf 0}, \sigma^2 {\bf I})$,
+i.e. ${\bf Y} \sim N({\bf X}{\boldsymbol \beta}, \sigma^2 {\bf I})$.
+Then,
+\begin{enumerate}
+\item $\hat {\boldsymbol \beta} \sim N({\boldsymbol \beta}, \sigma^2 ({\bf X}^T{\bf X})^{-1} )$
+\item $(\hat {\boldsymbol \beta} - {\boldsymbol \beta})^T {\bf X}^T{\bf X} (\hat {\boldsymbol \beta} - {\boldsymbol \beta}) / \sigma^2 \sim \chi_p^2$
+\item $\hat {\boldsymbol \beta}$ is independent of $S^2$.
+\item $RSS/\sigma^2 = (N-p)S^2/\sigma^2 \sim\chi_{N-p}^2$.
+
+\end{enumerate}
+\end{thm}
+
+\begin{tcolorbox}
+Let ${\boldsymbol \varepsilon}\sim N({\bf 0}, \sigma^2 {\bf I})$.
+Consider the full-rank model 
+$Y = \beta_0 + \beta_1 x_1 + \dots \beta_{p-1} x_{p-1}$. 
+Moreover, assume ${\bf x}_i$'s are ``standardized'';
+$\sum_i x_{ij}=0$ and $\norm{\bf{x_i}}_2^2=c$. 
+Then, $\sum_{j=0}^{p-1} var[\beta_j]$
+is minimized when columns of $\bf X$ are orthogonal.
+\end{tcolorbox}
 
 
 

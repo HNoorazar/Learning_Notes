@@ -7,7 +7,8 @@ response; i.e. there are $p$ independent variables.
 We believe the response is a function of these variables; 
 $y = f(x_1, x_2, \dots, x_p)$. However, in practice
 this will not happen. There will be noise present and 
-the $y$ values will be random variables. If our assumption ($y$ being function of
+the $y$ values will be random variables. 
+If our assumption ($y$ being function of
 $x_i$s) is correct (i.e. we did not miss anything), 
 $y$ will fluctuate about $f(\bm x)$ and we will model it via random 
 variable concept and in practice we will have 
@@ -29,7 +30,8 @@ thinks as if each training example is very confident.
 Therefore, our testing tools will be undermined and the
 power of tests will be reduced. Wrongfully we would think
 the model is a good model.\marginnote{In some cases the matrix $\bm X$
-will contain only zeros and ones and is referred to by design matrix. In these
+will contain only zeros and ones and is referred 
+to by design matrix. In these
 cases $\bm X$ may not be full rank and we ignore them here.}
 
 Let us carry on with the modeling. Let me add that
@@ -52,10 +54,14 @@ is an overdetermined system; number of equations is more than
 number of independent variables (features/regressors) i.e., 
 $\bm X \in \mathbb{R}^{N \times p},~ N > p$.
 The right-hand side is a vector in the space spanned by 
-by the columns of $\bm X$. So, if $\bm y$ does not lie in this space,
-then \cref{eq:overDeterminedSystem} does not have an exact solution!\sidenote{If we 
-had 2 points, we could find a 1-dimensional line that passes through 
-them. If we had 3 points, we could find a 2-dimensional place that passes through them,
+by the columns of $\bm X$. So, if $\bm y$ 
+does not lie in this space,
+then \cref{eq:overDeterminedSystem} 
+does not have an exact solution!\sidenote{If we 
+had 2 points, we could find a 1-dimensional 
+line that passes through 
+them. If we had 3 points, we could find a 
+2-dimensional place that passes through them,
 and so on, But in Eq.~\ref{eq:overDeterminedSystem} we
 are expecting to find a plane of $p-$dimension such that
 $N >>p$ points lie on it. In practice, those $N$ points will
@@ -65,16 +71,20 @@ even though we write it like an equation. Thus, we must
 settle with an approximation. The chosen/popular approach
 is to solve this system by least square method.
 Since we assumed $\bm X$ is full rank there is a unique
-\emph{solution} for the least square problem, i.e. minimizing squared 
-sum of residuals\marginnote{In this notes mostly the second norm is used, so, I will use $\norm{.}$
+\emph{solution} for the least square problem, 
+i.e. minimizing squared 
+sum of residuals\marginnote{In this notes mostly 
+the second norm is used, so, I will use $\norm{.}$
 for $\norm{.}_2$.}
 $ r_i = y_i -  \bm x_i^T \bbeta$; 
 \[ \norm{\bm y - \bm X {\bbeta}}_2 =\min_{\bbeta \in \mathbb{R}^p} \norm{\bm y - \bm X \bbeta}_2.\]
 
 This problem is explained geometrically as well as algebraically
 in the beautiful and smooth book by Watkins\cite{watkinsfund}.
-The latter is done via $QR$ decomposition as well as SVD decomposition
-which is one of the strongest tools in matrix computation toolbox. 
+The latter is done via $QR$ decomposition 
+as well as SVD decomposition
+which is one of the strongest tools in matrix 
+computation toolbox. 
 
 We know the shortest distance between a point and a line
 is the one that connects the point perpendicularly to the line.
@@ -86,7 +96,8 @@ projection of $\bm y$ onto $\mathcal{R}(\bm X)$; $proj_{\mathcal{R}(\bm X)}(\bm 
 Then the distance between $\bm y$ and $\mathcal{R}(\bm X)$
 is $\norm{\bm y - proj_{\mathcal{R}(\bm X)}(\bm y)}$.
 We also know the vector $\bm X \bm \beta$ is in column space of $\bm X$.
-So, the $\bm \beta$ for which $\norm{\bm y - \bm X \bm \beta}$ is minimized
+So, the $\bm \beta$ for which 
+$\norm{\bm y - \bm X \bm \beta}$ is minimized
 is the one that gives us $proj_{\mathcal{R}(\bm X)}(\bm y)$.
 Denote that solution by $\hat {\bm \beta_{LS}}$. Then, 
 since $\bm y - \bm X \hat{\bm \beta_{LS}}$ is orthogonal to 
@@ -103,12 +114,15 @@ is positive definite and consequently invertible and we have
 \[ \hat{\bbeta}_{LS} = (\bm X^T \bm X)^{-1} \bm X^T \bm y.\]
 Now, $\bm y \approx \hat {\bm y}_{LS} = \bm X \hat {\bbeta}_{LS} = \bm X (\bm X^T \bm X)^{-1} \bm X^T \bm y = \bm H \bm y$
 where $\hat {\bm y}_{LS}$ is orthogonal projection of $\bm y$
-onto $\mathcal{R}(\bm X)$ and $\hat {\bm y}_{LS} = \bm X \hat {\bbeta}$
-actually is an equality. The matrix $\bm H$ is called the hat matrix.
+onto $\mathcal{R}(\bm X)$ and 
+$\hat {\bm y}_{LS} = \bm X \hat {\bbeta}$
+actually is an equality. The matrix $\bm H$ 
+is called the hat matrix.
 Even if $\bm X$ is not full rank, i.e. it is rank deficient, 
 the least square problem given by overdetermined system 
 ${\bm y} = {\bm X \bm \beta}$
-will have a solution/best approximation (in the sense of minimizing
+will have a solution/best approximation 
+(in the sense of minimizing
 the residuals) except that is not unique. There will
 be infinitely many solutions~\citep{watkinsfund}.
 
@@ -116,7 +130,8 @@ be infinitely many solutions~\citep{watkinsfund}.
 Let $\bm X \in \mathbb{R}^{N \times p}$ be full rank and
 $\bm H = \bm X (\bm X^T \bm X)^{-1} \bm X^T$. Then 
 \begin{enumerate}[label=(\alph*)]
-\item $\bm H$ and $\bm I_N - \bm H$ are symmetric and idempotent.
+\item $\bm H$ and $\bm I_N - \bm H$ are symmetric 
+and idempotent.
 \item $rank(\bm I_N - \bm H) = tr(\bm I_N - \bm H) = N - p$.
 \end{enumerate}
 \end{thm}
@@ -139,12 +154,14 @@ for painting the geometric picture.
 
 Before moving forward recall that if $\bm v \in \mathbb{R}^k$,
 and $\bm Q \in \mathbb{R}^{k \times k}$ is an orthogonal matrix, 
-i.e. $\bm Q^{-1} = \bm Q^T$, then $\norm{\bm Q \bm v} = \norm{\bm v}$.
+i.e. $\bm Q^{-1} = \bm Q^T$, then 
+$\norm{\bm Q \bm v} = \norm{\bm v}$.
 
 
 Let $\bm X \bbeta = \bm y$ be an overdetermined system
 where  $\bm X \in \mathbb{R}^{N \times p}, N > p, \bbeta \in  \mathbb{R}^p$, 
-and  $\bm y \in \mathbb{R}^N$. Then, $\bm X$ has a QR decomposition
+and  $\bm y \in \mathbb{R}^N$. Then, $\bm X$ 
+has a $QR$ decomposition
 with an orthogonal $\bm Q \in \mathbb{R}^{N \times N}$ and 
 $\bm R \in \mathbb{R}^{N \times p}$:
 \[ \bm X = \bm Q \bm R = \bm Q \begin{bmatrix} \hat{\bm R} \\ \bm 0 \end{bmatrix}\]
@@ -155,8 +172,10 @@ Now consider the full rank case.
 We can re-write the system as $\bm Q \bm R \bbeta = \bm y$ 
 and consequently, $\bm R \bbeta = \bm Q^T \bm y$. 
 Let $\bm c = \bm Q^T \bm y$, then $\bm R \bbeta = \bm c$.
-Since $\bm Q$ is orthogonal the vectors $\bm r = \bm y - \bm X \bbeta$
-and $\bm Q^T \bm r = \bm Q^T (\bm y - \bm X \bbeta) = \bm c - \bm R \bbeta$
+Since $\bm Q$ is orthogonal the vectors 
+$\bm r = \bm y - \bm X \bbeta$
+and 
+$\bm Q^T \bm r = \bm Q^T (\bm y - \bm X \bbeta) = \bm c - \bm R \bbeta$
 are of the same size; i.e. minimizing $\norm{\bm r}$ is the same as
 minimizing $\norm{\bm c - \bm R \bbeta}$.
 Write $\bm c = \begin{bmatrix} \hat {\bm c} & \bm d \end{bmatrix}^T$,
@@ -180,7 +199,8 @@ solution that can be found easily by back substitution.
 \subsection{Properties of Least Square Estimates}
 \label{sec:Properties-of-Least-Square-Estimates}
 Assume $\bm X$ is full rank and $E[\varepsilon_i] = 0$, 
-i.e. errors are unbiased, then least square estimates $\hat \bbeta$ of $\bbeta$
+i.e. errors are unbiased, then least square 
+estimates $\hat \bbeta$ of $\bbeta$
 is unbiased:
 \begin{equation*}
 \begin{aligned}
@@ -191,9 +211,10 @@ E[\hat \bbeta_{LS}] &= E[\bm H \bm y]\\
                       &= \bbeta.
 \end{aligned}
 \end{equation*}
-Further, if we assume $cov[\varepsilon_i, \varepsilon_j] = 0$ if $i \neq j$ and 
-$cov[\varepsilon_i, \varepsilon_i] =  var[\varepsilon_i] = \sigma^2$ then 
-$var[\bm \varepsilon] = \sigma^2 {\bm I}_N$ and
+Further, if we assume the errors are uncorrelated, i.e.
+$cov[\varepsilon_i, \varepsilon_j] = 0$ if $i \neq j$ and 
+$cov[\varepsilon_i, \varepsilon_i] =  var[\varepsilon_i] = \sigma^2$ 
+(i.e. $var[\bm \varepsilon] = \sigma^2 {\bm I}_N$), then
 
 \[var[\bm Y] = var[\bm Y - \bm X \bbeta ] = var[ \bm \varepsilon ]\]
 Consequently, 
@@ -207,12 +228,26 @@ var[\hat \bbeta_{LS}] &= var[\bm H \bm Y]\\
                          &= \sigma^2 (\bm X^T \bm X)^{-1}.
 \end{aligned}
 \end{equation}
+Why $\hat {\boldsymbol \beta}_{LS}$ is
+chosen as an estimate of $\boldsymbol \beta$?
+``For a reasonable class of estimates 
+(linear unbiased estimates)  $\hat \beta_j$
+has the smallest variance.''
+If $\varepsilon_i \sim N(0, 1)$,
+i.e. ${\boldsymbol \varepsilon} \sim N({\bf 0}, \sigma^2 {\bf I})$, 
+i.e. ${\bf Y} \sim N({\bf X}{\boldsymbol \beta}, \sigma^2 {\bf I})$,
+then ${\bf v}^T \hat {\boldsymbol \beta}$ has minimum variance
+among the entire class of unbiased estimates, not just
+linear estimates.
+
+
 
 \begin{thm}
 Let $\bm X$ be full rank or rank deficient.
 Let $\hat {\bm Y}$ be the least square estimate of ${\bm Y}$
 from the over determined system $\bm X \bbeta = \bm Y$ and 
-$\tilde {\bm Y}$ be an estimation obtained by any linear unbiased estimator/method.
+$\tilde {\bm Y}$ be an estimation obtained by any linear 
+unbiased estimator/method.
 Then, $var[\bm v^T \hat {\bm Y}] <  var[\bm v^T \tilde {\bm Y}]$ 
 and it is unique; of course this is implied by ``$<$'' as opposed to ``$\le$''.
 \end{thm}
