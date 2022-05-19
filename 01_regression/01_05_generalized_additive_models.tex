@@ -1,5 +1,5 @@
-\section{Generalized Additive Models}
-\label{sec:Generalized_Additive_Models}
+\chapter{Regression: Generalized Additive Models}
+\label{chap:Generalized-Additive-Models}
 
 
 In the regression setting, a generalized 
@@ -30,7 +30,7 @@ g(\mu(X)) = \alpha + f_1(X_1) + f_2(X_2) + \dots + f_p(X_p).
 Examples of $g$ are $g(\mu) = \mu$, $g(\mu) = logit(\mu)$, $g(\mu) = log(\mu)$.
 
 
-\subsection{Fitting Additive Models}
+\section{Fitting Additive Models}
 \label{sec:Fitting_Additive_Models}
 In this section we describe a modular algorithm 
 for fitting additive models and their generalizations. The 
@@ -42,7 +42,7 @@ The point, here, is that scatterplot smoothing is not a
 specific technique. It is an umbrella for a variety
 of techniques that one is used in the Tibshirani's book (see page 297 of Tibshirani's book).\\
 
-\subsection{Smoothing}
+\section{Smoothing}
 \label{sec:Smoothing}
 A\sidenote{From this point on most thing in this chapter
 will be from Hastie and Tibshirani's book; Generalized 
@@ -71,7 +71,7 @@ will have low variance and potentially high bias and conversely for
 small neighborhoods. The size of neighborhood should be an adjustable
 parameter of the smoother.
 
-\subsection{Kernel Smoother}
+\section{Kernel Smoother}
 \label{sec:KernelSmoother}
 A scatterplot smoother is defined to be a function of
 $\mathbf{x}$ and $\mathbf{y}$, whose result is a function
@@ -128,7 +128,7 @@ Kernel smoothers also exhibit biased endpoint behavior.
 Special kernels are designed to overcome this problem. A simple
 approach is to use kernel weights in a locally-weighted straight-line fit.
 
-\subsection{Smoothing in Detail}
+\section{Smoothing in Detail}
 \label{sec:SmoothinginDetail}
 In previous sections no relation between $Y$ and $X$
 was assumed. Now we start to make such assumptions to
@@ -277,7 +277,7 @@ satisfied?\cite{loader2006local}.
 
 \end{description}
 
-\subsection{Degrees of Freedom of a Smoother}
+\section{Degrees of Freedom of a Smoother}
 \label{sec:Degrees_of_Freedom_of_a_Smoother}
 
 \begin{deff}{}

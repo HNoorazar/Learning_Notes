@@ -145,8 +145,8 @@ Prove the followings.
 \end{enumerate}
 \end {exc}
 
-\subsection{Lest Square Problem; A Numerical Analyst View}
-\label{sec:Lest-Square-Problem-A-Numerical-Analyst-View}
+\section{Least Square Problem; A Numerical Analyst View}
+\label{sec:Least-Square-Problem-A-Numerical-Analyst-View}
 I would present a very short presentation of solving the
 least square problem algebraically. I refer
 the reader to~\citep{watkinsfund} for the details and even
@@ -196,7 +196,7 @@ solution that can be found easily by back substitution.
 
 
 
-\subsection{Properties of Least Square Estimates}
+\section{Properties of Least Square Estimates}
 \label{sec:Properties-of-Least-Square-Estimates}
 Assume $\bm X$ is full rank and $E[\varepsilon_i] = 0$, 
 i.e. errors are unbiased, then least square 
@@ -262,7 +262,7 @@ whether this is true for rand deficient $\bm X.$}
 Moreover, $\hat \beta_j$s will be the maximum likelihood estimations of $\beta_j$s
 as well.
 
-\subsection{Unbiased Estimation of $\sigma^2$}
+\section{Unbiased Estimation of $\sigma^2$}
 \label{sec:Unbiased-Estimation-of-sigma-regression}
 Let $var[\varepsilon_i] = \sigma^2$.
 
@@ -292,7 +292,7 @@ $\bm Y \sim N_N(\bm X \bbeta, \sigma^2 \bm I)$. Then,
 \end{enumerate}
 \end{thm}
 
-\subsection{Maximum Likelihood Estimation}
+\section{Maximum Likelihood Estimation}
 \label{sec:Maximum-Likelihood-Estimation-Regression}
 \begin{deff}[Likelihood]
 The function $\mathcal{L}(\Tau, \bm \theta)$ 
@@ -431,4 +431,67 @@ population. Even if the $x_i$'s were not drawn randomly,
 the criterion is still valid if the $y_i$'s are conditionally 
 independent given the inputs $x_i$.
 
+
+
+\section{Robust Regression}
+\label{sec:Robust-Regression}
+Robustness here refers to effect of noise
+and corruption in the data on the fitted model.
+For example, how bad outliers can affect the
+fit or how much the noise in fraction of the data
+can distort the fit.
+
+``Robust statistics is statistics with good 
+performance for data drawn from a wide 
+range of probability distributions, especially 
+for distributions that are not normal. Robust 
+statistical methods have been developed for 
+many common problems, such as estimating 
+location, scale, and regression parameters. 
+One motivation is to produce statistical 
+methods that are not unduly affected by 
+outliers. Another motivation is to provide 
+methods with good performance when 
+there are small departures from a parametric 
+distribution. For example, robust methods 
+work well for mixtures of two normal distributions 
+with different standard-deviations; under this model, 
+non-robust methods like a t-test work poorly.''\cite{robustWiki}
+
+Least squares estimations of coefficients
+are not good in presence of outliers. \marginnote{We have
+seen this before, perhaps in the SVM book.}
+This is because outliers will have a large error,
+$e_i=r_i=Y_i - x_i^T\beta$, which will be even worse
+when they are squared. Moreover, in least square we are
+minimizing mean of errors, $\frac{1}{N}\sum r_i$.
+Mean is not robust as well since it will be affected by outliers.
+So, we can remedy these by using other metrics to measure
+errors and also use another measure of \emph{location} instead of
+mean; e.g. median or trimmed mean.
+
+Using a different measure of size instead of squared error
+leads to idea of M-estimation ($M$ for maximum likelihood) 
+or idea of Rousseeuw and Yohai to minimize
+a robust measure of the scale of residuals.
+
+Using median or trimmed mean, an another remedy, 
+leads to idea of least median of squares
+and least trimmed squares, respectively.
+
+In M-estimation method we start to take the route of 
+maximum likelihood estimation which leads to estimating 
+$\beta$ and $\sigma$. The techniques along this route leads
+to choosing some functions that will produce robust results.
+These functions dictate the measure of size and consequently 
+(implicitly? Ex. 3.15 of ~\citep{seber2012linear}) location.
+See~\citep{seber2012linear}, section 3.13, for more details.
+
+As an alternative to M-estimators, we can replace 
+the mean by a robust measure of location but retain 
+the squared residuals as a measure of size; median or 
+trimmed mean are two examples.
+
+\section{Robustness Measures}
+\label{sec:Robustness-Measures}
 
