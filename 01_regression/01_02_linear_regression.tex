@@ -292,6 +292,10 @@ $\bm Y \sim N_N(\bm X \bbeta, \sigma^2 \bm I)$. Then,
 \end{enumerate}
 \end{thm}
 
+Another estimate of $\sigma^2$ is
+$\hat \sigma^2 = RSS/N$ which is obtained
+through the maximum likelihood route.
+
 \section{Maximum Likelihood Estimation}
 \label{sec:Maximum-Likelihood-Estimation-Regression}
 \begin{deff}[Likelihood]
@@ -494,4 +498,114 @@ trimmed mean are two examples.
 
 \section{Robustness Measures}
 \label{sec:Robustness-Measures}
+
+\section{Hypothesis Testing}
+\label{sec:Hypothesis-Testing}
+Suppose we have a general model
+\[G: Y=\beta_0 + \beta_1 X_1 + \dots +\beta_{p-1}X_{p-1}+\varepsilon\]
+and we want to test wether some of those coefficients are truly zero,
+i.e. $H: \beta_r = \dots \beta_{p-1}=0$:
+\[H: Y=\beta_0 + \beta_1 X_1 + \dots +\beta_{r-1}X_{r-1}+\varepsilon.\]
+
+\noindent We need to look at 
+\[
+F=\frac{(RSS_H-RSS)/q}{RSS/N-p}
+ = \frac{({\bf A \boldsymbol \beta - \bf c})^T [{\bf A} ({\bf X}^T{\bf X})^{-1}{\bf A}^T]^{-1} (\bf A \boldsymbol \beta - \bf c)}{qS^2}
+ \sim F_{q, N-p}
+\]
+which has $F-$distribution with $q$ and $N-p$ degrees of freedom.
+If $H$ is true then $F\approx 1$ and if $H$ is false then $F$ is large
+and we reject the hypothesis.
+
+In the second part of Eq. above we have $q$ and $\bf c$.
+The reason is that the $H$ above can be generalized
+and be written as $\bf A \boldsymbol \beta = \bf c$,
+with $\bf A \in \mathbb{R}^{q \times {p-1}}$ where its
+rows are linearly independent and $\bf c$ can be a vector
+of zeros or not.\\
+
+\begin{exm}\label{exm:HypTestOneCoeffLinReg}
+From Seber:
+
+Given the general linear model
+\[Y_i = \beta_0 + \beta_1 x_{i1} + \dots + \beta_{p-1}x_{i,p-1}\]
+we can obtain a test statistic for $H:\beta_j=c$, where $j > 0$.
+We first need the following partition:
+\[ 
+({\bf X}^T{\bf X})^{-1} = 
+\begin{bmatrix}
+l & {\bf m}^T\\
+{\bf m} & {\bf D}
+\end{bmatrix}
+\]
+where $l \in \mathbb{R}$.
+Now $H$ is of the form ${\bf a}^T{\boldsymbol \beta}={\bf c}$, 
+where ${\bf a}^T$ is the row vector with unity in 
+the $j+1$ position and zeros elsewhere.
+Therefore, using the general matrix theory, 
+${\bf a}^T ({\bf X}^T{\bf X})^{-1} {\bf a} =d_{jj}$ 
+(the jth diagonal element of $\bf D$), 
+${\bf a}^T{\hat {\boldsymbol \beta}} - {\bf c}={\hat {\boldsymbol \beta}}_j - {\bf c}$, 
+and the F-statistic is
+\[F = \frac{({\hat {\boldsymbol \beta}}_j-c)^2}{S^2d_{jj}},\]
+which has the $F_{1, N-p}$ distribution when $H$ is true. 
+\end {exm}
+
+
+
+In case of straight line we have 
+$Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i$ and
+we want to check $H:\beta_1 = c$.
+We can either take derivative of 
+$\boldsymbol{\varepsilon}^T\boldsymbol {\varepsilon}$
+and set it to zero or compute ${\bf X}^T{\bf X}$ and so on
+to see
+
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+\hat \beta_0 &= \overline Y - \hat \beta_1 \overline x \\ 
+\hat \beta_1 &=  \frac{\sum Y_i (x_i-\overline x)}{\sum (x_i-\overline x)^2}= \frac{\sum (Y_i-\overline Y)(x_i -\overline x)}{\sum (x_i-\overline x)^2}\\ 
+\hat Y_i &= \hat \beta_0 + \hat \beta_1 x_i = \overline Y + \hat \beta_1(x_i - \overline x).
+\end{aligned}
+\end{gather} 
+\noindent From example~\ref{exm:HypTestOneCoeffLinReg}
+we see
+\[F = \frac{(\hat \beta_1 - c)^2}{S^2d_{11}} 
+= \frac{(\hat \beta_1 - c)^2}{S^2/\sum (x_i - \overline x)^2},\]
+where ($p=2$), $(N-2)S^2=\sum(Y_i - \overline Y)^2 - \sum(\hat Y_i - \overline Y)^2$.
+With a little bit of work (See Seber, page 108)
+we get 
+\[
+r^2 = \frac{\sum(\hat Y_i - \overline Y)^2}{\sum(Y_i - \overline Y)^2} 
+= \frac{[\sum (Y_i - \overline Y)(x_i - \overline x)]^2}{\sum (Y_i - \overline Y)^2 \sum (x_i - \overline x)^2}
+\]
+which is the square of the sample 
+correlation between $Y$ and $x$.
+Also, $r$ is a measure of the degree of linearity 
+between $Y$ and $x$ since
+\[RSS = (1-r^2)\sum(Y_i - \overline Y)^2\]
+so that the larger the value of $r^2$, the
+smaller RSS and the better the fit of 
+the estimated regression line to the observations.
+Let us mention the following again
+
+``Although $1 - r^2$ is a useful measure of fit, 
+the correlation $r$ itself is of doubtful use in 
+making inferences. Tukey [1954] makes the 
+provocative but not unreasonable statement that 
+correlation coefficients are justified in two 
+and only two circumstances, when they 
+are regression coefficients, 
+or when the measurement of one or both 
+variables on a determinate scale is hopeless.''\\
+
+Generalization of $r^2$ for straight line leads to
+$R^2$ (a.k.a. coefficient of demonstration):
+\[R = \frac{\sum(Y_i - \overline Y)(\hat Y_i - \overline {\hat  Y})}{ \{ \sum(Y_i - \overline Y)^2 \sum(\hat Y_i - \overline {\hat  Y})^2\}^2}\]
+
+and it can be shown:
+
+\[R^2 = \frac{\sum (\hat Y_i - \overline Y)^2}{\sum (Y_i - \overline Y)^2} = 1 - \frac{RSS}{\sum (Y_i - \overline Y)^2}\]
+
+
 

@@ -1,5 +1,12 @@
 \section{Basics}
 \label{sec:Fundamentals_Basics}
+It is a good idea to not overlook at basics.
+It will saves us time and effort if we do the basics
+at the beginning.
+We need to know distributions (normal, $t-$, $F-$, Gamma),
+Gamma function, expected value and variance and their properties.
+Learn the Lagrange Multipliers method. Get a good grasp of moment
+generating functions.
 
 \begin{deff}{}\label{def:independentEvents}
 Two events $E_1$ and $E_2$
@@ -453,4 +460,38 @@ is minimized when columns of $\bf X$ are orthogonal.
 \end{tcolorbox}
 
 
+
+\begin{deff}
+Pearson's correlation coefficient, when 
+applied to a sample, is commonly represented by 
+$r_{xy}$ and may be referred to as the sample correlation 
+coefficient or the sample Pearson correlation coefficient. 
+
+\[r_{xy} = \frac{\sum (x_i - \overline x) (y_i - \overline y)}{\sqrt{\sum(x_i - \overline x)^2} \sqrt{\sum(y_i - \overline y)^2}}. \]\\
+Pearson's correlation coefficient for a population
+is given by 
+\[\rho_{xy} = \frac{cov(X, Y)}{\sigma_X \sigma_Y}.\]
+\end{deff}
+
+\begin{deff}
+The correlation matrix of $n$ random variables $X_1, \ldots , X_n$ is the $n \times n$ matrix whose $(i, j)$ entry is $corr(X_i,X_j)$. 
+Thus the diagonal entries are all identically unity.
+\end{deff}
+So, if we have a data sample that are centered and
+scaled so that each column of $X$ has norm 1, then
+the correlation matrix is given by $R_{XX} = X^TX$.
+
+Let me mention the following quote 
+from~\citep{seber2012linear}
+that will be mentioned again in~\cref{sec:Hypothesis-Testing}
+about correlation coefficient
+``Although $1 - r^2$ is a useful measure of fit, 
+the correlation $r$ itself is of doubtful use in
+making inferences. Tukey [1954] makes 
+the provocative but not unreasonable 
+statement that correlation coefficients are 
+justified in two and only two circumstances, 
+when they are regression coefficients, or 
+when the measurement of one or both variables on 
+a determinate scale is hopeless.''
 
