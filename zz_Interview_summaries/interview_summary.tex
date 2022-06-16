@@ -51,9 +51,13 @@ Specifity = FPR = \frac{FP}{TN + FP}
 \begin{deff}{}
 Adjust $\beta$ for trade off between  precision and recall.
 For recall oriented tasts $\beta = 2$ and for precision oriented task $\beta = 0.5$.
-\begin{equation}\label{eq:Fscore}
-F_\beta = \frac{(1+\beta^2) TP}{ (1-\beta^2) TP + \beta FN + FP}
-\end{equation}
+
+\begin{gather} \label{eq:Fscore}% gather and aligned leads to having one label for eq.
+\begin{aligned} 
+F_\beta &= (1+\beta^2) \times \frac{\text{precision} \times \text{recall}}{(\beta^2 \times \text{precision}) + \text{recall}}\\
+             &= \frac{(1+\beta^2) TP}{ (1+\beta^2) TP + \beta^2 FN + FP}\\ 
+\end{aligned} 
+\end{gather} %
 
 \begin{equation}\label{eq:F1score}
 F_1 = \frac{2 \times recall \times precision}{ recall + precision}
