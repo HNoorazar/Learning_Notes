@@ -233,6 +233,9 @@ chosen as an estimate of $\boldsymbol \beta$?
 ``For a reasonable class of estimates 
 (linear unbiased estimates)  $\hat \beta_j$
 has the smallest variance.''
+The aforementioned statement does not depend
+on the distribution of errors; i.e. normality or other
+kind of distribution.
 If $\varepsilon_i \sim N(0, 1)$,
 i.e. ${\boldsymbol \varepsilon} \sim N({\bf 0}, \sigma^2 {\bf I})$, 
 i.e. ${\bf Y} \sim N({\bf X}{\boldsymbol \beta}, \sigma^2 {\bf I})$,
@@ -240,6 +243,16 @@ then ${\bf v}^T \hat {\boldsymbol \beta}$ has minimum variance
 among the entire class of unbiased estimates, not just
 linear estimates.
 
+\begin{tcolorbox}
+The $\hat \beta_j$s are said to be best linear unbiased estimators
+where \emph{best} mean having minimum variance.
+Of course, here we are assuming the model, $E[y_i]=\beta_0+\beta_1x_i$,
+is correct.
+
+Please note that normality of errors have not come into play.
+Confidence intervals and hypothesis testing is where 
+normality of errors come into the picture.
+\end{tcolorbox}
 
 
 \begin{thm}
@@ -258,7 +271,7 @@ i.e., $\bm Y \sim N(\bm X \bbeta, \sigma^2 \bm I)$,
 then $\bm v^T \hat \bbeta$ has minimum variance for entire class 
 of estimates of $\bbeta$, not only linear estimations.\sidenote{
 Seber uses $\hat \bbeta$ when $\bm X$ is full rank. So, I am not sure
-whether this is true for rand deficient $\bm X.$}
+whether this is true for rank deficient $\bm X.$}
 Moreover, $\hat \beta_j$s will be the maximum likelihood estimations of $\beta_j$s
 as well.
 
