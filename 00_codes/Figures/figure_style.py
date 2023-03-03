@@ -27,6 +27,7 @@ To Do
    >>> fig.adjust()
 
 """
+
 from __future__ import division
 
 import copy
@@ -46,6 +47,10 @@ import matplotlib.gridspec
 import matplotlib.pyplot as plt
 
 
+
+import sys
+sys.path.append("/Users/HN/Documents/00_GitHub/Learning_Notes/00_codes/Figures/")
+sys.path.append("/Users/HN/Documents/00_GitHub/mmfutils-fork/src/mmfutils/")
 from mmfutils.containers import Object
 
 # import mmf.utils.mac

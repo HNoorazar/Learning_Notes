@@ -276,7 +276,8 @@ of the class labels in the training data. The performance of AdaBoost
 has been empirically observed to dramatically degrade in such situations.
 
 Squared-error loss is not a good surrogate for misclassification error. 
-As seen in~\cref{fig:exponentialLoss_DevianceLoss}, it is not a monotone decreasing function of 
+As seen in~\cref{fig:exponentialLoss_DevianceLoss}, it is not a 
+monotone decreasing function of 
 increasing margin $y f(x)$. For margin values $y_i f(x_i) > 1$ it increases 
 quadratically, thereby placing increasing influence (error) on observations 
 that are correctly classified with increasing certainty, thereby reducing 

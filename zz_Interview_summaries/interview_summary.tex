@@ -86,7 +86,7 @@ To use AIC for model selection, we simply choose the model giving
 smallest AIC over the set of models considered. 
 For nonlinear and other complex models, we need to replace d by 
 some measure of model complexity.
-\begin{equation}\label{eq:AICLogistic}
+\begin{equation}\label{eq:AICLogisticnonlinear}
 AIC(\alpha) = \overline{err}  + 2\frac{d(\alpha)}{N}
 \end{equation}
 
@@ -649,9 +649,9 @@ the residuals from our model as a function of time. If the errors
 are uncorrelated, then there should be no discernible pattern. 
 On the other hand, if the error terms are positively correlated, 
 then we may see tracking in the residuals—that is, adjacent 
-residuals may have similar values. Figure~\ref{fig:ErrCorrelation} provides an 
-illustration. In the top panel, we see the residuals from a linear 
-regression fit to data generated with uncorrelated errors. 
+residuals may have similar values. Figure~\ref{fig:ErrCorrelation} 
+provides an illustration. In the top panel, we see the residuals from 
+a linear regression fit to data generated with uncorrelated errors. 
 There is no evidence of a time-related trend in the residuals. 
 In contrast, the residuals in the bottom panel are from a data 
 set in which adjacent errors had a correlation of 0.9. Now there 
@@ -663,7 +663,9 @@ There is still evidence of tracking, but the pattern is less clear.
 %  \centering
   \captionsetup{justification=centering}
   \includegraphics[width=0.6\textwidth]{00_figures/ErrCorrelation}
-  \caption[][-14\baselineskip]{Plots of residuals from simulated time series data sets generated with differing levels of correlation $\rho$ between error terms for adjacent time points.}%
+  \caption[][-14\baselineskip]{Plots of residuals from simulated time series data 
+  sets generated with differing levels of correlation $\rho$ between 
+  error terms for adjacent time points.}%
   \label{fig:ErrCorrelation}%
 \end{figure*}
 Many methods have been developed to properly take account of 
