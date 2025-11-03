@@ -1,0 +1,43 @@
+\chapter{Metric Design}
+\label{chap:Metric Design}
+
+In business there are metrics to evaluate performance of the model.
+Of course, since it is business, they care about money.
+Thus, the metric they want to hear is how much revenue is increased.
+These metrics may not be convex, smooth, etc. So, they may not be
+used during training phase. 
+But, hopefully, the metrics used during the training phase
+are good surrogate for the business-metric. 
+Lets see what is out there.
+At this point, Nov. 2, 2025, these are from edicative.io course; \emph{Machine Learning System Design}.
+Hopefully, I will remember to cite everything properly.
+
+Metrics used during training are referred to by \emph{offline metrics.}
+
+\section{Educative.io Metrics}
+\subsection{AirBnB}
+
+
+{\bf Offline Metrics}
+
+\begin{description}
+\item [Normalized discounted Cumulative Gain: nDCG] is a standard metric in ranking problems where position matters. It gives higher weight to correct predictions near the top of the list—exactly what we want in search ranking.
+
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Why nDCG?}]
+% olback=green!10!white,colframe=green!80!black
+Users rarely scroll through all results. A relevant result at position 2 is more valuable than at position 10. 
+It accounts for both relevance and position, unlike basic accuracy or AUC. 
+It reflects user satisfaction better than simple classification metrics like precision or recall.
+\end{tcolorbox}
+
+\begin{align}
+\text{DCG}_p &= \sum_{i=1}^{p} \frac{\text{rel}_i}{\log_2(i+1)} \\[6pt]
+\text{nDCG}_p &= \frac{\text{DCG}_p}{\text{IDCG}_p},
+\end{align}
+$\text{rel}_i$= relevance score of the result at position $i$ and 
+IDCG = ideal DCG, if all relevant results were perfectly ordered\sidenote{We need to expand on these. What are they?}
+
+
+
+\end{description}
