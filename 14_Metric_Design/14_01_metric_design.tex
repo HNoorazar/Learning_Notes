@@ -15,11 +15,129 @@ Hopefully, I will remember to cite everything properly.
 Metrics used during training are referred to by \emph{offline metrics.}
 
 \section{Educative.io Metrics}
+
+\begin{figure}
+\centering
+\includegraphics[width=\textwidth]{00_figures/systemDesignWorkFlow}
+\caption{The 6 basic steps to approach Machine Learning System Design}
+\label{fig:MLSystemDesignWorkFlow}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{itemize}
+\item Is the output of the feed in chronological order?
+\item How do we want to balance feeds versus sponsored ads, etc.?
+\end{itemize}
+
+
+\begin{description}
+\item [Offline Metrics]
+logloss and AUC for binary classification, or RMSE and MAPE for forecast.
+
+In Click Through Rate (CTR) prediction, Facebook uses Normalized Cross Entropy loss (a.k.a. logloss) to make the loss less sensitive to the background conversion rate. 
+
+\item [Online metrics]
+Lift in revenue or click through rate, to evaluate how well the model recommends relevant content to users. Consequently, we evaluate the impact on business metrics. If the observed revenue-related metrics show consistent improvement, then it is safe to gradually expose the model to a larger percentage of real traffic
+
+\item [Exploration vs. exploitation] Thompson Sampling
+
+\item [A/B testing]
+\href{https://aws.amazon.com/blogs/machine-learning/a-b-testing-ml-models-in-production-using-amazon-sagemaker/}{ Sage Maker enables A/B testing} and
+\href{https://www.linkedin.com/blog/engineering/archive/top-five-lessons-from-running-a-b-tests-on-the-world-s-largest-p}{LinkedIn A/B testing.}
+
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Video Recommendation}
+\noindent {\bf \color{blue}  Offline Metrics} 
+\begin{itemize}
+\item Precision \& recall: How accurate and complete are our recommendations?
+\item Ranking loss: Measures how well the system ranks relevant videos higher.
+\item Log loss: Captures the model's confidence in its predictions.
+
+\item Recall = how many relevant videos were retrieved.
+Precision = how many of the shown videos were actually relevant.
+
+Precision/Recall are simpler binary relevance metrics, good when the focus is on relevance detection rather than fine-grained ranking. That's why nDCG is not used here. In airBnB ranking is very important. In youtube video, relevance detection is more important than fine-grained ranking.
+\end{itemize}
+
+\noindent {\bf \color{blue}  Online Metrics} 
+\begin{itemize}
+\item Click-through rate (CTR): Do users click the videos we recommend?
+\item Watch time: How long do they stay engaged with the content?
+\item Conversion rate: Do they take desired actions like subscribing, liking, or sharing?
+\end{itemize}
+
+\begin{description}
+\item [The candidate generation]  can be done by Matrix factorization. The purpose of candidate generation is to generate ``somewhat'' relevant content to users based on their watched history. The candidate list needs to be big enough to capture potential matches for the model to perform well with desired latency.
+One solution is to use collaborative algorithms because the inference time is fast, and it can capture the similarity between user taste in the user-video space.
+
+In practice, for large scale system (Facebook, Google), we don't use Collaborative Filtering and prefer low latency method to get candidate. One example is to leverage Inverted Index (commonly used in Lucene, Elastic Search). Another powerful technique can be found FAISS or Google ScaNN.
+
+\item [Ranking model] A fully connected neural network is simple yet powerful for representing non-linear relationships, and it can handle big data.
+\end{description}
+\begin{figure}
+\centering
+\includegraphics[width=.8\textwidth]{00_figures/videoRecommender}
+\caption{Video recommender design}
+\label{fig:videoRecommender}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{LinkedIn Feed Ranking}
+\noindent {\bf \color{blue}  Offline Metrics} 
+Reasonable normalized cross-entropy. AUC.
+
+
+\noindent {\bf  \color{blue}  Online Metrics} 
+Conversion rate (ratio of clicks with number of feeds).
+
+\noindent {\bf \color{blue} Feed Ranking Models} 
+ Logistic Regression in Spark or Alternating Direction Method of Multipliers. We can also use deep learning in distributed settings. We can start with the fully connected layers with the Sigmoid activation function applied to the final layer.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{00_figures/linkedInFeedRanking}
+\caption{LinkedIn FeedRanking}
+\label{fig:linkedInFeedRanking}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ad click prediction}
+\noindent {\bf \color{blue} Offline Metrics}
+Normalized Cross-Entropy (NCE): NCE is the predictive logloss divided by the cross-entropy of the
+background CTR. This way NCE is insensitive to background CTR. This is the NCE formula
+(This metric penalizes confident but wrong predictions—perfect for probabilistic classifiers.):
+\[
+\text{NCE} = \frac{}{}
+\]
+
+
+\noindent  {\bf \color{blue} Online Metrics}
+Revenue Lift: Percentage of revenue changes over a period of time. Upon deployment, a new model is deployed on a small percentage of traffic. The key decision is to balance between percentage traffic and the duration of the A/B testing phase.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.8\textwidth]{00_figures/adClickPredDesign}
+\caption{ad Click Pred Design}
+\label{fig:adClickPredDesign}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \subsection{AirBnB}
-
-
-{\bf Offline Metrics}
-
+\noindent  {\bf \color{blue} Offline Metrics}
 \begin{description}
 \item [Normalized discounted Cumulative Gain: nDCG] is a standard metric in ranking problems where position matters. It gives higher weight to correct predictions near the top of the list—exactly what we want in search ranking.
 
@@ -38,6 +156,105 @@ It reflects user satisfaction better than simple classification metrics like pre
 $\text{rel}_i$= relevance score of the result at position $i$ and 
 IDCG = ideal DCG, if all relevant results were perfectly ordered\sidenote{We need to expand on these. What are they?}
 
+\end{description}
 
+
+\noindent  {\bf \color{blue} Online Metrics}
+conversion rate = number of bookings / number of search results\\
+
+
+Use stratified sampling, class weighting, or \hl {focal loss} to avoid biasing toward the majority class.\\
+
+
+\noindent  {\bf \color{blue} Cold-start challenge} New listings have no data. Use hybrid models or backfill with rule-based heuristics (e.g., prioritize listings with high-quality photos or competitive pricing).
+
+
+\noindent {\bf Backfill}
+\begin{description}
+\item [For new items]: The backfill model typically leverages content-based features (e.g., item attributes, categories, keywords, descriptions, or images) to recommend them to users whose preferences align with these features. A common simple backfill strategy is to display the most popular or trending items in general to new users or alongside new items.
+
+\item [For new users]: The backfill model might use demographic or contextual data (e.g., location, device type, time of day). Often, new users are shown general popular or top-rated items, or the system might explicitly ask them for their preferences during onboarding to quickly gather initial signals (active learning). 
+\end{description}
+
+
+\noindent {\bf Hybrid model}
+ They strategically integrate methods like content-based filtering, collaborative filtering, popularity-based approaches, and auxiliary data to provide effective recommendations from the outset. 
+
+\begin{description}
+\item [For New Users] (User Cold-Start)
+\begin{itemize}
+\item Content-Based Filtering (CBF) Integration: The hybrid system can initially rely on a CBF approach, which uses user profile information (e.g., demographics, declared preferences during onboarding surveys) and item metadata (e.g., genre, keywords, descriptions) to make initial recommendations. This does not require past interaction data.
+
+\item Popularity-Based Fallback: A common initial strategy is to recommend the most popular, trending, or top-rated items to new users until enough interaction data is collected to build a personalized profile.
+
+\item Leveraging External Data: Hybrid systems can incorporate data from external sources, such as social networks, to infer a new user's interests and make initial suggestions.
+
+\item Feature Combination: Combining explicit ratings and implicit feedback (like browsing history, adding items to a cart) into a single model helps build a more robust user representation faster, enabling a smoother transition to personalized recommendations. 
+\end{itemize}
+
+\item [For New Items] (Items Cold-Start)
+\begin{itemize}
+\item Content-Based Filtering (CBF): This is highly effective for new items as it uses their metadata (e.g., category, description, features) to match them with existing user preferences.
+
+\item Feature Augmentation/Mapping: Side information about new items (e.g., price, brand, description) can be integrated into the model's feature space, allowing the system to generate a latent representation (embedding) for the new item without any interaction data.
+
+\item Knowledge-Guided Retrieval: Utilizing a knowledge graph that connects new items to existing entities based on their attributes helps in retrieving relevant knowledge and making "zero-shot" recommendations. 
+\end{itemize}
 
 \end{description}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.6\textwidth]{00_figures/airBnBDesign}
+\caption{airBnB Design}
+\label{fig:airBnBDesign}
+\end{figure}
+
+
+\begin{table}[h!]
+\begin{fullwidth} % allows the table to extend across both columns
+\hspace{-.2in}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\textbf{Platform} & \textbf{Main User Action} & \textbf{Model Output} & \textbf{Goal} & \textbf{Metric} \\
+\hline
+\textbf{Airbnb} & Search/browse top listings & Relevance score & Correct \textbf{ordering} & nDCG \\
+\hline
+\textbf{YouTube} & Watch recomm. videos & Relevance Y/N & Find \textbf{relevant} videos & Precision/Recall \\
+\hline
+\textbf{LinkedIn} & Scroll feed, engage & Prob. of engage. & Pred. \textbf{likelihood} accur. & Cross-Entropy \\
+\hline
+\end{tabular}
+\end{fullwidth}
+\end{table}
+
+
+\newpage
+\subsection{Food Delivery Time}
+
+\noindent  {\bf \color{blue} Offline Metrics}  RMSE
+
+\noindent  {\bf \color{blue} Online Metrics} RMSE and customer engagement. Conduct A/B testing to see 
+model with overestimation is more successful or underestimation.
+
+In the design we have
+\begin{itemize}
+\item Feature Store: Provides fast lookup for low latency. A feature store with any key-value storage with high availability like Amazon DynamoDB is a good choice.
+
+\item Feature pipeline: Reads from Kafka, transforms, and aggregates near real-time statistics. Then, it stores them in feature storage.
+
+\item Database: Delivery Order database stores historical Orders and Delivery. Data prep is a process to create training data from a database. We can store training data in cloud storage, for example, S3.
+
+\item We have three services: Status Service, Notification Service, and Estimate Delivery Time service. The first two services handle real-time updates and the Estimate Delivery Time service uses our Machine Learning Model to estimate delivery time.
+
+\item We have a scheduler that handles and coordinates retraining models multiple times per day. After training, we store the Model in Model Storage.
+\end{itemize}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{00_figures/foodDeliveryDesign}
+\caption{Food Delivery Time}
+\label{fig:foodDeliveryDesign}
+\end{figure}

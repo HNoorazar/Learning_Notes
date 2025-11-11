@@ -12,12 +12,14 @@
 }{% #3 Tufte
 } 
 
+
+
 \select
  {% #1 article + archive
   \documentclass[%twocolumn,
                  switch]{article}
   \usepackage{arxiv}
-  \usepackage{caption}
+ \usepackage{caption}
   \usepackage{authblk}
   \bibliographystyle{plain}
 }{% #2 revtex
@@ -391,6 +393,11 @@ font={\color{blue}},
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\LogoOff  %this is for the foiltex documents
+\usepackage{graphicx}  
+\usepackage{float}  % for the [H] specifier
+
+\usepackage{listings}
+\lstset{language=Python, basicstyle=\ttfamily, numbers=left}
 
 \begin{document}
 %\raggedright
@@ -469,6 +476,8 @@ and hopefully, you can find these notes be useful.
 \input{./12_signals_main}
 \input{./13_deep_learning_main}
 \input{./14_Metric_Design_main}
+
+\input{./20_SQL}
 \input{./zz_Interview_summaries_main}
 
 
