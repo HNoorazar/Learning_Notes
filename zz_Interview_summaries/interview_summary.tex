@@ -600,7 +600,7 @@ Two approximations are happening here:
 ``close'' to the target point. 
 \end{itemize}
 
-\section{Problems}
+\section{Potential Problems of Linear Regression}
 \label{sec:problems_Interview}
 \begin{description}
 \item [1. Non-linearity of the response-predictor relationships.]
@@ -1311,5 +1311,37 @@ $\boldsymbol \cdot $ Adam optimization
 \end{itemize}
 
 
+
+
+\section{A/B testing}
+
+\begin{enumerate}
+\item Pooled variance from both populations (assuming equal variances (classic t-test assumption):)
+\[ s_p = \sqrt{\frac{(n_A - 1)s_A^2 + (n_B - 1)s_B^2}{n_A + n_B - 2}}\]
+
+\item Standard error of difference
+
+\[SE = s_p \sqrt{\frac{1}{n_A} + \frac{1}{n_B}}\]
+
+\item t-statistics
+\[t = \frac{\bar{x}_B - \bar{x}_A}{SE}\]
+
+\item degrees of freedom:
+
+\[
+df = \frac{
+\left( \frac{s_A^2}{n_A} + \frac{s_B^2}{n_B} \right)^2
+}{
+\frac{
+\left(\frac{s_A^2}{n_A}\right)^2}{n_A - 1}
++
+\frac{
+\left(\frac{s_B^2}{n_B}\right)^2}{n_B - 1}
+}
+\]
+
+\item find p-value
+
+\end{enumerate}
 
 

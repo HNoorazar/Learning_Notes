@@ -1,0 +1,39 @@
+\section{Tech Papers}
+\label{sec:Tech_Papers}
+The first paper from Tech I am reading this is~\cite{graepel2010web}.
+At least the first one I am taking notes on in this Notes. 
+Interesting and new things in it.
+
+\begin{description}
+\item [Advertisement Players Objectives] are three in this paper.
+advertisers, users, and the
+search engine. These three types of players have different,
+even contradictory objectives. Advertisers are interested
+in maximising their return on investment at high volume.
+Users would like to see maximally relevant ads that help
+them pursue their intent. The search engine would like to
+maximize revenue and growth.
+
+Internally, these conflicting goals are mapped to different
+key performance indicators (KPIs) that are used to tune
+the ad selection system. However, these KPIs are
+influenced by a large number of other subsystems such as
+fraud detection, query expansion, keyword-query
+matching, etc. Furthermore, there are a large number of
+parameters influencing the KPIs including reserve prices
+and rank-score parameters. So, while the ultimate test of a
+CTR predictor lies in its performance as part of the ad
+selection system, in a modular architecture it is often best
+to identify isolated performance measures as proxies for
+in-system performance.
+
+\item [Distribution changes over time] due to seasonality, 
+change of taste, changes in web content, economic conditions, etc. 
+Online algorithms, batch learning on shifting windows.
+
+
+\item [Exploration vs. Exploitation] Interesting point: The ads shown
+to users is decided by the algorithm that predicts which ads are good.
+But then, those will be our training set for future. So, the trade-off between
+exploration and exploitation should be considered.
+\end{description}
