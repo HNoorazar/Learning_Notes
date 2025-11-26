@@ -31,7 +31,6 @@ class LogisticRegression(nn.Module):
         return torch.sigmoid(self.linear(x))  # Sigmoid activation for binary classification
 
 
-
 # %%
 # 1. Generate random dataset (features and labels)
 # Features are two-dimensional, labels are binary (0 or 1)
