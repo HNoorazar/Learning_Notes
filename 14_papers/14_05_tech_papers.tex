@@ -1,10 +1,73 @@
 \section{Tech Papers}
 \label{sec:Tech_Papers}
-The first paper from Tech I am reading this is~\cite{graepel2010web}.
+The first paper from Tech I am reading is Baysian CTRprediction~\cite{graepel2010web}.
 At least the first one I am taking notes on in this Notes. 
-Interesting and new things in it.
+Interesting and new things in it and its method replaced Bing's CTR prediction algorithm in 2009.
+
+\begin{deff}
+We refer to an ad shown to a particular user in a particular
+page view as an ad impression
+\end{deff}
 
 \begin{description}
+
+\item [Contributions]
+First, it
+describes the Sponsored Search application scenario, the
+key role of CTR prediction in general, and the particular
+constraints derived from the task, including accuracy,
+calibration, scalability, dynamics, and exploration.
+Second, it describes a new Bayesian online learning
+algorithm for binary prediction, subsequently referred to
+as adPredictor. The algorithm is based on a generalised
+linear model with a probit (cumulative Gaussian) link
+function, a factorising Gaussian belief distribution on the
+feature weights, and calculates the approximate posterior
+using message passing, providing simple, closed-form
+update equations with automatic feature-wise learning
+rate adaptation. Third, we discuss the techniques we
+employed to make adPredictor work in Bing’s production
+environment, now driving 100% Sponsored Search traffic
+with ad impressions per year.
+
+\item [Keyword Auction]  is done as follows
+\begin{enumerate}
+\item For a given product advertisers identify suitable keywords
+likely to be typed by users. 
+
+\item For each of those keywords the advertisers provide a bid. 
+
+\item When a user types a query, the search
+engine matches the keywords of all the advertisers against
+the query.
+
+\item The search engine needs to allocate the available ad
+positions to the ads in the auction and needs to determine
+appropriate payments. This is achieved by a mechanism
+referred to as a Generalized Second Price (GSP) Auction.
+\end{enumerate}
+
+\item [Features] can be grouped in 3 categories:
+\begin{enumerate}
+\item {\bf Ad. features}
+bid phrases, ad title, ad text, landing page
+URL, landing page itself, and a hierarchy of advertiser,
+account, campaign, ad group and ad. 
+
+\item {\bf Query features} 
+include the search keywords, possible algorithmic query
+expansion, cleaning and stemming.
+
+\item {\bf Context features}  
+include display location, geographic location, time, user
+data and search history.
+\end{enumerate}
+
+\item [Scalability] of the algorithm is
+ensured through a principled weight pruning
+procedure and an approximate parallel
+implementation.
+
 \item [Advertisement Players Objectives] are three in this paper.
 advertisers, users, and the
 search engine. These three types of players have different,
