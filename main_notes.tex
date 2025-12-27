@@ -1,5 +1,7 @@
 %\documentclass[12pt]{article}
 %\documentclass{tufte-book}
+\PassOptionsToPackage{table,dvipsnames}{xcolor}
+
 \providecommand{\exclude}[1]{}
 % Simple approach for selecting styles
 % #1 article + archive
@@ -79,8 +81,10 @@
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{colortbl}
-\usepackage{xcolor}
-\usepackage{multirow} % needed for cline for example
+
+\usepackage{multirow,multicol} % needed for cline for example
+\usepackage{booktabs} % for \toprule
+%\usepackage[table,dvipsnames]{xcolor}
 
 
 %% HN packages
@@ -477,7 +481,7 @@ and hopefully, you can find these notes be useful.
 \input{./12_signals_main}
 \input{./13_deep_learning_main}
 \input{./14_papers_main}
-
+\input{./18__Metrics_main}
 \input{./19_Metric_Design_main}
 \input{./20_SQL}
 

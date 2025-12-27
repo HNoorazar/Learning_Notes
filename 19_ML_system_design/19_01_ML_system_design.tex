@@ -1,5 +1,77 @@
-\chapter{Metric Design}
-\label{chap:Metric Design}
+\chapter{ML System Design}
+\label{chap:ML_System_Design}
+
+\begin{description}
+\item [Problem statement]
+It’s important to state the correct problems. It is the candidates job to understand the intention of the design and why it is being optimized. It’s important to make the right assumptions and discuss them explicitly with interviewers. For example, in a LinkedIn feed design interview, the interviewer might ask broad questions:
+
+\begin{center}
+Design LinkedIn Feed Ranking.
+\end{center}
+
+Asking questions is crucial to filling in any gaps and agreeing on goals. The candidate should begin by asking follow-up questions to clarify the problem statement. For example:
+\begin{itemize}
+\item Is the output of the feed in chronological order?
+\item How do we want to balance feeds versus sponsored ads, etc.?
+\end{itemize}
+If we are clear on the problem statement of designing a Feed Ranking system, we can then start talking about relevant metrics like user agreements.
+
+\item [Identify metrics]
+During the development phase, we need to quickly test model performance using offline metrics. 
+You can start with the popular metrics like logloss and AUC for binary classification, or RMSE and MAPE for forecast.
+
+\item [Identify]  requirements
+\begin{enumerate}
+\item Training requirements
+\begin{itemize}
+\item There are many components required to train a model from end to end. These components include the data collection, feature engineering, feature selection, and loss function. For example, if we want to design a YouTube video recommendations model, it’s natural that the user doesn’t watch a lot of recommended videos. Because of this, we have a lot of negative examples. The question is asked:
+
+\begin{center}
+How do we train models to handle an imbalance class?
+\end{center}
+
+Once we deploy models in production, we will have feedback in real time.
+
+\begin{center}
+How do we monitor and make sure models don’t go stale?
+\end{center}
+\end{itemize}
+
+\item Inference requirements
+Once models are deployed, we want to run inference with low latency (<100ms) and scale our system to serve millions of users.
+
+\begin{center}
+How do we design inference components to provide high availability and low latency?
+\end{center}
+\end{enumerate}
+
+
+\item [Train and evaluate model]~~
+\begin{itemize}
+\item There are usually three components: feature engineering, feature selection, and models. We will use all the modern techniques for each component.
+
+\item For example, in Rental Search Ranking, we will discuss if we should use ListingID as embedding features. In Estimate Food Delivery Time, we will discuss how to handle the latitude and longitude features efficiently.
+\end{itemize}
+
+\item [Design high level system]
+In this stage, we need to think about the system components and how data flows through each of them. The goal of this section is to identify a minimal, viable design to demonstrate a working system. We need to explain why we decided to have these components and what their roles are.
+
+\begin{itemize}
+\item For example, when designing Video Recommendation systems, we would need two separate components: the Video Candidate Generation Service and the Ranking Model Service.
+\end{itemize}
+
+\item [Scale the design]
+In this stage, it’s crucial to understand system bottlenecks and how to address these bottlenecks. You can start by identifying:
+
+\begin{itemize}
+\item Which components are likely to be overloaded?
+\item How can we scale the overloaded components?
+\item Is the system good enough to serve millions of users?
+\item How we would handle some components becoming unavailable, etc.
+\item You can also learn more about how companies scale there design here.
+\end{itemize}
+
+\end{description}
 
 In business there are metrics to evaluate performance of the model.
 Of course, since it is business, they care about money.
@@ -8,13 +80,41 @@ These metrics may not be convex, smooth, etc. So, they may not be
 used during training phase. 
 But, hopefully, the metrics used during the training phase
 are good surrogate for the business-metric. 
-Lets see what is out there.
+Let's see what is out there.
 At this point, Nov. 2, 2025, these are from edicative.io course; \emph{Machine Learning System Design}.
 Hopefully, I will remember to cite everything properly.
 
-Metrics used during training are referred to by \emph{offline metrics.}
 
-\section{Educative.io Metrics}
+\section{Prediction}
+They call it inference.
+
+\begin{description}
+\item [Imbalance workload] Use load balancers to send clients' request
+to different servers. Load balancers can follow different logics
+\begin{enumerate}
+\item Work load
+
+\item  Round Robin: Sends each request to a new server in a rounding fashion. 
+Server 1, then 2, then 3, so on
+
+\item Request parameter: considers some parameters into account:
+geographical location: send to a server near user, or device type: send to a server 
+that is optimized for that device or has a model that is trained for users with that device.
+Or of a server needs to remember sth; e.g. shopping cart.
+\end{enumerate}
+
+\item [Non-stationary problem]
+In an online setting, data is always changing. Therefore, the data distribution shift is common. So, keeping the models fresh is crucial to achieving sustained performance. Based on how frequently the model performance degrades, we can then decide how often models need to update/retrain. One common algorithm that can be used is the Bayesian Logistic Regression.
+
+\item [Exploration vs. exploitation:] {\bf  \color{red}Thompson Sampling}
+In an Ad Click prediction use case, it’s beneficial to allow some exploration when recommending new ads. However, if there are too few ad conversions, it can reduce company revenue. This is a well-known exploration-exploitation trade-off. One common technique is Thompson Sampling where at a time, we need to decide which action to take based on the reward.
+
+\end{description}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{ML System Design (Educative.io)}
+\label{sec:ML_System_Design_Educative}
 
 \begin{figure}
 \centering
@@ -93,23 +193,35 @@ In practice, for large scale system (Facebook, Google), we don't use Collaborati
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{LinkedIn Feed Ranking}
-\noindent {\bf \color{blue}  Offline Metrics} 
-Reasonable normalized cross-entropy. AUC.
+\noindent {\bf \color{blue}  Offline Metrics:} normalized cross-entropy. AUC.
 
 
 \noindent {\bf  \color{blue}  Online Metrics} 
-Conversion rate (ratio of clicks with number of feeds).
+Conversion rate (ratio of clicks with number of feeds).\vspace{-.2in}\sidenote{I  am not sure why they are referring to \emph{ratio of clicks with number of feeds}
+as conversion rate. It seems that is CTR, not conversion rate.
+Conversion rate: (CVR) measures how often a desired action happens after exposure or a click, depending on how it's defined in your system (Conversion: purchase, signup, install, add-to-cart, etc.).}
 
 \noindent {\bf \color{blue} Feed Ranking Models} 
- Logistic Regression in Spark or Alternating Direction Method of Multipliers. We can also use deep learning in distributed settings. We can start with the fully connected layers with the Sigmoid activation function applied to the final layer.
+ Logistic Regression in Spark or Alternating Direction Method of Multipliers. We can also use deep learning in distributed settings. We can start with the fully connected layers with the Sigmoid activation function applied to the final layer.\\
 
 \begin{figure}[ht]
 \centering
+\smallskip
 \includegraphics[width=\textwidth]{00_figures/linkedInFeedRanking}
+\vspace*{0.5in}
 \caption{LinkedIn FeedRanking}
 \label{fig:linkedInFeedRanking}
 \end{figure}
 
+
+\noindent {\bf  \color{blue} Evaluation} One approach is to split the data into training data and validation data. Another approach is to replay the evaluation to avoid biased offline evaluation. 
+\sidenote{This is a language that used in recommender systems. This refers to replay-based (counterfactual) evaluation, also called policy replay or off-policy evaluation. {\bf Bias}: User saw items chosen by the old system $\rightarrow$ clicked some of them. You cannot fairly evaluate a new recommender on this data because:
+You don’t know how users would have reacted to items not shown}
+We use data until time $t$ for training the model. We use test data from time $t+1$
+ and reorder their ranking based on our model during inference. If there is an accurate click prediction at the correct position, then we record a match. The total match will be considered as total clicks.
+ 
+ 
+During evaluation we will also evaluate how big our training data set should be, and how frequently we should retrain the model, among many other hyperparameters.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%
