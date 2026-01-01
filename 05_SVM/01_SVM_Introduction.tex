@@ -1,0 +1,107 @@
+
+
+\section{Introduction}
+\label{sec:SVM_Introduction}
+
+I start my notes with the Chapter 12 of Tibshirani's 
+book\cite{Hastie2001elements} and then move to the 
+Steinwart's book\cite{steinwart2008support}; Support Vector Machines.
+
+Optimal separating hyperplanes are for the case when 
+two classes are linearly separable; it provides a 
+linear decision boundaries for classification. 
+Here we cover extensions to the non-separable case, 
+where the classes overlap. These techniques are then generalized to 
+what is known as the support vector machine, which produces 
+nonlinear boundaries by constructing a linear boundary in a large, 
+transformed version of the feature space.
+The second set of methods generalize Fisher's linear 
+discriminant analysis (LDA). The generalizations include 
+flexible discriminant analysis which facilitates construction of 
+nonlinear boundaries in a manner very similar to the support 
+vector machines, penalized discriminant analysis for 
+problems such as signal and image classification 
+where the large number of features are highly 
+correlated, and mixture discriminant analysis for 
+irregularly shaped classes.
+
+See \cref{sec:Separating_Hyperplanes}
+for a review of separating hyperplanes.
+
+\section{Separating Hyperplanes}
+\label{sec:Separating_Hyperplanes_SVMChapter}
+
+\iffalse
+Linear discriminant analysis and logistic 
+regression both estimate linear decision 
+boundaries in similar but slightly different 
+ways. For the rest of this chapter we describe 
+separating hyperplane classifiers. These procedures 
+construct linear decision boundaries that explicitly 
+try to separate the data into different classes 
+as well as possible. They provide the basis for 
+support vector classifiers.
+
+The perceptron learning algorithm tries 
+to find a separating hyperplane by 
+minimizing the distance of misclassified 
+points to the decision boundary. If
+a response $y_i = 1$ is misclassified, 
+then $\mathbf{x}_i^T  \boldsymbol{\beta  + \beta}_0 < 0$, 
+and the opposite for
+a misclassified response $y_i = -1$. The goal is to
+minimize 
+\begin{equation}\label{eq:perecptronClassifer}
+D(\boldsymbol{\beta, \beta}_0) = - \sum_{i \in \mathcal{M}} y_i 
+\end{equation}
+where $\mathcal{M}$ indexes the set of
+misclassified points. The quantity is non-negative 
+and proportional to the distance of the misclassified points 
+to the decision boundary defined by $\boldsymbol{\beta}^T \mathbf{x} + \boldsymbol{\beta}_0 = 0$.
+There are a number of problems with this algorithm:
+\begin{enumerate}
+\item When the data are separable, there are 
+         many solutions, and which one is found depends 
+         on the starting values.
+         
+\item The ``finite'' number of (gradient descent) steps 
+         can be very large. The smaller the gap, 
+         the longer the time to find it.
+         
+\item When the data are not separable, 
+         the algorithm will not converge, and cycles 
+         develop. The cycles can be long and 
+         therefore hard to detect.
+\end{enumerate}
+
+This problem can often be eliminated by 
+seeking a hyperplane not in the original space, 
+but in a much enlarged space obtained by creating
+many basis-function transformations of the original 
+variables. This is analogous to driving the residuals 
+in a polynomial regression problem down to zero 
+by making the degree sufficiently large. Perfect 
+separation cannot always be achieved: for 
+example, if observations from two different 
+classes share the same input. It may not be 
+desirable either, since the resulting model is 
+likely to be overfit and will not generalize well. 
+We return to this point at the end of the next 
+section.
+
+A rather elegant solution to the first problem 
+is to add additional constraints to 
+the separating hyperplane.
+
+The \emph{optimal separating hyperplane} 
+separates the two classes and maximizes the 
+distance to the closest point from either class.
+Not only does this provide a unique solution to the 
+separating hyperplane problem, but by maximizing 
+the margin between the two classes on the 
+training data, this leads to better classification 
+performance on test data.
+
+Consider the following
+
+\fi

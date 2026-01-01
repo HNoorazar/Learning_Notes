@@ -1,0 +1,173 @@
+Structured Query Language. Relational database.\marginnote{SQL from Coursera: UC Davis. SQLite here.}
+Read. Write. Update. (no copy. no creation.)
+
+\begin{enumerate}
+\item List column types of a given table in SQLite: PRAGMA should be capital letters. 
+\begin{lstlisting}
+PRAGMA table_info(table_name); 
+\end{lstlisting}
+
+\item Be careful with numbers. Divide by 100 vs 100.00.
+\end{enumerate}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c l p{8cm}}
+\hline
+\textbf{Step} & \textbf{Clause} & \textbf{Purpose} \\
+\hline
+1 & \texttt{FROM} & Identify and combine tables (including joins and subqueries). \\
+2 & \texttt{WHERE} & Filter rows \emph{before} grouping. \\
+3 & \texttt{GROUP BY} & Group remaining rows by specified columns. \\
+4 & \texttt{HAVING} & Filter groups \emph{after} grouping. \\
+5 & \texttt{SELECT} & Compute expressions and aggregates (such as \texttt{AVG}) for each group. \\
+6 & \texttt{ORDER BY} & Sort the final results. \\
+\hline
+\end{tabular}
+\caption{Logical order of SQL query processing}
+\end{table}
+
+
+Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6Wcjyli3I-zSqmvAGqt1ORVYnio/edit?usp=sharing}{this google doc}.
+
+
+\begin{exm} Retained customers
+\begin{lstlisting}[language=SQL]
+SELECT 
+    activity.date,
+    COUNT(DISTINCT activity.user_id) AS active_users,
+    COUNT(DISTINCT future_activity.user_id) AS retained_users,
+    COUNT(DISTINCT future_activity.user_id)::FLOAT /   
+                     COUNT(DISTINCT activity.user_id) AS retention
+FROM activity LEFT JOIN activity AS future_activity
+    ON activity.user_id = future_activity.user_id
+   AND activity.date = future_activity.date - INTERVAL '1 day'
+GROUP BY activity.date
+ORDER BY activity.date;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Count and show result in one row:
+\begin{lstlisting}[language=SQL]
+SELECT
+    COUNT(CASE WHEN gender = 'M' THEN 1 END) AS male_count,
+    COUNT(CASE WHEN gender = 'F' THEN 1 END) AS female_count
+FROM patients;
+\end{lstlisting}
+\end{exm}
+
+
+
+
+
+
+
+\begin{exm} (Medium) 
+Show number of patients per city sorted by patient count and then city.
+\begin{lstlisting}[language=SQL]
+SELECT city, COUNT(DISTINCT patient_id) as num_patients
+FROM patients
+GROUP BY city
+ORDER BY num_patients DESC, city ASC
+\end{lstlisting}
+\end{exm}
+
+\begin{exm}  (Medium) 
+Show first name, last name and role of every person that is either patient or doctor.
+The roles are either ``Patient'' or ``Doctor''.
+\begin{figure}[ht]
+\centering
+\subfloat[]{\includegraphics[width=0.25\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.3\textwidth]{00_figures/SQL/doctors}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.25\textwidth]{00_figures/SQL/EO1}}
+\caption[11\baselineskip]{Patients, doctors, and expected output.\label{fig:SQLEg1}}
+\end{figure}
+
+\begin{lstlisting}[language=SQL]
+SELECT first_name, last_name, 'Patient' as role 
+FROM patients union all (SELECT first_name, last_name, 'Doctor' 
+FROM doctors);
+\end{lstlisting}
+\end{exm}
+
+
+
+\begin{exm} 
+(Medium) Show all allergies ordered by popularity. 
+Remove NULL values from query. See \cref{fig:SQLEg1} for \emph{patients} table.
+\begin{lstlisting}[language=SQL]
+SELECT allergies, COUNT(DISTINCT patient_id) AS total_diagnosis
+FROM patients
+GROUP BY allergies
+Having allergies NOT null
+ORDER BY total_diagnosis DESC
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} (Medium)
+Show all patient's first name, last name, and birth date who were born in the 1970s decade. 
+Sort the list starting from the earliest birth date.
+\begin{lstlisting}[language=SQL]
+SELECT first_name, last_name, birth_date
+FROM patients
+WHERE YEAR(birth_date) BETWEEN 1970 AND 1979
+-- WHERE FLOOR(YEAR(birth_date) / 10) = 197
+RDER BY birth_date ASC;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} T following 2 make the same result:
+\begin{lstlisting}[language=SQL]
+SELECT patient_id, weight, height, 
+  CASE  WHEN (weight / power(height/100.0, 2)) >= 30 then 1 else 0  END as isObese
+FROM patients
+
+SELECT patient_id,  weight,  height,
+  weight / power(CAST(height AS float) / 100, 2) >= 30 AS obese
+FROM patients
+
+# Shortest: combined two above:
+SELECT patient_id,  weight,  height,
+  weight / power(height/ 100.00, 2) >= 30 AS obese
+FROM patients
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Difficult
+\begin{lstlisting}[language=SQL]
+SELECT  p.patient_id,  p.first_name,  p.last_name, 
+                    ph.specialty AS attending_doctor_specialty
+FROM patients p  
+            JOIN admissions a ON a.patient_id = p.patient_id
+            JOIN doctors ph ON ph.doctor_id = a.attending_doctor_id
+WHERE ph.first_name = 'Lisa' and a.diagnosis = 'Epilepsy'
+--------------
+SELECT p.patient_id,  p.first_name,  p.last_name,  doc1.specialty
+FROM patients p JOIN (
+       SELECT *  
+       FROM admissions JOIN doctors 
+      ON admissions.attending_doctor_id = doctors.doctor_id ) AS
+doc1 USING (patient_id)
+WHERE  doc1.diagnosis = 'Epilepsy' AND doc1.first_name = 'Lisa'
+--------------
+SELECT p.patient_id,  p.first_name,  p.last_name,  doctors.specialty
+FROM patients p,  doctors,  admissions
+WHERE  p.patient_id = admissions.patient_id
+     AND admissions.attending_doctor_id = doctors.doctor_id
+     AND admissions.diagnosis = 'Epilepsy'
+     AND doctors.first_name = 'Lisa';
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Hi
+\begin{lstlisting}[language=SQL]
+\end{lstlisting}
+\end{exm}
+
+
+
+

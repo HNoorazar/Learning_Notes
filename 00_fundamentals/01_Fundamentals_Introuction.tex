@@ -1,0 +1,35 @@
+\section{Introduction}
+\label{sec:Fundamentals_Introduction}
+I start my notes with the fundamentals definitions such
+as that of covariance. I prefer not to assume any
+background for readers and also to present these at
+the beginning of the book, rather than at the end as an appendix,
+at the cost of postponing the core ideas of statistical learning.
+
+\section{Notation}
+\label{sec:Notation}
+Hopefully I can maintain a consistent notation
+throughout this document. I have to admit the amount
+of notation is overwhelming and I am going  through
+lots of books and papers. If mistakes happen, hopefully
+the context is clear and they can be fixed.
+Let us get started.
+
+Since there will be lots of statistical learning involved, or even 
+probabilities in the context of image processing and
+optimizations, we have to use traditional upper case
+for random variables; $X$ and $Y$ for example.
+Inevitably, we have to use bold cases for denoting matrices;
+e.g. a linear system is written by $\bf{Ax=y}$. 
+Then, unfortunately, a matrix of constants and a matrix/vector
+of random variables (or observed values of random variables) 
+will have the same style. Observed values of random variables
+are denoted by lower case; e.g. $y$.
+
+Let $X$ and $Y$ be random variables, then
+$E[X]$, $var[X]$, $cov[X, Y]$, and $E[X|Y=y]$ represent
+expectation, variance, covariance, and conditional expectation.
+
+Vector of ones is denoted by $\bm 1_N \in \mathbb{R}^N$.
+Euclidean norm, 2-norm, usually referred to just by norm, 
+$\norm{\bf v}^2 = \norm{\bf v}_2^2 = \langle \bf v, \bf v \rangle = \sum v_i^2$.

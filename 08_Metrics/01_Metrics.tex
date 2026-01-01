@@ -1,0 +1,56 @@
+\begin{enumerate}
+\item {\bf From chatGPT:}\\
+{\bf Candidate generation} = recall problem (go for high recall/TPR); goal: retrieve all potentially relevant videos for the user.
+surrogate loss functions; Softmax/Cross-Entropy, Contrastive.\\
+
+{\bf Ranking} is precision problem; Order the candidate videos by how good they are right now for this user.
+surrogate loss functions; Pairwise ranking loss (BPR, hinge), Hinge loss, Weighted cross-entropy.\\
+
+\item Facebook uses normalized cross entropy (NE or NCE) for click through rate prediction.
+I need to learn more about this. Formula is confusing and not unique, it appears.
+Or maybe rather than +1 and 0 labels they have +1 and -1 as labels.
+Denominator is not clear:
+\[ \text{NC} = \dfrac { \frac{1}{N} \sum \left( \frac{1+y_i}{2} \log(p_i)  + \frac{1-y_i}{2} \log(1-p_i) \right) }{ -\left(  p \log(p) + (1-p)log(1-p)  \right) }
+\] 
+
+
+\item Mean Absolute Percentage Error.
+
+\[ M = \frac{100}{n} \sum \abs{\dfrac{A_t - F_t}{A_t}} \]
+
+\item Symmetric Mean Absolute Percentage Error. 
+ This is not unique; it is possible that denominator does not have absolute values in it.
+
+\[ \text{SMAPE} = \frac{100}{n} \sum \dfrac{\abs{A_t - F_t} }{\frac{\abs{A_t} + \abs{F_t}}{2}}  =   \frac{200}{n} \sum \dfrac{\abs{A_t - F_t} }{\abs{A_t} + \abs{F_t}}  \]
+
+\end{enumerate}
+
+Metrics used during training are referred to by \emph{offline metrics.}
+\begin{table}[h]
+\centering
+\caption{}
+\label{tab:MetricsList}
+\rowcolors{1}{aliceblue}{white}
+\begin{tabular}{llllll}
+\hline
+\rowcolor{shadecolor} \small{Goal} & \small{Metric} &  A &a & a & a\\ 
+\hline
+\rowcolor{shadecolor}
+\multicolumn{6}{c}{Offline Metrics} \\
+\hline
+CTR / binary loss &  NCE &  &  &  &  \\ 
+ &  &  &  &  &  \\ 
+ &  &  &  &  &  \\ 
+ \hline
+ \rowcolor{shadecolor}
+\multicolumn{6}{c}{Online Metrics} \\
+\hline
+ & User Agreement &  &  &  &  \\ 
+% \hline
+ &  &  &  &  &  \\ 
+ &  &  &  &  &  \\ 
+ &  &  &  &  &  \\ 
+\toprule
+\end{tabular}
+\end{table}
+

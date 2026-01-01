@@ -403,6 +403,22 @@ font={\color{blue}},
 \usepackage{listings}
 \lstset{language=Python, basicstyle=\ttfamily, numbers=left}
 
+\lstset{
+%  language=SQL,
+  basicstyle=\ttfamily\small,     % Font style
+  keywordstyle=\color{blue},       % Keywords in blue
+  stringstyle=\color{red},         % Strings in red
+  commentstyle=\color{green},      % Comments in green
+  morekeywords={SELECT, INSERT, UPDATE, DELETE, FROM, WHERE, AND, OR},  % Additional SQL keywords
+  numbers=left,                   % Line numbers on the left
+  numberstyle=\tiny\color{gray},   % Style for line numbers
+  stepnumber=1,                   % Number every line
+  numbersep=5pt,                  % Distance from the code to the line numbers
+  frame=single,                   % Draw a frame around the code
+  backgroundcolor=\color{lightgray!20},  % Background color of the code
+  showstringspaces=false          % Do not highlight spaces in strings
+}
+
 \begin{document}
 %\raggedright
 
@@ -474,15 +490,16 @@ and hopefully, you can find these notes be useful.
 \input{./03_classification_main}
 \input{./04_clustering_main}
 \input{./05_SVM_main}
-\input{./06_TDA_main}
-\input{./07_practical_issues_main}
-\input{./08_wavelet_fourier_main}
+\input{./06_practical_issues_main}
+\input{./07_tests}
+\input{./08_Metrics_main}
 \input{./09_model_inference_main}
-\input{./12_signals_main}
-\input{./13_deep_learning_main}
-\input{./14_papers_main}
-\input{./18__Metrics_main}
-\input{./19_Metric_Design_main}
+\input{./10_ML_system_Design_main}
+\input{./11_TDA_main}
+\input{./12_wavelet_fourier_main}
+\input{./13_signals_main}
+\input{./14_deep_learning_main}
+\input{./15_papers_main}
 \input{./20_SQL}
 
 \input{./zz_Interview_summaries_main}
