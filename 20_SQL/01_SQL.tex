@@ -3,11 +3,21 @@ Read. Write. Update. (no copy. no creation.)
 
 \begin{enumerate}
 \item List column types of a given table in SQLite: PRAGMA should be capital letters. 
-\begin{lstlisting}
+\begin{lstlisting}[language=SQL]
 PRAGMA table_info(table_name); 
 \end{lstlisting}
 
 \item Be careful with numbers. Divide by 100 vs 100.00.
+
+\item SQL is very fussy. Extra parentheses can break it down;
+\begin{lstlisting}[language=SQL]
+-- Correct: 
+CASE WHEN gender= `M` THEN 1 else 0 END
+
+-- Incorrect: 
+CASE (WHEN gender= `M` THEN 1 else 0 END)
+\end{lstlisting}
+
 \end{enumerate}
 
 \begin{table}[h!]
@@ -76,13 +86,13 @@ ORDER BY num_patients DESC, city ASC
 \begin{exm}  (Medium) 
 Show first name, last name and role of every person that is either patient or doctor.
 The roles are either ``Patient'' or ``Doctor''.
-\begin{figure}[ht]
+\begin{marginfigure}
 \centering
-\subfloat[]{\includegraphics[width=0.25\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
-\subfloat[]{\includegraphics[width=0.3\textwidth]{00_figures/SQL/doctors}}\hspace{0.5cm}
-\subfloat[]{\includegraphics[width=0.25\textwidth]{00_figures/SQL/EO1}}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/doctors}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.5\textwidth]{00_figures/SQL/EO1}}
 \caption[11\baselineskip]{Patients, doctors, and expected output.\label{fig:SQLEg1}}
-\end{figure}
+\end{marginfigure}
 
 \begin{lstlisting}[language=SQL]
 SELECT first_name, last_name, 'Patient' as role 
@@ -155,19 +165,149 @@ WHERE  doc1.diagnosis = 'Epilepsy' AND doc1.first_name = 'Lisa'
 --------------
 SELECT p.patient_id,  p.first_name,  p.last_name,  doctors.specialty
 FROM patients p,  doctors,  admissions
-WHERE  p.patient_id = admissions.patient_id
+WHERE p.patient_id = admissions.patient_id
      AND admissions.attending_doctor_id = doctors.doctor_id
      AND admissions.diagnosis = 'Epilepsy'
      AND doctors.first_name = 'Lisa';
 \end{lstlisting}
 \end{exm}
 
+\begin{exm} All patients who have gone through admissions, can see their medical documents on our site. Those patients are given a temporary password after their first admission. 
+Show the patient\_id and temp\_password.
 
-\begin{exm} Hi
+The password must be the following, in order:
+\begin{enumerate}
+\item patient\_id
+\item the numerical length of patient's last\_name
+\item year of patient's birth\_date
+\end{enumerate}
+\begin{marginfigure}%  [-1\baselineskip]  % Vertical offset of 1 line,
+\centering
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/admissions}}\hspace{0.5cm}
+\caption[11\baselineskip]{Patients and admissions.\label{fig:SQLEg2}}
+\end{marginfigure}
+
 \begin{lstlisting}[language=SQL]
+-- This did not work: It kept putting a dot between the numbers:
+SELECT patient_id, 
+    CAST(CAST(patient_id AS INT) as TEXT) ||
+    CAST(LEN(last_name) AS TEXT) || 
+    CAST(YEAR(birth_date) AS TEXT) AS temp_password
+FROM patients;
+
+-- This is their solution: 
+-- I do not know why admissions table is involved
+-- 
+SELECT
+  DISTINCT P.patient_id,
+  CONCAT( P.patient_id, LEN(last_name),
+    YEAR(birth_date)
+  ) AS temp_password
+FROM patients P
+  JOIN admissions A ON A.patient_id = P.patient_id
+ 
+-- another solution:
+SELECT DISTINCT p.patient_id,
+  p.patient_id || floor(len(last_name)) || floor(YEAR(birth_date)) 
+  AS temp_password
+FROM patients p
+  JOIN admissions a ON p.patient_id = a.patient_id 
+
+-- and another
+SELECT pa.patient_id, ad.patient_id || 
+                      FLOOR(len(pa.last_name)) || 
+                      FLOOR(YEAR(pa.birth_date)) AS temp_password
+FROM patients pa JOIN 
+admissions ad ON pa.patient_id = ad.patient_id
+GROUP by pa.patient_id;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Each admission costs \$50 for patients without insurance, 
+and \$10 for patients with insurance. 
+All patients with an even patient\_id have insurance.
+
+Give each patient a `Yes' if they have insurance, and a `No' if they don't have insurance. 
+Add up the admission\_total cost for each has\_insurance group.
+\begin{lstlisting}[language=SQL]
+SELECT CASE WHEN patient_id%2=0 Then 'Yes' ELSE 'No' END AS has_insurance,
+SUM(CASE WHEN patient_id%2=0 Then 10 ELSE 50 END) as cost_after_insurance
+FROM admissions 
+GROUP BY has_insurance;
+
+-- another way
+SELECT has_insurance, 
+      CASE WHEN has_insurance='Yes' THEN COUNT(has_insurance) * 10
+           ELSE count(has_insurance)*50 END AS cost_after_insurance
+FROM (SELECT CASE WHEN patient_id % 2 = 0 THEN 'Yes' ELSE 'No' END 
+                                                AS has_insurance  
+              FROM admissions)
+GROUP BY has_insurance
+
+-- another way
+SELECT has_insurance, sum(admission_cost) as admission_total
+FROM (SELECT patient_id,
+   CASE WHEN patient_id%2=0 THEN 'Yes' ELSE 'No' END AS has_insurance,
+   CASE WHEN patient_id%2=0 THEN 10 ELSE 50 END AS admission_cost
+   FROM admissions)
+group by has_insurance
+
+\end{lstlisting}
+\end{exm}
+
+\newpage
+\begin{exm} Show the provinces that has more patients identified as `M' than `F'. 
+Must only show full province\_name.
+\begin{marginfigure}
+\centering
+\includegraphics[width=\textwidth]{00_figures/SQL/patients_DB1}
+\caption[11\baselineskip]{Patients DB1.\label{fig:patients_DB1}}
+\end{marginfigure}
+\begin{lstlisting}[language=SQL]
+SELECT province_name
+FROM (SELECT patients.gender, 
+             COUNT(patients.gender) AS gender_count, 
+             patients.province_id, 
+             province_names.province_name
+        FROM patients JOIN province_names USING (province_id)
+        GROUP BY patients.gender, patients.province_id) AS 
+                                                     gender_counts
+GROUP BY province_id, province_name
+HAVING 
+    SUM(CASE WHEN gender = 'M' THEN gender_count ELSE 0 END) > 
+    SUM(CASE WHEN gender = 'F' THEN gender_count ELSE 0 END);
+    
+-- another way
+SELECT province_name
+FROM (SELECT province_name, SUM(gender = 'M') AS n_male,
+                            SUM(gender = 'F') AS n_female
+      FROM patients pa
+      JOIN province_names pr ON pa.province_id = pr.province_id
+      GROUP BY province_name)
+WHERE n_male > n_female
+
+-- another way
+SELECT pr.province_name
+FROM province_names AS pr JOIN patients AS pa
+                       ON pa.province_id = pr.province_id
+GROUP BY pr.province_name
+HAVING SUM(gender = 'M') > SUM(gender = 'F');
+
+-- another way. I like this best.
+SELECT province_name 
+FROM province_names
+WHERE province_id IN (SELECT province_id
+                      FROM patients
+                      GROUP BY province_id 
+                      HAVING SUM(gender = 'M') > SUM(gender = 'F'))
 \end{lstlisting}
 \end{exm}
 
 
 
-
+\begin{exm} Hi
+\begin{lstlisting}[language=SQL]
+\end{lstlisting}
+\end{exm}
