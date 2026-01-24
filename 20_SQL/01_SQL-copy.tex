@@ -1,0 +1,378 @@
+Structured Query Language. Relational database.\marginnote{SQL from Coursera: UC Davis. SQLite here.}
+Read. Write. Update. (no copy. no creation.)
+
+\begin{enumerate}
+\item List column types of a given table in SQLite: PRAGMA should be capital letters. 
+\begin{lstlisting}[language=SQL]
+PRAGMA table_info(table_name); 
+\end{lstlisting}
+
+\item Be careful with numbers. Divide by 100 vs 100.00.
+
+\item SQL is very fussy. Extra parentheses can break it down;
+\begin{lstlisting}[language=SQL]
+-- Correct: 
+CASE WHEN gender= `M` THEN 1 else 0 END
+
+-- Incorrect: 
+CASE (WHEN gender= `M` THEN 1 else 0 END)
+\end{lstlisting}
+
+\end{enumerate}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{c l p{8cm}}
+\hline
+\textbf{Step} & \textbf{Clause} & \textbf{Purpose} \\
+\hline
+1 & \texttt{FROM} & Identify and combine tables (including joins and subqueries). \\
+2 & \texttt{WHERE} & Filter rows \emph{before} grouping. \\
+3 & \texttt{GROUP BY} & Group remaining rows by specified columns. \\
+4 & \texttt{HAVING} & Filter groups \emph{after} grouping. \\
+5 & \texttt{SELECT} & Compute expressions and aggregates (such as \texttt{AVG}) for each group. \\
+6 & \texttt{ORDER BY} & Sort the final results. \\
+\hline
+\end{tabular}
+\caption{Logical order of SQL query processing}
+\end{table}
+
+
+Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6Wcjyli3I-zSqmvAGqt1ORVYnio/edit?usp=sharing}{this google doc}.
+
+
+\begin{exm} For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
+\begin{lstlisting}[language=SQL]
+SELECT admission_date, count(admission_date) as admission_day,
+ count(admission_date) - 
+ LAG(count(admission_date)) OVER(ORDER BY admission_date) AS admission_count_change 
+FROM admissions
+GROUP BY admission_date
+------------------------
+WITH admission_counts_table AS (
+  SELECT admission_date, COUNT(patient_id) AS admission_count
+  FROM admissions 
+GROUP BY admission_date
+ORDER BY admission_date DESC)
+SELECT
+  admission_date, 
+  admission_count, 
+  admission_count - LAG(admission_count) OVER(ORDER BY admission_date) AS admission_count_change 
+FROM admission_counts_table
+
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Retained customers
+\begin{lstlisting}[language=SQL]
+SELECT 
+    activity.date,
+    COUNT(DISTINCT activity.user_id) AS active_users,
+    COUNT(DISTINCT future_activity.user_id) AS retained_users,
+    COUNT(DISTINCT future_activity.user_id)::FLOAT /   
+                     COUNT(DISTINCT activity.user_id) AS retention
+FROM activity LEFT JOIN activity AS future_activity
+    ON activity.user_id = future_activity.user_id
+   AND activity.date = future_activity.date - INTERVAL '1 day'
+GROUP BY activity.date
+ORDER BY activity.date;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Count and show result in one row:
+\begin{lstlisting}[language=SQL]
+SELECT
+    COUNT(CASE WHEN gender = 'M' THEN 1 END) AS male_count,
+    COUNT(CASE WHEN gender = 'F' THEN 1 END) AS female_count
+FROM patients;
+\end{lstlisting}
+\end{exm}
+
+
+
+
+
+
+
+\begin{exm} (Medium) 
+Show number of patients per city sorted by patient count and then city.
+\begin{lstlisting}[language=SQL]
+SELECT city, COUNT(DISTINCT patient_id) as num_patients
+FROM patients
+GROUP BY city
+ORDER BY num_patients DESC, city ASC
+\end{lstlisting}
+\end{exm}
+
+\begin{exm}  (Medium) 
+Show first name, last name and role of every person that is either patient or doctor.
+The roles are either ``Patient'' or ``Doctor''.
+\begin{marginfigure}
+\centering
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/doctors}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.5\textwidth]{00_figures/SQL/EO1}}
+\caption[11\baselineskip]{Patients, doctors, and expected output.\label{fig:SQLEg1}}
+\end{marginfigure}
+
+\begin{lstlisting}[language=SQL]
+SELECT first_name, last_name, 'Patient' as role 
+FROM patients union all (SELECT first_name, last_name, 'Doctor' 
+FROM doctors);
+\end{lstlisting}
+\end{exm}
+
+
+
+\begin{exm} 
+(Medium) Show all allergies ordered by popularity. 
+Remove NULL values from query. See \cref{fig:SQLEg1} for \emph{patients} table.
+\begin{lstlisting}[language=SQL]
+SELECT allergies, COUNT(DISTINCT patient_id) AS total_diagnosis
+FROM patients
+GROUP BY allergies
+Having allergies NOT null
+ORDER BY total_diagnosis DESC
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} (Medium)
+Show all patient's first name, last name, and birth date who were born in the 1970s decade. 
+Sort the list starting from the earliest birth date.
+\begin{lstlisting}[language=SQL]
+SELECT first_name, last_name, birth_date
+FROM patients
+WHERE YEAR(birth_date) BETWEEN 1970 AND 1979
+-- WHERE FLOOR(YEAR(birth_date) / 10) = 197
+RDER BY birth_date ASC;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} T following 2 make the same result:
+\begin{lstlisting}[language=SQL]
+SELECT patient_id, weight, height, 
+  CASE  WHEN (weight / power(height/100.0, 2)) >= 30 then 1 else 0  END as isObese
+FROM patients
+
+SELECT patient_id,  weight,  height,
+  weight / power(CAST(height AS float) / 100, 2) >= 30 AS obese
+FROM patients
+
+# Shortest: combined two above:
+SELECT patient_id,  weight,  height,
+  weight / power(height/ 100.00, 2) >= 30 AS obese
+FROM patients
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Difficult
+\begin{lstlisting}[language=SQL]
+SELECT  p.patient_id,  p.first_name,  p.last_name, 
+                    ph.specialty AS attending_doctor_specialty
+FROM patients p  
+            JOIN admissions a ON a.patient_id = p.patient_id
+            JOIN doctors ph ON ph.doctor_id = a.attending_doctor_id
+WHERE ph.first_name = 'Lisa' and a.diagnosis = 'Epilepsy'
+--------------
+SELECT p.patient_id,  p.first_name,  p.last_name,  doc1.specialty
+FROM patients p JOIN (
+       SELECT *  
+       FROM admissions JOIN doctors 
+      ON admissions.attending_doctor_id = doctors.doctor_id ) AS
+doc1 USING (patient_id)
+WHERE  doc1.diagnosis = 'Epilepsy' AND doc1.first_name = 'Lisa'
+--------------
+SELECT p.patient_id,  p.first_name,  p.last_name,  doctors.specialty
+FROM patients p,  doctors,  admissions
+WHERE p.patient_id = admissions.patient_id
+     AND admissions.attending_doctor_id = doctors.doctor_id
+     AND admissions.diagnosis = 'Epilepsy'
+     AND doctors.first_name = 'Lisa';
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} All patients who have gone through admissions, can see their medical documents on our site. Those patients are given a temporary password after their first admission. 
+Show the patient\_id and temp\_password.
+
+The password must be the following, in order:
+\begin{enumerate}
+\item patient\_id
+\item the numerical length of patient's last\_name
+\item year of patient's birth\_date
+\end{enumerate}
+\begin{marginfigure}%  [-1\baselineskip]  % Vertical offset of 1 line,
+\centering
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/patients}}\hspace{0.5cm}
+\subfloat[]{\includegraphics[width=0.7\textwidth]{00_figures/SQL/admissions}}\hspace{0.5cm}
+\caption[11\baselineskip]{Patients and admissions.\label{fig:SQLEg2}}
+\end{marginfigure}
+
+\begin{lstlisting}[language=SQL]
+-- This did not work: It kept putting a dot between the numbers:
+SELECT patient_id, 
+    CAST(CAST(patient_id AS INT) as TEXT) ||
+    CAST(LEN(last_name) AS TEXT) || 
+    CAST(YEAR(birth_date) AS TEXT) AS temp_password
+FROM patients;
+
+-- This is their solution: 
+-- I do not know why admissions table is involved
+-- 
+SELECT
+  DISTINCT P.patient_id,
+  CONCAT( P.patient_id, LEN(last_name),
+    YEAR(birth_date)
+  ) AS temp_password
+FROM patients P
+  JOIN admissions A ON A.patient_id = P.patient_id
+ 
+-- another solution:
+SELECT DISTINCT p.patient_id,
+  p.patient_id || floor(len(last_name)) || floor(YEAR(birth_date)) 
+  AS temp_password
+FROM patients p
+  JOIN admissions a ON p.patient_id = a.patient_id 
+
+-- and another
+SELECT pa.patient_id, ad.patient_id || 
+                      FLOOR(len(pa.last_name)) || 
+                      FLOOR(YEAR(pa.birth_date)) AS temp_password
+FROM patients pa JOIN 
+admissions ad ON pa.patient_id = ad.patient_id
+GROUP by pa.patient_id;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Each admission costs \$50 for patients without insurance, 
+and \$10 for patients with insurance. 
+All patients with an even patient\_id have insurance.
+
+Give each patient a `Yes' if they have insurance, and a `No' if they don't have insurance. 
+Add up the admission\_total cost for each has\_insurance group.
+\begin{lstlisting}[language=SQL]
+SELECT CASE WHEN patient_id%2=0 Then 'Yes' ELSE 'No' END AS has_insurance,
+SUM(CASE WHEN patient_id%2=0 Then 10 ELSE 50 END) as cost_after_insurance
+FROM admissions 
+GROUP BY has_insurance;
+
+-- another way
+SELECT has_insurance, 
+      CASE WHEN has_insurance='Yes' THEN COUNT(has_insurance) * 10
+           ELSE count(has_insurance)*50 END AS cost_after_insurance
+FROM (SELECT CASE WHEN patient_id % 2 = 0 THEN 'Yes' ELSE 'No' END 
+                                                AS has_insurance  
+              FROM admissions)
+GROUP BY has_insurance
+
+-- another way
+SELECT has_insurance, sum(admission_cost) as admission_total
+FROM (SELECT patient_id,
+   CASE WHEN patient_id%2=0 THEN 'Yes' ELSE 'No' END AS has_insurance,
+   CASE WHEN patient_id%2=0 THEN 10 ELSE 50 END AS admission_cost
+   FROM admissions)
+group by has_insurance
+
+\end{lstlisting}
+\end{exm}
+
+\newpage
+\begin{exm} Show the provinces that has more patients identified as `M' than `F'. 
+Must only show full province\_name.
+\begin{marginfigure}
+\centering
+\includegraphics[width=\textwidth]{00_figures/SQL/patients_DB1}
+\caption[11\baselineskip]{Patients DB1.\label{fig:patients_DB1}}
+\end{marginfigure}
+\begin{lstlisting}[language=SQL]
+SELECT province_name
+FROM (SELECT patients.gender, 
+             COUNT(patients.gender) AS gender_count, 
+             patients.province_id, 
+             province_names.province_name
+        FROM patients JOIN province_names USING (province_id)
+        GROUP BY patients.gender, patients.province_id) AS 
+                                                     gender_counts
+GROUP BY province_id, province_name
+HAVING 
+    SUM(CASE WHEN gender = 'M' THEN gender_count ELSE 0 END) > 
+    SUM(CASE WHEN gender = 'F' THEN gender_count ELSE 0 END);
+    
+-- another way
+SELECT province_name
+FROM (SELECT province_name, SUM(gender = 'M') AS n_male,
+                            SUM(gender = 'F') AS n_female
+      FROM patients pa
+      JOIN province_names pr ON pa.province_id = pr.province_id
+      GROUP BY province_name)
+WHERE n_male > n_female
+
+-- another way
+SELECT pr.province_name
+FROM province_names AS pr JOIN patients AS pa
+                       ON pa.province_id = pr.province_id
+GROUP BY pr.province_name
+HAVING SUM(gender = 'M') > SUM(gender = 'F');
+
+-- another way. I like this best.
+SELECT province_name 
+FROM province_names
+WHERE province_id IN (SELECT province_id
+                      FROM patients
+                      GROUP BY province_id 
+                      HAVING SUM(gender = 'M') > SUM(gender = 'F'))
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} We need a breakdown for the total amount of admissions each doctor has started each year. Show the doctor\_id, doctor\_full\_name, specialty, year, total\_admissions for that year.
+\begin{lstlisting}[language=SQL]
+WITH super_table AS (SELECT *
+                     FROM admissions JOIN doctors 
+         ON admissions.attending_doctor_id = doctors.doctor_id)
+SELECT doctor_id, first_name || ' ' || last_name AS doctor_name,
+       specialty,
+       count(patient_id) AS total_admissons,
+       YEAR (admission_date) AS selected_year
+FROM super_table
+GROUP BY selected_year, doctor_name
+
+---
+SELECT has_insurance, sum(cost) as cost_after_insurance
+FROM (
+SELECT patient_id,
+CASE WHEN patient_id%2=0 THEN 'Yes' ELSE 'No' END AS has_insurance,
+CASE WHEN patient_id%2=0 THEN 10 ELSE 50 END AS cost
+FROM admissions)
+GROUP BY has_insurance
+
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} Sort the province names in ascending order in such a way that the province `Ontario' is always on top.
+\begin{lstlisting}[language=SQL]
+SELECT province_name
+FROM province_names
+ORDER BY
+  (CASE WHEN province_name = 'Ontario' THEN 0 ELSE 1 END),
+  province_name
+----------------------------------------
+SELECT province_name
+FROM province_names
+ORDER BY  province_name = 'Ontario' DESC, province_name
+----------------------------------------
+SELECT province_name
+FROM province_names
+ORDER BY CASE WHEN province_name = 'Ontario' THEN 1 ELSE 
+                                province_name END
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} Hi
+\begin{lstlisting}[language=SQL]
+\end{lstlisting}
+\end{exm}

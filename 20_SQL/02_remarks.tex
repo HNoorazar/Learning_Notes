@@ -1,0 +1,24 @@
+\section{Remarks}
+\label{sec:SQLRemarks}
+
+\begin{rem} 
+List column types of a given table in SQLite: PRAGMA should be capital letters. 
+\begin{lstlisting}[language=SQL]
+PRAGMA table_info(table_name); 
+\end{lstlisting}
+\end{rem}
+
+\begin{rem} 
+Be careful with numbers. Division by 100 vs 100.00 are different.
+\end{rem} 
+
+\begin{rem} 
+SQL is very fussy. Extra parentheses can break it down;
+\begin{lstlisting}[language=SQL]
+-- Correct: 
+CASE WHEN gender= `M` THEN 1 else 0 END
+
+-- Incorrect: 
+CASE (WHEN gender= `M` THEN 1 else 0 END)
+\end{lstlisting}
+\end{rem} 

@@ -99,12 +99,12 @@ We also know the vector $\bm X \bm \beta$ is in column space of $\bm X$.
 So, the $\bm \beta$ for which 
 $\norm{\bm y - \bm X \bm \beta}$ is minimized
 is the one that gives us $proj_{\mathcal{R}(\bm X)}(\bm y)$.
-Denote that solution by $\hat {\bm \beta_{LS}}$. Then, 
-since $\bm y - \bm X \hat{\bm \beta_{LS}}$ is orthogonal to 
+Denote that solution by $\hat {\bm \beta}_{LS}$. 
+Then, since $\bm y - \bm X \hat{\bm \beta}_{LS}$ is orthogonal to 
 $\mathcal{R}(\bm X)$, it is orthogonal to all columns of $\bm X$;
 $\langle \bm y - \bm X \hat{\bm \beta}_{LS}, \bm X_{k} \rangle = 0$
 where $\bm X_k$ is the $k^{\text{th}}$ column of $\bm X$.
-In matrix notation $\bm X^T (\bm y - \bm X \hat{\bm \beta_{LS}}) = 0$.
+In matrix notation $\bm X^T (\bm y - \bm X \hat{\bm \beta}_{LS}) = 0$.
 Therefore, 
 \[
 \bm X^T \bm X \hat{\bm \beta} = \bm X^T \bm y.
@@ -375,8 +375,8 @@ We will use the following fact later
 If the \textit{best} is measured by average square error
 then linear regression leads to the solution $f(x) = E[Y |X = x]$.\iffalse\marginnote{Please
 note the $f(X)$ here is our estimate of $Y$. Perhaps a better
-notation is $\hat f(X)$.... statisticians and their notations, again! }\fi
- The NN methods attempt fo fit the data by
+notation is $\hat f(X)$\dots statisticians and their notations, again! }\fi
+The NN methods attempt fo fit the data by
 finding the averages at each point in the input space.
 Two approximations are happening here:
 \begin{itemize}
@@ -504,6 +504,7 @@ to choosing some functions that will produce robust results.
 These functions dictate the measure of size and consequently 
 (implicitly? Ex. 3.15 of ~\citep{seber2012linear}) location.
 See~\citep{seber2012linear}, section 3.13, for more details.
+Beginners' books can be~\cite{frost2020hypothesis}
 
 As an alternative to M-estimators, we can replace 
 the mean by a robust measure of location but retain 
@@ -515,6 +516,41 @@ trimmed mean are two examples.
 
 \section{Hypothesis Testing}
 \label{sec:Hypothesis-Testing}
+There are books on this topic.
+Seems that \citep{lehmann2005testing} is a well-known one
+for theory. Applied and intermediate books that covers hypothesis 
+testing are also available~\citep{casella2024statistical,montgomery2017design,wackerly2008mathematical}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cc|cc}
+ &  & \multicolumn{2}{c}{\textcolor{blue}{\textbf{Truth}}}  \\
+ &  & $H_0$ & $H_a$ \\
+\hline
+\multirow{2}{*}{\textcolor{blue}{\textbf{Decision}}}
+ & Reject $H_0$ & Type I Error & Correct \\
+ & Do Not Reject $H_0$ & Correct & Type II Error \\
+\end{tabular}
+\caption{A summary of the possible scenarios associated with testing the
+null hypothesis $H_0$. Type I errors are also known as false positives, and Type II
+errors as false negatives.}
+\end{table}
+
+\begin{deff}
+The power of the hypothesis test is defined as the probability of not making a Type II error given that $H_a$ holds, i.e., the probability of correctly rejecting $H_0$.
+\end{deff}
+
+From~\citep{james2013introduction} ```Once the hypothesis test is performed, the row of the
+table is known (based on whether or not we have rejected $H_0$); 
+however, it is impossible for us to know which column we are in. 
+If we reject $H_0$ when $H_0$ is false (i.e., when $H_a$ is true), or if we do not reject $H_0$ when it is true, then we arrived at the correct result. 
+However, if we erroneously reject $H_0$ when $H_0$ is in fact true, then we have committed a Type I error. 
+The Type I Type I error error rate is defined as the probability of making a Type I error given that Type I error $H_0$ holds, i.e., the probability of incorrectly rejecting $H_0$. 
+Alternatively, if rate we do not reject $H_0$ when $H_0$ is in fact false, then we have committed a
+Type II error.''\marginnote{Read page 563 of ISPL.}\\
+
+
+Let us look at regression examples.
 Suppose we have a general model
 \[G: Y=\beta_0 + \beta_1 X_1 + \dots +\beta_{p-1}X_{p-1}+\varepsilon\]
 and we want to test wether some of those coefficients are truly zero,
@@ -623,3 +659,60 @@ and it can be shown:
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Multiple Testing}
+\label{sec:Multiple-Testing}
+Multiple testing is more challenging than a single hypothesis test.
+But now suppose that we wish to test $m$ null hypotheses,
+$H_{01}, \dots, H_{0m}$. 
+Will it do to simply reject all null hypotheses for which the
+corresponding p-value falls below (say) 0.01? Stated another way, if we
+reject all null hypotheses for which the p-value falls below 0.01, then how
+many Type I errors should we expect to make?
+From~\citep{james2013introduction}:
+``Suppose that we flip 1,024 fair
+coins ten times each. Then we would expect (on average) one coin to
+come up all tails. (There's a 1/210 = 1/1,024 chance that any single coin
+will come up all tails. So if we flip 1,024 coins, then we expect one coin to
+come up all tails, on average.) If one of our coins comes up all tails, then
+we might therefore conclude that this particular coin is not fair. In fact, a
+standard hypothesis test for the null hypothesis that this particular coin
+is fair would lead to a p-value below 0.002! But it would be incorrect to
+conclude that the coin is not fair: in fact, the null hypothesis holds, and we
+just happen to have gotten ten tails in a row by chance.''
+
+So, we need to control for a family-wise error rate.
+If we have one hypothesis, we use $\alpha$, significance level, to control
+for Type I error; $\alpha$ is probability of rejecting null hypothesis by mistake, i.e.
+$\alpha = p(\text{falsely rejecting }H_0)$. 
+Family-wise error rate is probability of making at least one such mistake when we have multiple hypothesis. Using notation of~\cref{tab:fwer1} $FWER = Pr(V \ge 1)$.
+\begin{table}[h]
+\label{tab:fwer1}
+\centering
+\begin{tabular}{cc|cc|c}
+ &  & \multicolumn{2}{c}{\textcolor{blue}{\textbf{Truth}}}  & Total\\
+ &  & $H_0$ & $H_a$ \\
+\hline
+\multirow{2}{*}{\textcolor{blue}{\textbf{Decision}}}
+ & Reject $H_0$ & V & S & R\\
+ & Do Not Reject $H_0$ & U & W & m-R \\
+ \hline
+& & $m_0$ & $m - m_0$ & m
+\end{tabular}
+\caption{A summary of the results of testing m null hypotheses.
+A given null hypothesis is either true or false, and a test of that null hypothesis can either
+reject or fail to reject it. 
+In practice, the individual values of $V$ , $S$, $U$, and $W$ are unknown. 
+However, we do have access to $V + S = R$ and $U+W = m-R$, which are
+the numbers of null hypotheses rejected and not rejected, respectively.}
+\end{table}
+
+\vspace{.2in}
+\noindent {\color{blue}\bf Approaches to Control the Family-Wise Error Rate}\\
+Bonferroni method and Holm’s step-down procedure are very general-purpose 
+approaches for controlling the FWER that can be applied whenever m p-values have been computed, regardless of the form of the null hypotheses, the choice of test statistics, or the
+(in)dependence of the p-values. Tukey’s method and Scheff{\'e}'s method are for 
+certain situations, more specialized approaches for controlling the FWER may be
+preferable. See~\cite{james2013introduction} page 567.

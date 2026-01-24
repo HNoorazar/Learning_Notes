@@ -3,6 +3,40 @@
 
 \section{Introduction}
 \label{sec:Summary_for_Interviews_Introduction_Interview}
+There are whole range of materials I am hearing from
+people working in industry. I list them below with some
+references for each topic.
+\begin{enumerate}
+\item A/B testing. A book called \emph{Statistical Methods in Online A/B Testing: Statistics for data-driven business decisions and risk management in e-commerce by Georgi Zdravkov Georgiev}
+came up and Georgi Zdravkov Georgiev has worked in industry for a long time.
+
+\item Metrics
+
+\item Data Quality
+\begin{itemize}
+\item \href{https://www.alation.com/blog/data-quality-metrics/}{Data quality}
+\end{itemize}
+
+\item Missing values. Two famous books are of course
+\emph{Statistical Analysis with Missing Data by Little and Rubin}~\citep{little2019statistical}
+and
+\emph{Applied missing data analysis by Enders}~\citep{enders2022applied}.
+
+
+\item Monitoring data drifts/distribution over time. 
+For example, trends changes overtime. 
+Trend includes culture, people's taste, videos that go viral,
+new movies that are released, prices that changes overtime and would
+impact customers' decisions. 
+As such data distribution changes over time.
+The distribution should/might be monitored and training new
+models should be a concern. I read on educative.io course, \emph{ML system design}, 
+that retraining sometimes is done multiple times in a day.
+
+
+\end{enumerate}
+
+
 
 Evaluation Metrics:
 \begin{table}[h!]
@@ -1317,9 +1351,11 @@ $\boldsymbol \cdot $ Adam optimization
 
 
 \section{A/B testing}
+There is a book by Georgi Zdravkov Georgiev, \emph{Statistical Methods in Online A/B Testing: Statistics for data-driven business decisions and risk management in e-commerce}, on this topic.
+
 
 \begin{enumerate}
-\item Pooled variance from both populations (assuming equal variances (classic t-test assumption):)
+\item Pooled variance from both populations (assuming equal variances --classic t-test assumption--)
 \[ s_p = \sqrt{\frac{(n_A - 1)s_A^2 + (n_B - 1)s_B^2}{n_A + n_B - 2}}\]
 
 \item Standard error of difference
@@ -1347,4 +1383,91 @@ df = \frac{
 
 \end{enumerate}
 
+\subsection{LinkedIn Blog}
+The following is from~\href{https://www.linkedin.com/blog/engineering/archive/top-five-lessons-from-running-a-b-tests-on-the-world-s-largest-p}{Top Five Lessons from Running A/B Tests on the World's Largest Professional Network}
+\begin{description}
+
+\item [Measure one change at a time.]
+
+This is not to say that you can only test one thing at a time, but that you have to design your experiment properly so that you are able to measure one change at a time. At LinkedIn, a product launch usually involves multiple features/components. One big upgrade to LinkedIn Search in 2013 introduced unified search across different product categories. With this functionality, the search box is smart enough to figure out query intent without explicit input on categories such as ``People,'' or ``Jobs,'' or ``Companies.''
+
+However, that was not all. Almost every single component on the search landing-page was touched, from the left rail navigation to snippets and action buttons. The first experiment was run with all changes lumped together. To our surprise, many key metrics tanked. It was a lengthy process to bring back one feature at a time in order to figure out the true culprit. In the end, we realized that several small changes, not the unified search itself, were responsible for bringing down clicks and revenue. After restoring these features, unified search was shown to be positive to user experience and deployed to everyone.  
+
+\item [Decide on triggered users, but report on all users]
+It is very common that an experiment only impacts a small fraction of your user base. 
+For example, we want to automatically help people fill in their patents on their LinkedIn profiles, but not every member has a patent. So the experiment would only be affecting those ~5\% of members who have filed patents.
+To measure how much benefit this is bringing to our members, we have to focus on this small subsegment, the ``triggered'' users. 
+Otherwise, the signal from that 5\% of users would be lost in the 95\% noise.
+However, once we determined that patents are a beneficial feature, we needed to have a ``realistic'' estimate of the overall impact. How is LinkedIn’s bottom line going to change once this feature is rolled out universally? 
+Having such a ``site-wide'' impact not only makes it possible to compare impacts across experiments, but also easy to quantify Return On Investment.
+
+\item [The experimental group should not be influenced by the experiment outcomes]
+
+The fundamental assumption of A/B testing is that the difference between the A and B groups is only caused by the treatment we impose. 
+It may be obvious that we need to make sure the users in A and B are similar enough to begin with. 
+The standard approach to check for any pre-existing differences is to run an A/A test before the actual A/B test, where both groups of users receive identical treatments. 
+However, it is equally important to make sure the user groups stay ``similar'' during the experiment especially in the online world because the experimental population is usually “dynamic”. 
+As an example, we tested a new feature where members received a small banner on their LinkedIn profile page to encourage them to explore our new homepage. 
+Only users who had not visited the homepage recently were eligible to be in the experiment, and the eligibility was dynamically updated after a user visited the homepage. 
+Because the banner brought more users in the treatment group to visit the homepage, more treatment users became ineligible over time. 
+Because these ``additionally'' removed users tend to be more active than the rest, we artificially created a difference between users in A and B as the test continued. 
+In general, if the experimental population is directly influenced by the experiment outcomes, we are likely to see a bias. 
+Such bias could void the experiment results because it usually overwhelms any real signal resulting from the treatment itself.
+
+\begin{tcolorbox}[colback=green!5!white,colframe=green!80!black,title=\textbf{A/A test}]
+The goal of an A/A test is to verify that your experimentation system is behaving correctly, which includes making sure control and treatment groups are statistically equivalent before you trust any A/B results.
+\begin{itemize}
+\item Randomization; Users are assigned fairly, No hidden segmentation or leakage
+
+\item Instrumentation \& logging: Events fire equally for both groups, No missing or duplicated data
+
+\item Metric computation; Same definitions, same aggregation logic,
+No pipeline bugs or timing issues
+
+\item Statistical framework;
+False positive rate matches your alpha (e.g., 5\%),
+Confidence intervals behave as expected
+\end{itemize}
+\end{tcolorbox}
+
+\begin{itemize}
+\item $H_0: \mu_T - \mu_C = 0$
+
+\item $\hat \Delta = \bar{X}_T - \bar{X}_C$
+
+\item $SE(\hat \Delta) = \sqrt{\frac{s_T^2}{n_T} + \frac{s_C^2}{n_C}}$
+
+\item $z = \frac{hat \Delta }{SE(\hat \Delta) }$
+
+\item Under $H_0$, $z \sim N(0, 1)$
+
+\item If we assume equal variances in both groups, then, we use pooled SE:
+ \[SE_{\text{pooled}}(\hat \Delta) = \sqrt{\frac{(n_T-1)s_T^2 + (n_C - 1)s_C^2 }{n_T + n_C - 2}} \sqrt{\frac{1}{n_T} + \frac{1}{n_C} }\]
+\end{itemize}
+
+
+\item [Avoid coupling a marketing campaign with an A/B test]
+
+We have recently revamped the Who Viewed My Profile page. 
+The product team wanted to measure through an A/B test if the changes are indeed better, and if so, by how much. 
+The marketing team wanted to create buzz around the new page with an email campaign. 
+This is a very common scenario, but how can the A/B test and the email campaign coexist? 
+Clearly, we can only send campaign emails to the treatment group, since there is nothing new for members in control. 
+However, such a campaign would contaminate the online A/B test because it encourages more members from the treatment to visit. 
+These additional users tend to be less engaged, therefore we are likely to see an artificial drop in key metrics. 
+It is best to measure the A/B test first before launching the campaign.
+
+\item [Use a simple rule of thumb to address multiple testing problems]
+
+Multiple testing problems are extremely prevalent in online A/B testing. 
+The symptom is that irrelevant metrics appear to be statistically significant. 
+The root cause is usually because too many metrics are examined simultaneously (keep in mind that we compute over 1000 metrics for each experiment). 
+Even though we have tried to educate people on the topic of multiple testing, many are still clueless about what they should do when a metric is unexpectedly significant. 
+Should they trust it or treat it as noise? Instead, we have found it very effective to introduce a simple rule of thumb: Use the standard 0.05 p-value cutoff for metrics that are expected to be impacted, but use a smaller cutoff, say 0.001, for metrics that are not. 
+The rule-of-thumb is based on an interesting Bayesian interpretation. 
+It boils down to how much we believe a metric will be impacted before we even run the experiment. 
+In particular, if using 0.05 reflects a prior probability of 50\%, then using 0.001 means a much weaker belief - at about 2\%.
+
+To see more about multiple testing, see Chapter 13 of \emph{An Introduction to Statistical Learning}\cite{james2013introduction} of which some are in~\cref{sec:Multiple-Testing}.
+\end{description}
 
