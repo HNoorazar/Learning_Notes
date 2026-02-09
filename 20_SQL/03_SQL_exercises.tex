@@ -1,5 +1,5 @@
-\section{Exercises}
-\label{sec:SQLExercises}
+\section{Exercises 1}
+\label{sec:SQLExercises1}
 
 Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6Wcjyli3I-zSqmvAGqt1ORVYnio/edit?usp=sharing}{this google doc}.
 
@@ -116,12 +116,12 @@ SELECT first_name, last_name, birth_date
 FROM patients
 WHERE YEAR(birth_date) BETWEEN 1970 AND 1979
 -- WHERE FLOOR(YEAR(birth_date) / 10) = 197
-RDER BY birth_date ASC;
+ORDER BY birth_date ASC;
 \end{lstlisting}
 \end{exm}
 
 
-\begin{exm} T following 2 make the same result:
+\begin{exm} The following make the same result:
 \begin{lstlisting}[language=SQL]
 SELECT patient_id, weight, height, 
   CASE  WHEN (weight / power(height/100.0, 2)) >= 30 then 1 else 0  END as isObese
@@ -340,6 +340,190 @@ ORDER BY CASE WHEN province_name = 'Ontario' THEN 1 ELSE
                                 province_name END
 \end{lstlisting}
 \end{exm}
+
+
+
+\section{Exercises 2}
+\label{sec:SQLExercises2}
+These questions are from \href{https://platform.stratascratch.com}{https://platform.stratascratch.com}
+and might be harder than the questions in~\Cref{sec:SQLExercises1}.
+The free version has limited number of questions available (you can see and run them, just cannot check your solution or see Expected Output!!!), but this \href{https://github.com/TeslaNik/stratascratch-SQL}{GitHub repo} has a list of questions in it which hopefully is more than free version.
+I have not checked at the time of writing this (Feb, 05, 2026). 
+This platform does not have SQLite. I am using MySQL.
+
+\begin{rem} 
+First difference between SQLite and MySQL I had:
+\begin{itemize}
+\item SQLite: \code{prev\_date = DATE(date, '-1 day')}
+\item MySQL: \code{prev\_date = DATE\_SUB(date, INTERVAL 1 DAY)}
+\end{itemize}
+\end{rem} 
+
+\begin{marginfigure}% [-1\baselineskip]  % Vertical offset of 1 line,
+  \centering
+  %\captionsetup{justification=centering}
+  \includegraphics[width=2\textwidth]{00_figures/SQL/SQL_Logic}
+  \caption{SQL order of execution of commands}
+  \label{fig:SQL_LogicMargin}
+\end{marginfigure}
+
+\begin{exm} (Question ID 9915: Highest Cost Orders) \marginnote{This ID is from stratascratch.com} Find the customers with the highest daily total order cost between 2019-02-01 and 2019-05-01. If a customer had more than one order on a certain day, sum the order costs on a daily basis. Output each customer's first name, total cost of their items, and the date. If multiple customers tie for the highest daily total on the same date, return all of them.
+
+For simplicity, you can assume that every first name in the dataset is unique.
+
+{\bf \color{red} Recall} the order of execution of statements in SQL~\cref{fig:SQL_LogicMargin}.
+That means Window functions are evaluated after \code{WHERE}, so \code{max\_cost} doesn't exist yet when \code{WHERE} runs.
+\begin{lstlisting}[language=SQL]
+--- This will not work due to above remark.
+WITH t as (SELECT customers.id, customers.first_name, 
+                          orders.order_date, 
+           SUM(orders.total_order_cost) as cust_spent_day
+           FROM customers join orders on customers.id = orders.cust_id
+           WHERE orders.order_date BETWEEN '2019-02-01' AND '2019-05-01'
+           GROUP BY customers.id, customers.first_name, orders.order_date
+           )
+SELECT id, first_name, order_date, cust_spent_day,
+MAX(cust_spent_day) over (partition by order_date)  as max_cost
+from t
+ORDER BY order_date, id
+WHERE cust_spent_day = max_cost
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL]
+-- This solution might not be optimal or readable or whatever
+-- It shows what we could to to use the result of partition:
+WITH daily_totals AS (SELECT c.id, c.first_name, o.order_date,
+                      SUM(o.total_order_cost) AS cust_spent_day
+                      FROM customers c
+                     JOIN orders o ON c.id = o.cust_id
+             WHERE o.order_date BETWEEN '2019-02-01' AND '2019-05-01'
+                    GROUP BY c.id, c.first_name, o.order_date),
+with_max AS (SELECT *,
+      MAX(cust_spent_day) OVER (PARTITION BY order_date) AS max_cost
+      FROM daily_totals)
+SELECT first_name, order_date, max_cost
+FROM with_max
+WHERE cust_spent_day = max_cost
+ORDER BY order_date, id;
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL]
+-- Solution 2: no partition
+WITH daily_totals AS (SELECT c.first_name, o.order_date,
+                     SUM(o.total_order_cost) AS total_cost
+              FROM customers c JOIN orders o ON c.id = o.cust_id
+              WHERE o.order_date BETWEEN '2019-02-01' AND '2019-05-01'
+                     GROUP BY c.first_name, o.order_date
+                     )
+SELECT *
+FROM daily_totals dt
+WHERE total_cost = (SELECT MAX(total_cost)
+                    FROM daily_totals
+                    WHERE order_date = dt.order_date)
+ORDER BY order_date, first_name;
+\end{lstlisting}
+\end{exm}
+
+
+
+\begin{exm}  ({\bf  \color{red}{ID 2054: Consecutive Days - Hard}})
+Find all the users who were active for 3 consecutive days or more.
+
+\begin{lstlisting}[language=SQL]
+with t as (SELECT *,
+   LAG(record_date, 1) OVER (PARTITION BY user_id ORDER BY record_date) AS one_dayAgo,
+   LAG(record_date, 2) OVER (PARTITION BY user_id ORDER BY record_date) AS two_dayAgo
+FROM sf_events),
+retained_3days as (select DISTINCT user_id,
+       CASE WHEN one_dayAgo = DATE_SUB(record_date, INTERVAL 1 DAY) THEN 1 ELSE 0 END AS retained_1day,
+       CASE WHEN two_dayAgo = DATE_SUB(record_date, INTERVAL 2 DAY) THEN 1 ELSE 0 END AS retained_2day
+       from t
+HAVING (retained_2day=1) and (retained_1day=1))
+select distinct user_id
+from retained_3days
+
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf ID 10318: New Products})
+Calculate the net change in the number of products launched by companies in 2020 compared to 2019. Your output should include the company names and the net difference.
+
+(Net difference = Number of products launched in 2020 - The number launched in 2019.)
+\begin{lstlisting}[language=SQL]
+-- My first Silution:
+with tbl_2020 as (SELECT  company_name, year, COUNT(DISTINCT product_name) as prod_2020
+                  FROM car_launches
+                  WHERE year=2020
+                  GROUP BY company_name, year),
+     tbl_2019 as (SELECT  company_name, year, COUNT(DISTINCT product_name)  as prod_2019
+                  FROM car_launches
+                  WHERE year=2019
+                  GROUP BY company_name, year)
+SELECT tbl_2020.company_name, tbl_2020.prod_2020 - tbl_2019.prod_2019 as total_launch
+FROM tbl_2020 join tbl_2019 USING(company_name)
+
+-- Shorter: 
+SELECT 
+    company_name,
+    COUNT(DISTINCT CASE WHEN year = 2020 THEN product_name END) -
+    COUNT(DISTINCT CASE WHEN year = 2019 THEN product_name END) AS total_launch
+FROM car_launches
+WHERE year IN (2019, 2020)
+GROUP BY company_name;
+
+-- Bug Free(?): 
+SELECT 
+    company_name,
+    COALESCE(COUNT(DISTINCT CASE WHEN year = 2020 THEN product_name END),0) -
+    COALESCE(COUNT(DISTINCT CASE WHEN year = 2019 THEN product_name END),0) AS total_launch
+FROM car_launches
+WHERE year IN (2019, 2020)
+GROUP BY company_name;
+\end{lstlisting}
+\end{exm}
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Remark}]
+% olback=green!10!white,colframe=green!80!black
+\code{COALESCE} is a very handy SQL function that returns the first non-NULL value in its list of arguments:
+
+\code{COALESCE(value1, value2, value3, \dots)}
+
+
+\begin{lstlisting}[language=SQL]
+SELECT name, COALESCE(middle_name, `N/A`) AS middle
+FROM people;
+\end{lstlisting}
+
+So, in the example above:
+
+If a company has no launches in 2020, \code{COUNT(DISTINCT \dots)} could be 
+\vari{NULL} (depends on SQL dialect).
+\code{COALESCE(\dots, 0)} ensures the result is 0 instead of \vari{NULL} , so subtraction works safely.
+\end{tcolorbox}
+
+
+
+\begin{exm} ({\bf ID 515: City With the Biggest Growth and Drop})
+Find which cities recorded the largest growth and biggest drop in order amount between between March 11, 2019, and April 11, 2019.
+Just compare the total order amount on March 11 and April 11, 2019 for each city. Your output should include the names of the cities and the corresponding amount of growth or drop.
+\begin{lstlisting}[language=SQL]
+-- My First Solution:
+with growth_table as (SELECT city_id,
+      SUM(CASE WHEN DATE(order_timestamp_utc)='2019-04-11' THEN amount ELSE 0 END) - 
+       SUM(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN amount ELSE 0 END) as growth
+FROM postmates_orders
+GROUP BY city_id)
+Select city_id, growth
+FROM growth_table
+where growth = (SELECT MAX(growth)
+                FROM growth_table) OR 
+      growth = (SELECT MIN(growth)
+                FROM growth_table)
+
+\end{lstlisting}
+\end{exm}
+
 
 
 \begin{exm} Hi

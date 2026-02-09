@@ -12,7 +12,7 @@ PRAGMA table_info(table_name);
 Be careful with numbers. Division by 100 vs 100.00 are different.
 \end{rem} 
 
-\begin{rem} 
+\begin{rem}
 SQL is very fussy. Extra parentheses can break it down;
 \begin{lstlisting}[language=SQL]
 -- Correct: 
@@ -21,4 +21,51 @@ CASE WHEN gender= `M` THEN 1 else 0 END
 -- Incorrect: 
 CASE (WHEN gender= `M` THEN 1 else 0 END)
 \end{lstlisting}
+\end{rem} 
+
+\begin{rem} {\bf  GROUP BY v. PARTITION}
+
+\code{GROUP BY}
+reduces rows (many $\rightarrow$ one)
+
+\code{PARTITION BY} (window functions)
+adds context without reducing rows
+\end{rem} 
+
+
+
+\begin{rem} {\bf WITH clause} can define multiple CTEs, and they are written as a comma-separated list.
+
+\begin{lstlisting}[language=SQL]
+WITH cte1 AS (...),
+     cte2 AS (...),
+     cte3 AS (...)
+SELECT ...
+\end{lstlisting}
+\end{rem} 
+
+\begin{rem} 
+First difference between SQLite and MySQL I had:
+\begin{itemize}
+\item SQLite: \code{prev\_date = DATE(date, '-1 day')}
+\item MySQL: \code{prev\_date = DATE\_SUB(date, INTERVAL 1 DAY)}
+\end{itemize}
+\end{rem} 
+
+
+
+\begin{rem} 
+You cannot put SUM() inside CASE.
+\begin{lstlisting}[language=SQL]
+COALESCE(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN SUM(amount) END, 0)
+\end{lstlisting}
+
+Correct way: CASE inside SUM:
+\begin{lstlisting}[language=SQL]
+SUM(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN amount ELSE 0 END)
+\end{lstlisting}
+
+\code{CASE} operates row by row. 
+\code{SUM} is aggregate function.
+SQL does not allow putting \code{SUM()} inside a \code{CASE}.
 \end{rem} 

@@ -531,16 +531,26 @@ testing are also available~\citep{casella2024statistical,montgomery2017design,wa
  & Reject $H_0$ & Type I Error & Correct \\
  & Do Not Reject $H_0$ & Correct & Type II Error \\
 \end{tabular}
-\caption{A summary of the possible scenarios associated with testing the
+\caption{
+A summary of the possible scenarios associated with testing the
 null hypothesis $H_0$. Type I errors are also known as false positives, and Type II
-errors as false negatives.}
+errors as false negatives.
+In general there is a tradeoff between Type I and Type II errors. The only
+way to decrease both at the same time is to increase the sample size (or, in
+some cases, decrease measurement error).
+See page 82 of \emph{Think Stat}~\citep{downey2011think}  and do the Exercises.
+}
 \end{table}
 
+
+\vspace{.1in}
 \begin{deff}
-The power of the hypothesis test is defined as the probability of not making a Type II error given that $H_a$ holds, i.e., the probability of correctly rejecting $H_0$.
+The power of the hypothesis test is the probability of correctly rejecting a false $H_0$. 
+\[\text{power} = 1 - P(\text{Type II error}) = \frac{\text{number of false nulls that we reject}}{\text{number of false nulls}}
+\]
 \end{deff}
 
-From~\citep{james2013introduction} ```Once the hypothesis test is performed, the row of the
+From~\citep{james2013introduction} ``Once the hypothesis test is performed, the row of the
 table is known (based on whether or not we have rejected $H_0$); 
 however, it is impossible for us to know which column we are in. 
 If we reject $H_0$ when $H_0$ is false (i.e., when $H_a$ is true), or if we do not reject $H_0$ when it is true, then we arrived at the correct result. 
@@ -687,7 +697,7 @@ So, we need to control for a family-wise error rate.
 If we have one hypothesis, we use $\alpha$, significance level, to control
 for Type I error; $\alpha$ is probability of rejecting null hypothesis by mistake, i.e.
 $\alpha = p(\text{falsely rejecting }H_0)$. 
-Family-wise error rate is probability of making at least one such mistake when we have multiple hypothesis. Using notation of~\cref{tab:fwer1} $FWER = Pr(V \ge 1)$.
+Family-wise error rate is probability of making at least one such mistake when we have multiple hypothesis. Using notation of~\cref{tab:fwer1} $\text{FWER} = P(V \ge 1)$.
 \begin{table}[h]
 \label{tab:fwer1}
 \centering
@@ -715,4 +725,25 @@ Bonferroni method and Holm’s step-down procedure are very general-purpose
 approaches for controlling the FWER that can be applied whenever m p-values have been computed, regardless of the form of the null hypotheses, the choice of test statistics, or the
 (in)dependence of the p-values. Tukey’s method and Scheff{\'e}'s method are for 
 certain situations, more specialized approaches for controlling the FWER may be
-preferable. See~\cite{james2013introduction} page 567.
+preferable. See~\citep{james2013introduction} page 567.
+
+\begin{align*}
+\text{FWER}(\alpha) &= P(V \ge 1)\\
+                     &= 1- P(V =0)\\
+                     &= 1- \text{P(do not falsely reject any null hypotheses)}\\
+                     &= 1 - P(\bigcap_i \text{\{do not falsely reject } H_{0i}  \text{\}})\\
+                     &= \text{assuming independence, then,}\\
+                     &= 1 - \prod_i (1 - \alpha)\\
+                     &= 1 - (1 - \alpha)^m\\
+                     &= \text{under independence, or}\\
+                     &= P(\text{falsely reject at least one null hypothesis})\\
+                     &= P(\cup_i A_i)\\
+                     &\le \sum_i P(A_i)
+\end{align*}
+where $A_i$ is the event that we make a Type I error for the $i$th null hypothesis,
+and the inequality comes from $P(A \cup B) \le P(A) + P(B)$.
+Bonferroni uses this fact and sets significance level to $\alpha/m$;
+\[\text{FWER}(\alpha/m) \le  m \times \frac{\alpha}{m} \]
+
+
+  

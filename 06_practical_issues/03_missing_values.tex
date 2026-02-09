@@ -3,6 +3,34 @@
 The issue of missing values is a real one
 that is present in any dataset. It is inevitable and impossible to avoid it.
 
+Rubin~\citep{rubin1976inference} divides the missing data mechanisms
+into three categories; missing at random (MAR) missing completely at random (MCAR),
+and missing not at random (MNAR).
+\begin{description}
+\item [MCAR] Missing completely at random (bad luck), e.g. Server dies.
+This is the safest case. 
+drop rows.\\
+{\bf Test} Litte's MCAR test. If MCAR is rejected then it is either MAR or MNAR.\\
+{\bf Imputation:} drop rows, mean, mode, KNN, regression, MICE.
+
+\item [MAR] Missing At Random: missing value depends on observed variables and does not depend on the missing value itsef. you can explain why data is missing by other columns.
+eg: old people don't do medical tests.
+
+{\bf Imputation:} MICE, maximum likelihood, joint modeling, use tree-based methods, category for missing values.
+
+methods such as multi imputation, max-likelihood rely on this assumption
+\item [MNAR] They are missing because of the unobserved value itself.
+e.g. high income people do not report their income.
+Requires modeling missingness process explicitly. we cannot detect MNAR from data. you don't see what caused missingness. $P(\text{missing} | \text{value})$-- and not $p(\text{value} | \text{missing})$
+
+MAR and MNAR are statistically indistinguishable.
+We can some times reject MAR, but not confirm MNAR.
+Standard imputation can be biased. 
+
+{\bf Imputation:} Explicitly model missingness, Pattern-mixture models, 
+\end{description}
+
+
 In this section we focus our attention to the problem of
 missing values. Let us start with defining the simplest methods
 of dealing with such issue.
@@ -52,10 +80,12 @@ missing data mechanism statistically''~\citep{dong2013principled}.
 
 Before choosing an approach for imputing missing data
 one has to examine missing data mechanism and pattern of
-missing data.
+missing data.\\
 
-Rubin~\citep{rubin1976inference} divides the missing data mechanisms
-into three categories; missing at random (MAR) missing completely at random (MCAR),
-and missing not at random (MNAR).
-
-
+MICE (different from MI?) acts in the following way
+\begin{itemize}
+\item model $\text{income} = f(\text{age}, \text{education})$
+\item model $\text{education} = g(\text{age}, \text{income})$
+\item model $\text{age} = h(\text{income}, \text{education})$
+\item repeat
+\end{itemize}
