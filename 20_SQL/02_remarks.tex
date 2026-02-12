@@ -69,3 +69,12 @@ SUM(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN amount ELSE 0 END)
 \code{SUM} is aggregate function.
 SQL does not allow putting \code{SUM()} inside a \code{CASE}.
 \end{rem} 
+
+
+\begin{rem} 
+Pay attention to rand and dense rank functions:
+\begin{itemize}[itemsep=-2pt]
+\item \code{RANK()}: skips numbers (1, 1, 3)
+\item  \code{DENSE\_RANK()}: no skipping (1, 1, 2)
+\end{itemize}
+\end{rem} 
