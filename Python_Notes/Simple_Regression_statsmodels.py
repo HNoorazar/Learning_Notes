@@ -17,6 +17,11 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from statsmodels.formula.api import ols
 
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import cross_val_score
+
 # %% [markdown]
 # # Lesson:
 #
@@ -100,6 +105,60 @@ from statsmodels.formula.api import ols
 #    
 # **See them in action [here](https://github.com/HNoorazar/Montgomery_Intro_Linear_Regression_Analysis/blob/main/CH2_SimpleLinearRegression.ipynb)**
 
-# %%
+# %% [markdown]
+# # SkLearn vs statsmodel
+#
+# According to chatGPT: 
+# - Sklearn better for ML, pipeline, production, integration. Cross-validation
+# - Statsmodel good for inference.
+#
+#
+# ```python
+# from sklearn.pipeline import Pipeline
+# from sklearn.preprocessing import StandardScaler
+# from sklearn.linear_model import LinearRegression
+# from sklearn.model_selection import cross_val_score
+# import statsmodels.formula.api as smf
+#
+# pipe = Pipeline([("scaler", StandardScaler()), ("model", LinearRegression())])
+# scores = cross_val_score(pipe, X, y, cv=5)
+# pipe.fit(X, y)
+# ```
+#
+# **statsmodel for inference**
+#
+# ```python
+# X_transformed = pipe.named_steps["scaler"].transform(X)
+# feature_names = X.columns  # or define manually
+# X_df = pd.DataFrame(X_transformed, columns=feature_names)
+# X_df["y"] = y
+#
+# formula = "y ~ " + " + ".join(feature_names)
+# model = smf.ols(formula=formula, data=X_df).fit()
+# print(model.summary())
+# ```
+#
+# ------------
+#
+# - **robust SE**: What does that mean?: heteroskedasticity-robust standard errors
+# Classical OLS assumes homoskedasticity: all errors have the same variance
+# Keep the same coefficient estimates, but compute heteroskedasticity-robust standard errors
+#
+# ```python
+# model = smf.ols(formula=formula, data=X_df).fit(cov_type="HC3")
+# ```
+#
+# - interaction and polynomial terms:
+# ```python
+# model = smf.ols("y ~ x1 + x2 + x1:x2", data=X_df).fit()
+# ```
+
+# %% [markdown]
+# Sklearn linear regression
+#
+# ```python
+# linr = LinearRegression()
+# linr.fit(x_train, y_train)
+# ```
 
 # %%
