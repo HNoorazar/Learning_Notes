@@ -1,0 +1,89 @@
+\section{Data Quality}
+\label{sec:Data_Quality}
+
+Data quality consist of several different factors/dimensions.
+This is, of course, of utmost importance for clear reasons.\sidenote{Statistical Models: Theory and Practice David A. Freedman.}
+
+\begin{description}
+\item [Accuracy] Are they reflecting reality? Is there anybody whose recorded age is 200?
+
+{\bf \color{red} Metrics Examples:} Percentage of records matching authoritative sources.
+Number of data entry or format errors per dataset.
+Ratio of correct to incorrect values (based on audits or validation rules).\sidenote{Metric examples are from \href{https://www.alation.com/blog/data-quality-metrics/}{Alation blog.}}
+
+\item [Completeness] Are important values missing? 
+Missing labels, null timestamps, partial logs. 
+
+{\bf \color{red} Metrics Examples:} Percentage of missing values per dataset.
+Ratio of populated fields to total required fields.
+
+\item [Consistency] Same entity, same value across systems?
+Data remains uniform across systems, formats, and processes?
+``US'' in one table, ``United States'' in another?
+
+{\bf \color{red} Metrics Examples:} Percentage of conflicting values across systems.
+Number of schema or format discrepancies.
+Count of mismatched values for shared fields (e.g., customer ID, product code).
+
+\item [Timeliness / Freshness] 
+Is the data up to date for the decision being made?
+Real-time fraud vs. weekly reporting.
+
+{\bf \color{red} Metrics Examples:} 
+Data latency (time between creation and availability).
+Percentage of records updated within SLA\sidenote{Service Level Agreement: It refers to a formal, agreed-upon standard or commitment regarding the timing and quality of a service. The agreed-upon timeframe within which data must be updated or processed to maintain its quality.} timeframes.
+Number of outdated records detected in a given period.
+
+\item [Validity] Does data obey rules?
+Date ranges, enums, schema constraints.
+
+{\bf \color{red} Metrics Examples:} 
+Percentage of values outside accepted ranges (e.g., age < 0).
+Ratio of records failing validation rules.
+Number of syntax or format errors (e.g., invalid email addresses).
+
+\item [Uniqueness]
+Duplicate rows, duplicate users, duplicated events.
+
+{\bf \color{red} Metrics Examples:} 
+Duplicate record rate (\% of redundant entries).
+Number of duplicate IDs or transactions.
+Percentage of unique keys or identifiers.
+
+\item [Availability] Do we have all the data we need?
+
+{\bf \color{red} Metrics Examples:} 
+
+\end{description}
+
+Airbnb defines data quality across several dimensions: accuracy, consistency, usability, timeliness, cost efficiency, and availability.\sidenote{from \href{https://www.engineering.fyi/article/data-quality-at-airbnb?utm_source=chatgpt.com}{Data Quality at Airbnb blog} which is not very comprehensive. More detailed version is in \href{https://medium.com/airbnb-engineering/data-quality-at-airbnb-870d03080469}{original blog.}}
+Airbnb ensures end-to-end data quality by applying the Midas standards to all commonly consumed data assets, covering both data warehouse tables and the metrics derived from them. This approach guarantees that users across the organization access consistent and reliable data.\\
+
+
+
+I do not want to keep all tabs open. These are to be read:
+\begin{multicols}{4}
+\begin{enumerate}
+\item \href{https://medium.com/airbnb-engineering/how-airbnb-built-wall-to-prevent-data-bugs-ad1b081d6e8f}{Link 1}
+
+\item \href{https://www.browserstack.com/guide/data-quality-metrics?utm_source=chatgpt.com}{Link 2}
+
+\item \href{https://www.dataengineeringweekly.com/p/data-engineering-weekly-19?utm_source=chatgpt.com}{Link 3}
+
+\item \href{https://research.netflix.com/publication/evaluating-the-surrogate-index-as-a-decision-making-tool-using-200-a-b-tests}{Link 4}
+
+\item \href{https://netflixtechblog.com/a-survey-of-causal-inference-applications-at-netflix-b62d25175e6f}{Link 5}
+
+\item \href{https://netflixtechblog.com/quasi-experimentation-at-netflix-566b57d2e362}{Link 6}
+
+\item \href{https://netflixtechblog.com/decision-making-at-netflix-33065fa06481}{Link 7}
+
+\item \href{https://netflixtechblog.com/round-2-a-survey-of-causal-inference-applications-at-netflix-fd78328ee0bb}{Link 8}
+
+\item \href{https://netflixtechblog.com/what-is-an-a-b-test-b08cc1b57962}{Link 9}
+
+\item \href{https://medium.com/airbnb-engineering/how-airbnb-built-wall-to-prevent-data-bugs-ad1b081d6e8f}{Link 10}
+
+\item \href{https://medium.com/airbnb-engineering/how-airbnb-achieved-metric-consistency-at-scale-f23cc53dea70}{Link 11}
+\end{enumerate}
+\end{multicols}
