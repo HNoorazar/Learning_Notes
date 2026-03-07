@@ -78,3 +78,15 @@ Pay attention to rand and dense rank functions:
 \item  \code{DENSE\_RANK()}: no skipping (1, 1, 2)
 \end{itemize}
 \end{rem} 
+
+
+\begin{rem} 
+In MySQL the correct and incorrect way of subtracting time stamps
+seems to be in the following way:
+\begin{lstlisting}[language=SQL]
+exit_.min_d_exit - load_.max_d_load -- incorrect
+TIMESTAMPDIFF(SECOND, load_.max_d_load, exit_.min_d_exit) -- correct
+\end{lstlisting}
+\end{rem} 
+
+

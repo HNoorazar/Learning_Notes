@@ -213,13 +213,16 @@
 \newtheorem{lem}[thm]{Lemma}
 \newtheorem{rem}[thm]{Remark}
 \newtheorem{exm}[thm]{Example}
+% \newtheorem{exm}{Example}[section]
 \newtheorem{deff}[thm]{Definition}
 \newtheorem{exc}[thm]{Exercise} % "[thm]" in the middle will use the same counter as the theorem environment. if "[thm]" was at the end, then  the counter of this new environment will be reset every time a new theorem environment is used.
 \newtheorem{claim}[thm]{Claim}
 \newtheorem{cond}[thm]{Condition}
 
+
 \newcommand{\Tau}{\mathcal{T}}
 \renewcommand\qedsymbol{$\blacksquare$}
+
 
 
 \def\code#1{{\color{titlered}{\texttt{#1}}}} %Cerulean
@@ -252,6 +255,7 @@
 %\renewcommand{\familydefault}{\sfdefault}
 %\renewcommand{\familydefault}{\ttdefault}
 \usepackage{hyperref}
+\usepackage[nameinlink,sort]{cleveref}
 \hypersetup{
     colorlinks=true,
     linkcolor=cyan, % color1 : will be black
@@ -265,7 +269,8 @@
     pdfauthor={Author},
 }
 
-\usepackage[nameinlink]{cleveref}
+
+
   % \cref{} and \Cref{} which work like \autoref but also
   % allow for capialization.  The 'nameinlink' used to mimic \autoref's behavior
   % of including the cross-reference's name in the link
@@ -275,6 +280,7 @@
   \crefname{table}{Table}{Tables}
   \crefname{figure}{Fig.}{Figs.}
   \crefname{equation}{Eq.}{Eqs.}
+
 
 
 \newenvironment{mylist}{\begin{list}{*}{\itemsep=.01in \parsep=.01in
@@ -422,6 +428,28 @@ font={\color{blue}},
   showstringspaces=false          % Do not highlight spaces in strings
 }
 
+
+% \makeatletter
+% \let\c@exm\c@thm  % share the counter
+% \makeatother
+
+\crefname{thm}{theorem}{theorem}
+\Crefname{thm}{Theorem}{Theorem}
+\crefname{deff}{Definition}{Definitions}
+\crefname{rem}{Remark}{Remarks}
+\crefname{lem}{Lemma}{Lemmas}
+\crefname{Coro}{Corollary}{Corollaries}
+\crefname{exm}{example}{examples}
+\Crefname{exm}{Example}{Examples}
+% examples are sharing label counts by theorems. 
+% The following line helps LaTex to show proper references
+%
+\crefalias{exm}{exm}
+\crefalias{deff}{deff}
+\crefalias{rem}{rem}
+\crefalias{Coro}{Coro}
+\crefalias{lem}{lem}
+
 \begin{document}
 %\raggedright
 
@@ -444,6 +472,9 @@ font={\color{blue}},
   \let\oldmaketitle\maketitle
   \def\maketitle{\begin{fullwidth}\oldmaketitle\end{fullwidth}}
 } 
+
+
+
 
 \providecommand{\marginnote}[1]{Sidebar: {#1}}
 

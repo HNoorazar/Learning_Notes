@@ -1,6 +1,6 @@
-\section{Exercises 1}
+\section{Exercises 1: sql-practice.com}
 \label{sec:SQLExercises1}
-
+These are from \href{sql-practice.com}{sql-practice.com}
 Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6Wcjyli3I-zSqmvAGqt1ORVYnio/edit?usp=sharing}{this google doc}.
 
 
@@ -24,38 +24,7 @@ FROM admission_counts_table
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} Retained customers
-\begin{lstlisting}[language=SQL]
-WITH t AS (SELECT date, user_id,
-           LAG(date) OVER (PARTITION BY user_id ORDER BY date) AS prev_date
-           FROM activity)
-SELECT date,
-  COUNT(DISTINCT user_id) AS active_users,
-  COUNT(DISTINCT CASE
-     WHEN prev_date=DATE(date, '-1 day') THEN user_id END) AS retained_u,
-  COUNT(DISTINCT CASE
-     WHEN prev_date = DATE(date, '-1 day') THEN user_id END) * 1.0 /
-                        COUNT(DISTINCT user_id) AS retention
-FROM t
-GROUP BY date
-ORDER BY date;
-------------------------------------------------------
-WITH user_activity AS 
- (SELECT date, user_id,
-  LAG(date) OVER (PARTITION BY user_id ORDER BY date) AS prev_date
-  FROM activity),
-     daily_stats AS 
-  (SELECT date, COUNT(DISTINCT user_id) AS active_users,
-   COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN user_id
-        END) AS retained_users
-    FROM user_activity
-    GROUP BY date)
-SELECT date, active_users, retained_users,
-    retained_users * 1.0 / active_users AS retention
-FROM daily_stats
-ORDER BY date;
-\end{lstlisting}
-\end{exm}
+
 
 \begin{exm} Count and show result in one row:
 \begin{lstlisting}[language=SQL]
@@ -343,7 +312,7 @@ ORDER BY CASE WHEN province_name = 'Ontario' THEN 1 ELSE
 
 
 
-\section{Exercises 2}
+\section{Exercises 2: Stratascratch}
 \label{sec:SQLExercises2}
 These questions are from \href{https://platform.stratascratch.com}{https://platform.stratascratch.com}
 and might be harder than the questions in~\Cref{sec:SQLExercises1}.
@@ -457,10 +426,10 @@ with tbl_2020 as (SELECT  company_name, year, COUNT(DISTINCT product_name) as pr
                   FROM car_launches
                   WHERE year=2020
                   GROUP BY company_name, year),
-     tbl_2019 as (SELECT  company_name, year, COUNT(DISTINCT product_name)  as prod_2019
-                  FROM car_launches
-                  WHERE year=2019
-                  GROUP BY company_name, year)
+  tbl_2019 as (SELECT company_name, year,  COUNT(DISTINCT product_name) as prod_2019
+               FROM car_launches
+               WHERE year=2019
+               GROUP BY company_name, year)
 SELECT tbl_2020.company_name, tbl_2020.prod_2020 - tbl_2019.prod_2019 as total_launch
 FROM tbl_2020 join tbl_2019 USING(company_name)
 
@@ -641,7 +610,189 @@ WHERE dec.cmt_month = 12;
 \end{lstlisting}
 \end{exm}
 
+\begin{exm} ({\bf ID 10352: Users By Average Session Time})
+Calculate each user's average session time, where a session is defined as the time difference between a  \code{page\_load} and a \code{page\_exit}. Assume each user has only one session per day. 
+If there are multiple \code{page\_load} or \code{page\_exit} events on the same day, use only the latest 
+ \code{page\_load} and the earliest  \code{page\_exit}. 
+Only consider sessions where the \code{page\_load} occurs before the 
+\code{page\_exit} on the same day. 
+Output the \code{user\_id} and their average session time.
 
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Recall}]
+I wasted so much time on this question:
+In MySQL the correct and incorrect way of subtracting time stamps
+seems to be in the following way
+\begin{lstlisting}[language=SQL]
+exit_.min_d_exit - load_.max_d_load -- incorrect
+TIMESTAMPDIFF(SECOND, load_.max_d_load, exit_.min_d_exit) -- correct
+\end{lstlisting}
+\end{tcolorbox}
+
+\begin{lstlisting}[language=SQL]
+WITH load_ AS (SELECT user_id, MAX(timestamp) AS max_d_load, 
+               DATE(timestamp) AS date_
+               FROM facebook_web_log
+               WHERE action = 'page_load'
+               GROUP BY user_id, DATE(timestamp)),
+exit_ AS (SELECT user_id, MIN(timestamp) AS min_d_exit, 
+          DATE(timestamp) AS date_
+          FROM facebook_web_log
+          WHERE action = 'page_exit'
+          GROUP BY user_id, DATE(timestamp)
+),
+session_t AS (SELECT load_.user_id, 
+        TIMESTAMPDIFF(SECOND, load_.max_d_load, exit_.min_d_exit) AS time_session 
+           FROM load_ 
+           JOIN exit_ USING (user_id, date_)
+           WHERE exit_.min_d_exit > load_.max_d_load)
+SELECT user_id, AVG(time_session)
+FROM session_t
+GROUP BY user_id;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf {\color{red} ID 10171}: Find the genre of the person with the most number of oscar winnings})
+Find the genre of the person with the most number of oscar winnings.
+If there are more than one person with the same number of oscar wins, return the first one in alphabetic order based on their name. Use the names as keys when joining the tables.
+\begin{lstlisting}[language=SQL]
+with tab_ as (SELECT ni.name as name, ni.top_genre, 
+                 sum(o_n.winner) as win_count
+              FROM nominee_information ni join oscar_nominees o_n
+                    on ni.name = o_n.nominee
+              GROUP BY name
+              ORDER BY win_count desc, name desc
+              LIMIT 1)
+SELECT top_genre
+FROM tab_
+\end{lstlisting}
+\end{exm}
+
+\newpage
+\begin{exm}\label{exm:2059}
+({\bf  \color{red} ID 2059: Player with Longest Streak})
+You are given a table of tennis players and their matches that they could either win (W) or lose (L). 
+Find the longest streak of wins. A streak is a set of consecutive won matches of one player. 
+The streak ends once a player loses their next match.\sidenote{This was difficult}.
+
+For this question, disregard edge cases such as: players who never lose, streaks that start before the first loss, and streaks that continue after the final match.
+
+First, let us see how the table looks like below. Ignore the column called Loss Group; it is not
+in the provided table. That column is added in the first step of our code. 
+Each time a player loses, we increment a counter.
+That naturally separates win streaks into groups.
+Then, we count consecutive W's within each \code{loss\_group}.
+Then, take the maximum.
+\begin{table}[h]
+\centering
+\rowcolors{1}{aliceblue}{white}
+\begin{tabular}{c|c|c|c}
+\rowcolor{shadecolor} Player ID & Match Date & Result & Loss Group \\
+\hline
+401 & 2021-05-04 & W & 0 \\
+401 & 2021-05-09 & L & 1 \\
+401 & 2021-05-16 & L & 2 \\
+401 & 2021-05-18 & W & 2 \\
+401 & 2021-05-22 & L & 3 \\
+401 & 2021-06-15 & L & 4 \\
+401 & 2021-06-16 & W & 4 \\
+401 & 2021-06-18 & W & 4 \\
+401 & 2021-07-06 & L & 5 \\
+401 & 2021-07-13 & L & 6 \\
+\hline
+\end{tabular}
+\caption{Match Results for Player 401}
+\end{table}
+
+\vspace{.2in}
+The second table, \code{win\_streaks}, looks like
+\begin{table}[h]
+\centering
+\rowcolors{1}{aliceblue}{white}
+\begin{tabular}{c|c|c}
+\rowcolor{shadecolor} Player ID & loss group & streak length \\
+\hline
+401 & 0 & 1\\
+401 & 2 & 1\\
+401 & 4 & 2\\
+\hline
+\end{tabular}
+\caption{Win streaks}
+\end{table}
+
+\begin{lstlisting}[language=SQL]
+WITH match_groups AS (SELECT player_id, match_date, match_result,
+        SUM(CASE WHEN match_result = 'L' THEN 1 ELSE 0 END)
+             OVER (PARTITION BY player_id ORDER BY match_date) AS loss_group
+                      FROM players_results),
+    win_streaks AS (SELECT player_id, loss_group, COUNT(*) AS streak_length
+                    FROM match_groups
+                    WHERE match_result = 'W'
+                    GROUP BY player_id, loss_group)
+SELECT player_id, MAX(streak_length) AS max_streak
+FROM win_streaks
+GROUP BY player_id
+HAVING MAX(streak_length) = (SELECT MAX(streak_length)FROM win_streaks);
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm}\label{exm:10547}
+({\bf \color{red} ID 10547: Actor Rating Difference Analysis})
+You are given a dataset of actors and the films they have been involved in, 
+including each film's release date and rating. 
+For each actor, calculate the difference between the rating of their most recent film and their average rating across all previous films (the average rating excludes the most recent one).
+
+Return a list of actors along with their average lifetime rating, the rating of their most recent film, and the difference between the two ratings. 
+Round the difference calculation to 2 decimal places. 
+If an actor has only one film, return 0 for the difference and 
+their only film’s rating for both the average and latest rating fields.
+\begin{lstlisting}[language=SQL]
+WITH ranked_films AS (SELECT actor_name, film_title, release_date, film_rating,
+                             ROW_NUMBER() OVER (PARTITION BY actor_name ORDER BY release_date DESC) AS rn,
+                             COUNT(*) OVER (PARTITION BY actor_name) AS film_count
+                      FROM actor_rating_shift),
+avg_previous AS (SELECT actor_name, AVG(film_rating) AS avg_prev_rating
+                 FROM ranked_films
+                 WHERE rn > 1
+                 GROUP BY actor_name)
+SELECT r.actor_name, 
+       ROUND(CASE WHEN r.film_count = 1 THEN r.film_rating ELSE a.avg_prev_rating END, 2) AS avg_lifetime_rating,
+       r.film_rating AS most_recent_rating,
+       ROUND(CASE WHEN r.film_count = 1 THEN 0 ELSE r.film_rating - a.avg_prev_rating END, 2) AS rating_difference
+FROM ranked_films r
+LEFT JOIN avg_previous a ON r.actor_name = a.actor_name
+WHERE r.rn = 1
+ORDER BY r.actor_name;
+\end{lstlisting}
+\end{exm}
+
+\begin{exm}\label{exm:RetainedCustomers}
+Retained customers
+\begin{lstlisting}[language=SQL]
+WITH t AS (SELECT date, ID, LAG(date) OVER (PARTITION BY ID ORDER BY date) AS prev_date
+           FROM activity)
+SELECT date, COUNT(DISTINCT ID) AS active_users,
+  COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END) AS retained_u,
+  COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END)*1.0/COUNT(DISTINCT ID) AS retention
+FROM t
+GROUP BY date
+ORDER BY date;
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL]
+WITH user_activity AS (SELECT date, ID, LAG(date) OVER (PARTITION BY ID ORDER BY date) AS prev_date
+                       FROM activity),
+   daily_stats AS (SELECT date, COUNT(DISTINCT ID) AS active_users,
+                     COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END) AS retained_users
+                   FROM user_activity
+                   GROUP BY date)
+SELECT date, active_users, retained_users, retained_users*1.0/active_users AS retention
+FROM daily_stats
+ORDER BY date;
+\end{lstlisting}
+\end{exm}
 
 \begin{exm} ({\bf ID })
 \begin{lstlisting}[language=SQL]
