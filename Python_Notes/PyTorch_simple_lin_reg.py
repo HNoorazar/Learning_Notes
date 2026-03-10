@@ -60,7 +60,6 @@ class ManualLinearRegression(nn.Module):
         return self.b + self.w * x
     
 torch.manual_seed(42)
-# Creates a "dummy" instance of our ManualLinearRegression model
 dummy = ManualLinearRegression()
 print(list(dummy.parameters()))
 
@@ -70,7 +69,6 @@ print(list(dummy.parameters()))
 # Moreover, we can get the current values of all parameters using our model’s ```state_dict()``` method.
 
 # %%
-ummy = ManualLinearRegression()
 print(dummy.state_dict())
 
 # %% [markdown]
@@ -188,7 +186,7 @@ print(model.state_dict())
 # %% [markdown]
 # ## Hold On. Zoom out:
 #
-# A nested model is ``nested'' because:
+# A nested model is "nested" because:
 # - A module contains other modules
 # - Those modules contain other modules
 # - It forms a tree structure
@@ -280,6 +278,52 @@ for epoch in range(n_epochs):
     optimizer.step()
     optimizer.zero_grad()
 
+
+# %% [markdown]
+# ## Higher Order Function
+
 # %%
+def make_train_step(model, loss_fn, optimizer):
+    # Builds function that performs a step in the train loop
+    def perform_train_step(x, y):
+        model.train() # Sets model to TRAIN mode
+        
+        # Step 1 - computes model's predictions - forward pass
+        yhat = model(x)
+        # Step 2 - computes the loss
+        loss = loss_fn(yhat, y)
+        # Step 3 - computes gradients for "b" and "w" parameters
+        loss.backward()
+        # Step 4 - updates parameters using gradients and the learning rate
+        optimizer.step()
+        optimizer.zero_grad()
+        
+        # Returns the loss
+        return loss.item()
+    
+    # Returns the function that will be called inside the train loop
+    return perform_train_step
+
+
+# %%
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+lr = 0.1
+torch.manual_seed(42)
+model = nn.Sequential(nn.Linear(1, 1)).to(device)
+
+# Defines a SGD optimizer to update the parameters 
+optimizer = optim.SGD(model.parameters(), lr=lr)
+loss_fn = nn.MSELoss(reduction='mean') # Defines a MSE loss function
+
+# Creates the train_step function for our model, loss function and optimizer
+train_step = make_train_step(model, loss_fn, optimizer) # 1)
+
+n_epochs = 1000
+losses = []
+
+for epoch in range(n_epochs):
+    loss = train_step(x_train_tensor, y_train_tensor)
+    losses.append(loss)
 
 # %%
