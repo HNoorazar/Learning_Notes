@@ -56,12 +56,12 @@ First difference between SQLite and MySQL I had:
 
 \begin{rem} 
 You cannot put SUM() inside CASE.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 COALESCE(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN SUM(amount) END, 0)
 \end{lstlisting}
 
 Correct way: CASE inside SUM:
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 SUM(CASE WHEN DATE(order_timestamp_utc)='2019-03-11' THEN amount ELSE 0 END)
 \end{lstlisting}
 

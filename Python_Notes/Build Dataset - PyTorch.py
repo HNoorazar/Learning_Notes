@@ -105,8 +105,65 @@ train_loader = DataLoader(dataset=train_data, batch_size=16, shuffle=True)
 # will return a list -> 2 tensors (features, labels)
 print(next(iter(train_loader)))
 
+
 # %% [markdown]
 # ### Use the dataset and data loader in mini-batch
+
+# %%
+############################################################
+############################################################
+#####
+#####      From Before:
+#####
+def make_train_step(model, loss_fn, optimizer):
+    # Builds function that performs a step in the train loop
+    def perform_train_step(x, y):
+        # Sets model to TRAIN mode
+        model.train()
+        
+        # Step 1 - computes model's predictions - forward pass
+        yhat = model(x)
+        # Step 2 - computes the loss
+        loss = loss_fn(yhat, y)
+        # Step 3 - computes gradients for "b" and "w" parameters
+        loss.backward()
+        # Step 4 - updates parameters using gradients and the learning rate
+        optimizer.step()
+        optimizer.zero_grad()
+        
+        # Returns the loss
+        return loss.item()
+    
+    # Returns the function that will be called inside the 
+    # train loop
+    return perform_train_step
+
+def make_val_step(model, loss_fn):
+    # Builds function that performs a step in the validation loop
+    def perform_val_step(x, y):
+        # Sets model to EVAL mode
+        model.eval()     # 1)
+        
+        # Step 1 - Computes our model's predicted output
+        yhat = model(x) # forward pass
+        # Step 2 - Computes the loss
+        loss = loss_fn(yhat, y)
+        # There is no need to compute Steps 3 and 4, 
+        # since we don't update parameters during evaluation
+        return loss.item()
+    
+    return perform_val_step
+
+############################################################
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+lr = 0.1
+torch.manual_seed(42)
+model = nn.Sequential(nn.Linear(1, 1)).to(device)
+optimizer = optim.SGD(model.parameters(), lr=lr)
+loss_fn = nn.MSELoss(reduction='mean')
+train_step = make_train_step(model, loss_fn, optimizer) # 1)
+
+# %%
 
 # %%
 n_epochs = 1000
@@ -130,3 +187,30 @@ for epoch in range(n_epochs):
     # Computes average loss over all mini-batches (That's the epoch loss)
     loss = np.mean(mini_batch_losses)
     losses.append(loss)
+
+
+# %%
+def mini_batch(device, data_loader, step):
+    mini_batch_losses = []
+    for x_batch, y_batch in data_loader:
+        x_batch = x_batch.to(device)
+        y_batch = y_batch.to(device)
+
+        mini_batch_loss = step(x_batch, y_batch)
+        mini_batch_losses.append(mini_batch_loss)
+
+    loss = np.mean(mini_batch_losses)
+    return loss
+
+###########################################################################
+###########################################################################
+n_epochs = 200
+losses = []
+for epoch in range(n_epochs):
+    # inner loop
+    loss = mini_batch(device, train_loader, train_step) # 1)
+    losses.append(loss)
+
+# %%
+
+# %%

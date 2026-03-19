@@ -5,7 +5,7 @@ Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6W
 
 
 \begin{exm} For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 SELECT admission_date, COUNT(admission_date) AS admission_day,
  COUNT(admission_date) - 
  LAG(count(admission_date)) OVER(ORDER BY admission_date) AS admission_count_change 
@@ -193,7 +193,7 @@ All patients with an even patient\_id have insurance.
 
 Give each patient a `Yes' if they have insurance, and a `No' if they don't have insurance. 
 Add up the admission\_total cost for each has\_insurance group.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 SELECT CASE WHEN patient_id%2=0 Then 'Yes' ELSE 'No' END AS has_insurance,
 SUM(CASE WHEN patient_id%2=0 Then 10 ELSE 50 END) as cost_after_insurance
 FROM admissions 
@@ -343,7 +343,7 @@ For simplicity, you can assume that every first name in the dataset is unique.
 
 {\bf \color{red} Recall} the order of execution of statements in SQL~\cref{fig:SQL_LogicMargin}.
 That means Window functions are evaluated after \code{WHERE}, so \code{max\_cost} doesn't exist yet when \code{WHERE} runs.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 --- This will not work due to above remark.
 WITH t as (SELECT customers.id, customers.first_name, 
                           orders.order_date, 
@@ -383,8 +383,7 @@ WITH daily_totals AS (SELECT c.first_name, o.order_date,
                      SUM(o.total_order_cost) AS total_cost
               FROM customers c JOIN orders o ON c.id = o.cust_id
               WHERE o.order_date BETWEEN '2019-02-01' AND '2019-05-01'
-                     GROUP BY c.first_name, o.order_date
-                     )
+                     GROUP BY c.first_name, o.order_date)
 SELECT *
 FROM daily_totals dt
 WHERE total_cost = (SELECT MAX(total_cost)
@@ -394,12 +393,10 @@ ORDER BY order_date, first_name;
 \end{lstlisting}
 \end{exm}
 
-
-
 \begin{exm}  ({\bf  \color{red}{ID 2054: Consecutive Days - Hard}})
 Find all the users who were active for 3 consecutive days or more.
 
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL,linewidth=1.5\textwidth]
 with t as (SELECT *,
    LAG(record_date, 1) OVER (PARTITION BY user_id ORDER BY record_date) AS one_dayAgo,
    LAG(record_date, 2) OVER (PARTITION BY user_id ORDER BY record_date) AS two_dayAgo
@@ -415,12 +412,25 @@ from retained_3days
 \end{lstlisting}
 \end{exm}
 
+\begin{exm} ({\bf ID 10299: Finding Updated Records})
+We have a table with employees and their salaries; however, some of the records are old and contain outdated salary information. Since there is no timestamp, assume salary is non-decreasing over time. You can consider the current salary for an employee is the largest salary value among their records. If multiple records share the same maximum salary, return any one of them. Output their id, first name, last name, department ID, and current salary. Order your list by employee ID in ascending order.
+\begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
+with help_t AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY salary DESC) as rn
+                FROM ms_employee_salary
+                ORDER BY id ASC)
+SELECT id, first_name, last_name, salary, department_id
+FROM help_t
+WHERE rn = 1
+ORDER BY id ASC
+\end{lstlisting}
+\end{exm}
+
 
 \begin{exm} ({\bf ID 10318: New Products})
 Calculate the net change in the number of products launched by companies in 2020 compared to 2019. Your output should include the company names and the net difference.
 
 (Net difference = Number of products launched in 2020 - The number launched in 2019.)
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
 -- My first Silution:
 with tbl_2020 as (SELECT  company_name, year, COUNT(DISTINCT product_name) as prod_2020
                   FROM car_launches
@@ -469,7 +479,7 @@ So, in the example above:
 
 If a company has no launches in 2020, \code{COUNT(DISTINCT \dots)} could be 
 \vari{NULL} (depends on SQL dialect).
-\code{COALESCE(\dots, 0)} ensures the result is 0 instead of \vari{NULL} , so subtraction works safely.
+\code{COALESCE(\dots, 0)} ensures the result is zero instead of \vari{NULL} , so subtraction works safely.
 \end{tcolorbox}
 
 
@@ -477,7 +487,7 @@ If a company has no launches in 2020, \code{COUNT(DISTINCT \dots)} could be
 \begin{exm} ({\bf ID 515: City With the Biggest Growth and Drop})
 Find which cities recorded the largest growth and biggest drop in order amount between between March 11, 2019, and April 11, 2019.
 Just compare the total order amount on March 11 and April 11, 2019 for each city. Your output should include the names of the cities and the corresponding amount of growth or drop.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 -- My First Solution:
 with growth_table as (SELECT city_id,
       SUM(CASE WHEN DATE(order_timestamp_utc)='2019-04-11' THEN amount ELSE 0 END) - 
@@ -509,11 +519,8 @@ FROM db_employee JOIN db_dept ON db_employee.department_id = db_dept.id;
 \begin{lstlisting}[language=SQL]
 -- Sol 2:
 SELECT ABS(MAX(salary_max) - MIN(salary_max)) AS salary_difference
-FROM (
-    SELECT MAX(e.salary) AS salary_max
-    FROM db_employee e
-    JOIN db_dept d 
-        ON e.department_id = d.id
+FROM (SELECT MAX(e.salary) AS salary_max
+     FROM db_employee e JOIN db_dept d ON e.department_id = d.id
     WHERE d.department IN ('marketing', 'engineering')
     GROUP BY d.department
 ) t;
@@ -529,86 +536,34 @@ To calculate sales, ignore returns and cancellations.
 Output the month, description of the item, and the total amount paid.
 
 \begin{lstlisting}[language=SQL]
-WITH helper_table AS (SELECT MONTH(invoicedate) AS month_,
-                             description,
+WITH helper_tbl AS (SELECT MONTH(invoicedate) AS month_, description,
                              SUM(quantity * unitprice) AS total_paid
                       FROM online_retail
                       WHERE quantity > 0
-                      GROUP BY month_, description
-                     )
+                      GROUP BY month_, description)
 SELECT month_, description, total_paid
 FROM (SELECT *,
       RANK() OVER (PARTITION BY month_ ORDER BY total_paid DESC) AS rnk
-      FROM helper_table
-) t
+      FROM helper_tbl) t
 WHERE rnk = 1;
 \end{lstlisting}
 
 \begin{lstlisting}[language=SQL]
 -- Same exact thing in slightly different ``cosmetic''
-WITH helper_table AS (
-    SELECT 
-        MONTH(invoicedate) AS month_,
-        description,
-        SUM(quantity * unitprice) AS total_paid
-    FROM online_retail
-    WHERE quantity > 0
-    GROUP BY month_, description
-), helper_w_rank as (SELECT *,
+WITH helper_table AS (SELECT MONTH(invoicedate) AS month_, description,
+                           SUM(quantity * unitprice) AS total_paid
+                      FROM online_retail
+                      WHERE quantity > 0
+                      GROUP BY month_, description), 
+    helper_w_rank as (SELECT *,
                        RANK() OVER (PARTITION BY month_ ORDER BY total_paid DESC) AS rnk
-                       FROM helper_table)
-    
+                      FROM helper_table)
 SELECT month_, description, total_paid
 FROM helper_w_rank
 WHERE rnk = 1;
 \end{lstlisting}
 \end{exm}
 
-
-\begin{exm} ({\bf \color{red} ID 2007 : Rank Variance Per Country})
-Compare the total number of comments made by users in each country during December 2019 and January 2020.
-
-For each month, rank countries by their total number of comments in descending order. Countries with the same total should share the same rank, and the next rank should increase by one (without skipping numbers).
-
-Return the names of the countries whose rank improved from December to January (that is, their rank number became smaller).\\
-
-{\bf Recall:} When there is a tie in ranking you can handle it in 2 different ways:
-\begin{itemize}[itemsep=-2pt]
-\item \code{RANK()}: skips numbers (1, 1, 3)
-\item  \code{DENSE\_RANK()}: no skipping (1, 1, 2)
-\end{itemize}
-\begin{lstlisting}[language=SQL]
-WITH helper_t AS (SELECT SUM(cnt.number_of_comments) AS cmt_cnt, 
-                      country.country, MONTH(cnt.created_at) AS cmt_month
-                 FROM fb_comments_count cnt JOIN fb_active_users country USING (user_id)
-                 WHERE created_at >= '2019-12-01'AND created_at <  '2020-02-01'
-                 GROUP BY country.country, cmt_month),
-helper_rank AS (SELECT *,  
-                   DENSE_RANK() OVER (PARTITION BY cmt_month ORDER BY cmt_cnt DESC) AS rnk
-                FROM helper_t),
-pivoted AS (SELECT country,
-              MAX(CASE WHEN cmt_month = 12 THEN rnk END) AS dec_rank,
-              MAX(CASE WHEN cmt_month = 1  THEN rnk END) AS jan_rank
-            FROM helper_rank
-            GROUP BY country)
-            
-SELECT country
-FROM pivoted
-WHERE jan_rank < dec_rank;
-\end{lstlisting}
-\code{pivoted} table is a table whose columns are rows of \code{helper\_rank} table to make
-comparison possible.  It is doing pivoting in Python; converting tall table into wide table.
-Another way would be self-join, but self-join becomes cumbersome if you have many columns to pivot.
-\begin{lstlisting}[language=SQL]
-SELECT dec.country,
-       dec.rnk AS dec_rank,
-       jan.rnk AS jan_rank
-FROM helper_rank dec
-LEFT JOIN helper_rank jan
-  ON dec.country = jan.country AND jan.cmt_month = 1
-WHERE dec.cmt_month = 12;
-\end{lstlisting}
-\end{exm}
 
 \begin{exm} ({\bf ID 10352: Users By Average Session Time})
 Calculate each user's average session time, where a session is defined as the time difference between a  \code{page\_load} and a \code{page\_exit}. Assume each user has only one session per day. 
@@ -669,128 +624,23 @@ FROM tab_
 \end{lstlisting}
 \end{exm}
 
-\newpage
-\begin{exm}\label{exm:2059}
-({\bf  \color{red} ID 2059: Player with Longest Streak})
-You are given a table of tennis players and their matches that they could either win (W) or lose (L). 
-Find the longest streak of wins. A streak is a set of consecutive won matches of one player. 
-The streak ends once a player loses their next match.\sidenote{This was difficult}.
 
-For this question, disregard edge cases such as: players who never lose, streaks that start before the first loss, and streaks that continue after the final match.
+\begin{exm} ({\bf ID 10285: Acceptance Rate By Date})
+Calculate the friend acceptance rate for each \code{date} when friend requests were sent. 
+A request is sent if \code{action = sent} and accepted if \code{action = accepted}. 
+If a request is not accepted, there is no record of it being accepted in the table.
 
-First, let us see how the table looks like below. Ignore the column called Loss Group; it is not
-in the provided table. That column is added in the first step of our code. 
-Each time a player loses, we increment a counter.
-That naturally separates win streaks into groups.
-Then, we count consecutive W's within each \code{loss\_group}.
-Then, take the maximum.
-\begin{table}[h]
-\centering
-\rowcolors{1}{aliceblue}{white}
-\begin{tabular}{c|c|c|c}
-\rowcolor{shadecolor} Player ID & Match Date & Result & Loss Group \\
-\hline
-401 & 2021-05-04 & W & 0 \\
-401 & 2021-05-09 & L & 1 \\
-401 & 2021-05-16 & L & 2 \\
-401 & 2021-05-18 & W & 2 \\
-401 & 2021-05-22 & L & 3 \\
-401 & 2021-06-15 & L & 4 \\
-401 & 2021-06-16 & W & 4 \\
-401 & 2021-06-18 & W & 4 \\
-401 & 2021-07-06 & L & 5 \\
-401 & 2021-07-13 & L & 6 \\
-\hline
-\end{tabular}
-\caption{Match Results for Player 401}
-\end{table}
-
-\vspace{.2in}
-The second table, \code{win\_streaks}, looks like
-\begin{table}[h]
-\centering
-\rowcolors{1}{aliceblue}{white}
-\begin{tabular}{c|c|c}
-\rowcolor{shadecolor} Player ID & loss group & streak length \\
-\hline
-401 & 0 & 1\\
-401 & 2 & 1\\
-401 & 4 & 2\\
-\hline
-\end{tabular}
-\caption{Win streaks}
-\end{table}
-
+The output will only include dates where requests were sent and at least one of them was accepted (acceptance can occur on any date after the request is sent).
 \begin{lstlisting}[language=SQL]
-WITH match_groups AS (SELECT player_id, match_date, match_result,
-        SUM(CASE WHEN match_result = 'L' THEN 1 ELSE 0 END)
-             OVER (PARTITION BY player_id ORDER BY match_date) AS loss_group
-                      FROM players_results),
-    win_streaks AS (SELECT player_id, loss_group, COUNT(*) AS streak_length
-                    FROM match_groups
-                    WHERE match_result = 'W'
-                    GROUP BY player_id, loss_group)
-SELECT player_id, MAX(streak_length) AS max_streak
-FROM win_streaks
-GROUP BY player_id
-HAVING MAX(streak_length) = (SELECT MAX(streak_length)FROM win_streaks);
-\end{lstlisting}
-\end{exm}
-
-
-\begin{exm}\label{exm:10547}
-({\bf \color{red} ID 10547: Actor Rating Difference Analysis})
-You are given a dataset of actors and the films they have been involved in, 
-including each film's release date and rating. 
-For each actor, calculate the difference between the rating of their most recent film and their average rating across all previous films (the average rating excludes the most recent one).
-
-Return a list of actors along with their average lifetime rating, the rating of their most recent film, and the difference between the two ratings. 
-Round the difference calculation to 2 decimal places. 
-If an actor has only one film, return 0 for the difference and 
-their only film’s rating for both the average and latest rating fields.
-\begin{lstlisting}[language=SQL]
-WITH ranked_films AS (SELECT actor_name, film_title, release_date, film_rating,
-                             ROW_NUMBER() OVER (PARTITION BY actor_name ORDER BY release_date DESC) AS rn,
-                             COUNT(*) OVER (PARTITION BY actor_name) AS film_count
-                      FROM actor_rating_shift),
-avg_previous AS (SELECT actor_name, AVG(film_rating) AS avg_prev_rating
-                 FROM ranked_films
-                 WHERE rn > 1
-                 GROUP BY actor_name)
-SELECT r.actor_name, 
-       ROUND(CASE WHEN r.film_count = 1 THEN r.film_rating ELSE a.avg_prev_rating END, 2) AS avg_lifetime_rating,
-       r.film_rating AS most_recent_rating,
-       ROUND(CASE WHEN r.film_count = 1 THEN 0 ELSE r.film_rating - a.avg_prev_rating END, 2) AS rating_difference
-FROM ranked_films r
-LEFT JOIN avg_previous a ON r.actor_name = a.actor_name
-WHERE r.rn = 1
-ORDER BY r.actor_name;
-\end{lstlisting}
-\end{exm}
-
-\begin{exm}\label{exm:RetainedCustomers}
-Retained customers
-\begin{lstlisting}[language=SQL]
-WITH t AS (SELECT date, ID, LAG(date) OVER (PARTITION BY ID ORDER BY date) AS prev_date
-           FROM activity)
-SELECT date, COUNT(DISTINCT ID) AS active_users,
-  COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END) AS retained_u,
-  COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END)*1.0/COUNT(DISTINCT ID) AS retention
-FROM t
-GROUP BY date
-ORDER BY date;
-\end{lstlisting}
-
-\begin{lstlisting}[language=SQL]
-WITH user_activity AS (SELECT date, ID, LAG(date) OVER (PARTITION BY ID ORDER BY date) AS prev_date
-                       FROM activity),
-   daily_stats AS (SELECT date, COUNT(DISTINCT ID) AS active_users,
-                     COUNT(DISTINCT CASE WHEN prev_date=DATE(date, '-1 day') THEN ID END) AS retained_users
-                   FROM user_activity
-                   GROUP BY date)
-SELECT date, active_users, retained_users, retained_users*1.0/active_users AS retention
-FROM daily_stats
-ORDER BY date;
+WITH a AS (SELECT * FROM fb_friend_requests WHERE action = 'accepted'),
+     b AS (SELECT * FROM fb_friend_requests WHERE action = 'sent')
+SELECT b.date AS send_date,
+     ROUND(COUNT(a.user_id_receiver)*1.0/COUNT(*), 2) AS accept_rate
+FROM b LEFT JOIN a ON b.user_id_sender = a.user_id_sender
+                  AND b.user_id_receiver = a.user_id_receiver
+                  AND a.date >= b.date
+GROUP BY b.date
+HAVING COUNT(a.user_id_receiver) > 0;
 \end{lstlisting}
 \end{exm}
 
@@ -798,3 +648,4 @@ ORDER BY date;
 \begin{lstlisting}[language=SQL]
 \end{lstlisting}
 \end{exm}
+

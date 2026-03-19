@@ -97,6 +97,23 @@ def make_train_step(model, loss_fn, optimizer):
     return perform_train_step
 
 
+def make_val_step(model, loss_fn):
+    # Builds function that performs a step in the validation loop
+    def perform_val_step(x, y):
+        # Sets model to EVAL mode
+        model.eval()     # 1)
+        
+        # Step 1 - Computes our model's predicted output
+        yhat = model(x) # forward pass
+        # Step 2 - Computes the loss
+        loss = loss_fn(yhat, y)
+        # There is no need to compute Steps 3 and 4, 
+        # since we don't update parameters during evaluation
+        return loss.item()
+    
+    return perform_val_step
+
+
 # %%
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 

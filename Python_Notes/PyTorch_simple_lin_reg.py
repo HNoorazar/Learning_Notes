@@ -281,6 +281,8 @@ for epoch in range(n_epochs):
 
 # %% [markdown]
 # ## Higher Order Function
+#
+# The following function packs the code inside a for-loop into a function that is made by an higher order function.
 
 # %%
 def make_train_step(model, loss_fn, optimizer):
@@ -298,7 +300,6 @@ def make_train_step(model, loss_fn, optimizer):
         optimizer.step()
         optimizer.zero_grad()
         
-        # Returns the loss
         return loss.item()
     
     # Returns the function that will be called inside the train loop
@@ -312,9 +313,8 @@ lr = 0.1
 torch.manual_seed(42)
 model = nn.Sequential(nn.Linear(1, 1)).to(device)
 
-# Defines a SGD optimizer to update the parameters 
 optimizer = optim.SGD(model.parameters(), lr=lr)
-loss_fn = nn.MSELoss(reduction='mean') # Defines a MSE loss function
+loss_fn = nn.MSELoss(reduction='mean')
 
 # Creates the train_step function for our model, loss function and optimizer
 train_step = make_train_step(model, loss_fn, optimizer) # 1)

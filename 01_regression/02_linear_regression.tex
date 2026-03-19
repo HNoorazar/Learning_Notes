@@ -543,8 +543,7 @@ testing are also available~\citep{casella2024statistical,montgomery2017design,wa
  & Reject $H_0$ & Type I Error & Correct \\
  & Do Not Reject $H_0$ & Correct & Type II Error \\
 \end{tabular}
-\caption{
-A summary of the possible scenarios associated with testing the
+\caption{A summary of the possible scenarios associated with testing the
 null hypothesis $H_0$. Type I errors are also known as false positives, and Type II
 errors as false negatives.
 In general there is a tradeoff between Type I and Type II errors. The only
@@ -552,11 +551,16 @@ way to decrease both at the same time is to increase the sample size (or, in
 some cases, decrease measurement error).
 See page 82 of \emph{Think Stat}~\citep{downey2011think}  and do the Exercises.
 }
+\vspace{2\baselineskip} 
 \end{table}
 
-
-\vspace{.1in}
+\vspace{.15in}
 \begin{deff}
+``Power of a statistical test is the probability of observing a statically significant 
+outcome if a true effect of a certain magnitude exist''\cite{georgiev2019}.
+``Statistical power is the probability of detecting a meaningful difference
+between the variants when there really is one (statistically, reject the null when
+there is a difference)''\cite{kohavi2020trustworthy}.
 The power of the hypothesis test is the probability of correctly rejecting a false $H_0$. 
 \[\text{power} = 1 - P(\text{Type II error}) = \frac{\text{number of false nulls that we reject}}{\text{number of false nulls}}
 \]
