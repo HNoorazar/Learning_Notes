@@ -337,7 +337,10 @@ First difference between SQLite and MySQL I had:
   \label{fig:SQL_LogicMargin}
 \end{marginfigure}
 
-\begin{exm} (Question ID 9915: Highest Cost Orders) \marginnote{This ID is from stratascratch.com} Find the customers with the highest daily total order cost between 2019-02-01 and 2019-05-01. If a customer had more than one order on a certain day, sum the order costs on a daily basis. Output each customer's first name, total cost of their items, and the date. If multiple customers tie for the highest daily total on the same date, return all of them.
+\begin{exm} ({\bf ID 9915: Highest Cost Orders})\marginnote{This ID is from stratascratch.com}\\
+Find the customers with the highest daily total order cost between 2019-02-01 and 2019-05-01. 
+If a customer had more than one order on a certain day, sum the order costs on a daily basis. Output each customer's first name, total cost of their items, and the date. 
+If multiple customers tie for the highest daily total on the same date, return all of them.
 
 For simplicity, you can assume that every first name in the dataset is unique.
 
@@ -393,7 +396,7 @@ ORDER BY order_date, first_name;
 \end{lstlisting}
 \end{exm}
 
-\begin{exm}  ({\bf  \color{red}{ID 2054: Consecutive Days - Hard}})
+\begin{exm}({\bf  \color{red}{ID 2054: Consecutive Days - Hard}})\\
 Find all the users who were active for 3 consecutive days or more.
 
 \begin{lstlisting}[language=SQL,linewidth=1.5\textwidth]
@@ -412,7 +415,7 @@ from retained_3days
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf ID 10299: Finding Updated Records})
+\begin{exm} ({\bf ID 10299: Finding Updated Records})\\
 We have a table with employees and their salaries; however, some of the records are old and contain outdated salary information. Since there is no timestamp, assume salary is non-decreasing over time. You can consider the current salary for an employee is the largest salary value among their records. If multiple records share the same maximum salary, return any one of them. Output their id, first name, last name, department ID, and current salary. Order your list by employee ID in ascending order.
 \begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
 with help_t AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY salary DESC) as rn
@@ -426,7 +429,7 @@ ORDER BY id ASC
 \end{exm}
 
 
-\begin{exm} ({\bf ID 10318: New Products})
+\begin{exm} ({\bf ID 10318: New Products})\\
 Calculate the net change in the number of products launched by companies in 2020 compared to 2019. Your output should include the company names and the net difference.
 
 (Net difference = Number of products launched in 2020 - The number launched in 2019.)
@@ -484,8 +487,8 @@ If a company has no launches in 2020, \code{COUNT(DISTINCT \dots)} could be
 
 
 
-\begin{exm} ({\bf ID 515: City With the Biggest Growth and Drop})
-Find which cities recorded the largest growth and biggest drop in order amount between between March 11, 2019, and April 11, 2019.
+\begin{exm} ({\bf ID 515: City With the Biggest Growth and Drop})\\
+Find which cities recorded the largest growth and biggest drop in order amount between March 11, 2019, and April 11, 2019.
 Just compare the total order amount on March 11 and April 11, 2019 for each city. Your output should include the names of the cities and the corresponding amount of growth or drop.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 -- My First Solution:
@@ -504,11 +507,11 @@ where growth = (SELECT MAX(growth)
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf ID 10308: Salaries Differences})
+\begin{exm} ({\bf ID 10308: Salaries Differences})\\
 Calculates the difference between the highest salaries 
 in the marketing and engineering departments. 
 Output just the absolute difference in salaries.
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 SELECT ABS(
     MAX(CASE WHEN db_dept.department = 'marketing' THEN db_employee.salary END) -
     MAX(CASE WHEN db_dept.department = 'engineering' THEN db_employee.salary END)
@@ -527,7 +530,7 @@ FROM (SELECT MAX(e.salary) AS salary_max
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf \color{red} ID 10172: Best Selling Item})
+\begin{exm} ({\bf \color{red} ID 10172: Best Selling Item})\\
 Find the best-selling item for each month (no need to separate months by year). 
 The best-selling item is determined by the highest total sales amount, calculated as: 
 \code{total\_paid = unitprice$\times$quantity}. 
@@ -535,7 +538,7 @@ A negative \code{quantity} indicates a return or cancellation (the invoice numbe
 To calculate sales, ignore returns and cancellations. 
 Output the month, description of the item, and the total amount paid.
 
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 WITH helper_tbl AS (SELECT MONTH(invoicedate) AS month_, description,
                              SUM(quantity * unitprice) AS total_paid
                       FROM online_retail
@@ -565,7 +568,7 @@ WHERE rnk = 1;
 \end{exm}
 
 
-\begin{exm} ({\bf ID 10352: Users By Average Session Time})
+\begin{exm} ({\bf ID 10352: Users By Average Session Time})\\
 Calculate each user's average session time, where a session is defined as the time difference between a  \code{page\_load} and a \code{page\_exit}. Assume each user has only one session per day. 
 If there are multiple \code{page\_load} or \code{page\_exit} events on the same day, use only the latest 
  \code{page\_load} and the earliest  \code{page\_exit}. 
@@ -581,10 +584,18 @@ seems to be in the following way
 \begin{lstlisting}[language=SQL]
 exit_.min_d_exit - load_.max_d_load -- incorrect
 TIMESTAMPDIFF(SECOND, load_.max_d_load, exit_.min_d_exit) -- correct
+
+-- JULIANDAY is for SQLite. In MySQL we have to use DATEDIFF
+JULIANDAY(date2) - JULIANDAY(date1) >= 1
+DATEDIFF(date2, date1) >= 1
+
+-- JULIANDAY considers the year; the following will be 366
+-- This is not to say DATEDIFF() does not do it! 
+SELECT julianday('2025-01-01') - julianday('2024-01-01');
 \end{lstlisting}
 \end{tcolorbox}
 
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 WITH load_ AS (SELECT user_id, MAX(timestamp) AS max_d_load, 
                DATE(timestamp) AS date_
                FROM facebook_web_log
@@ -608,7 +619,7 @@ GROUP BY user_id;
 \end{exm}
 
 
-\begin{exm} ({\bf {\color{red} ID 10171}: Find the genre of the person with the most number of oscar winnings})
+\begin{exm} ({\bf {\color{red} ID 10171}: Find the genre of the person with the most number of oscar winnings})\\
 Find the genre of the person with the most number of oscar winnings.
 If there are more than one person with the same number of oscar wins, return the first one in alphabetic order based on their name. Use the names as keys when joining the tables.
 \begin{lstlisting}[language=SQL]
@@ -625,13 +636,17 @@ FROM tab_
 \end{exm}
 
 
-\begin{exm} ({\bf ID 10285: Acceptance Rate By Date})
+\begin{exm} ({\bf ID 10285: Acceptance Rate By Date})\\
 Calculate the friend acceptance rate for each \code{date} when friend requests were sent. 
 A request is sent if \code{action = sent} and accepted if \code{action = accepted}. 
 If a request is not accepted, there is no record of it being accepted in the table.
 
 The output will only include dates where requests were sent and at least one of them was accepted (acceptance can occur on any date after the request is sent).
-\begin{lstlisting}[language=SQL]
+
+{\bf Shorter and clearer:}  Of all friend requests sent on a given day, what fraction eventually got accepted?
+\marginnote{\idea Look at how left join is done by \code{a.date >= b.date}}
+
+\begin{lstlisting}[language=SQL, linewidth=1.05\textwidth]
 WITH a AS (SELECT * FROM fb_friend_requests WHERE action = 'accepted'),
      b AS (SELECT * FROM fb_friend_requests WHERE action = 'sent')
 SELECT b.date AS send_date,
@@ -644,7 +659,37 @@ HAVING COUNT(a.user_id_receiver) > 0;
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf ID })
+
+\begin{exm} ({\bf \color{orange} ID 10322: Finding User Purchases})\\
+Identify returning active users by finding users who made a second purchase within 1 to 7 days after their first purchase. Ignore same-day purchases. Output a list of these \code{user\_ids}.\\
+
+\noindent {\color{red}{\bf NOTE}} Question is  talking only about 1st and 2nd purchase. Ignore 3rd, and 4th purchases.
+
+\begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
+with row_ as (SELECT *,
+              ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at ASC) as rn
+              FROM amazon_transactions),
+filtered as (SELECT *
+             FROM row_
+             WHERE rn <3),
+help_t as (SELECT user_id,  created_at, 
+  LAG (created_at) OVER (PARTITION BY user_id ORDER BY created_at ASC) as prev_dt_purch
+           FROM filtered),
+help_t2 as (SELECT *
+            FROM help_t
+            WHERE prev_dt_purch IS NOT NULL AND 
+                      DATEDIFF(created_at, prev_dt_purch) >= 1 AND
+                      DATEDIFF(created_at, prev_dt_purch) <= 7)
+SELECT DISTINCT (user_id) 
+FROM help_t2
+\end{lstlisting}
+\end{exm}
+
+
+
+
+
+\begin{exm} ({\bf ID })\\
 \begin{lstlisting}[language=SQL]
 \end{lstlisting}
 \end{exm}

@@ -127,15 +127,13 @@ def make_train_step(model, loss_fn, optimizer):
         loss = loss_fn(yhat, y)
         # Step 3 - computes gradients for "b" and "w" parameters
         loss.backward()
-        # Step 4 - updates parameters using gradients and the learning rate
+        # Step 4 - updates parameters using gradients and LR
         optimizer.step()
         optimizer.zero_grad()
         
-        # Returns the loss
         return loss.item()
     
-    # Returns the function that will be called inside the 
-    # train loop
+    # Returns the function that will be called inside train loop
     return perform_train_step
 
 def make_val_step(model, loss_fn):
@@ -170,7 +168,6 @@ n_epochs = 1000
 
 losses = []
 for epoch in range(n_epochs):
-    # inner loop
     mini_batch_losses = []                              
     for x_batch, y_batch in train_loader:
         # the dataset "lives" in the CPU, so do our mini-batches

@@ -526,8 +526,6 @@ hypothesis \citep{wasserman2004all}.
 \end{tcolorbox}
 
 
-
-
 There are books on this topic.
 Seems that \citep{lehmann2005testing} is a well-known one
 for theory. Applied and intermediate books that covers hypothesis 
@@ -556,24 +554,56 @@ See page 82 of \emph{Think Stat}~\citep{downey2011think}  and do the Exercises.
 
 \vspace{.15in}
 \begin{deff}
+The power of the hypothesis test is the probability of correctly rejecting a false $H_0$. 
 ``Power of a statistical test is the probability of observing a statically significant 
 outcome if a true effect of a certain magnitude exist''\cite{georgiev2019}.
 ``Statistical power is the probability of detecting a meaningful difference
 between the variants when there really is one (statistically, reject the null when
 there is a difference)''\cite{kohavi2020trustworthy}.
-The power of the hypothesis test is the probability of correctly rejecting a false $H_0$. 
-\[\text{power} = 1 - P(\text{Type II error}) = \frac{\text{number of false nulls that we reject}}{\text{number of false nulls}}
-\]
+
+\begin{gather} % gather and aligned leads to having one label for eq.
+\begin{aligned}
+\text{power} &=  1 - P(\text{Type II error})\\
+                   &= 1 - \beta \\
+                   &=  \frac{\text{number of false nulls that we reject}}{\text{number of false nulls}}\\
+\end{aligned}
+\end{gather} 
 \end{deff}
+
+Grain of salt:
+If proof in courtroom has a high bar, then fewer innocent people are convicted (lower Type-I), and more of guilty people are not convicted as well (higher Type-II).
+Fixing sample size $\rightarrow$ trade-off between $\alpha$ and $\beta$
+If your sample size is fixed, lowering $\alpha$ (being more strict about rejecting $H_0$ reduces false positives, but increases $\beta$ (more false negatives).
+Increasing $\alpha$ (being more willing to reject ), reduces $\beta$, but increases Type I errors.
+So: you can’t minimize both at the same time without changing something else.
+If you increase sample size, you can reduce both $\alpha$ and $\beta$ simultaneously.\\
+
+Here $\alpha$ is the significance level we chose before
+the test even is performed. It is also the probability of Type-I error.
+It is set by us and has nothing to do with sample size.
+Type-II error ($\beta$, probability of failing to reject $H_0$ when it is false)
+is affected by sample size. 
+Larger samples reduce variability, making it easier to detect a true effect; $\beta$ decreases, power increases. The sample size helps because standard error is a function of sample
+size, they are inversely related. 
+Sample size changes during sequential sampling, for example.
+You can collect enough data to reach a good power, but that needs
+to be done with care. Dig deeper later.
+
 
 From~\citep{james2013introduction} ``Once the hypothesis test is performed, the row of the
 table is known (based on whether or not we have rejected $H_0$); 
 however, it is impossible for us to know which column we are in. 
 If we reject $H_0$ when $H_0$ is false (i.e., when $H_a$ is true), or if we do not reject $H_0$ when it is true, then we arrived at the correct result. 
 However, if we erroneously reject $H_0$ when $H_0$ is in fact true, then we have committed a Type I error. 
-The Type I Type I error error rate is defined as the probability of making a Type I error given that Type I error $H_0$ holds, i.e., the probability of incorrectly rejecting $H_0$. 
+The Type I error rate is defined as the probability of making a Type I error given that Type I error $H_0$ holds, i.e., the probability of incorrectly rejecting $H_0$. 
 Alternatively, if rate we do not reject $H_0$ when $H_0$ is in fact false, then we have committed a
 Type II error.''\marginnote{Read page 563 of ISPL.}\\
+
+Statistical power of a test is characteristic of a test procedure and 
+the predetermined sample size and the predetermined significance level
+of a certain null hypothesis. Power makes no use of collected data,
+its calculation is hypothetical, and is of no use after a test is run\cite{georgiev2019}.
+A good book that covers power is written by Cohen\cite{cohen2013statistical}.
 
 
 Let us look at regression examples.

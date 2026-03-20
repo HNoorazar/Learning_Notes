@@ -82,11 +82,18 @@ Pay attention to rand and dense rank functions:
 
 \begin{rem} 
 In MySQL the correct and incorrect way of subtracting time stamps
-seems to be in the following way:
+seems to be in the following way
 \begin{lstlisting}[language=SQL]
 exit_.min_d_exit - load_.max_d_load -- incorrect
 TIMESTAMPDIFF(SECOND, load_.max_d_load, exit_.min_d_exit) -- correct
+
+-- JULIANDAY is for SQLite. MySQL syntax is DATEDIFF
+JULIANDAY(date2) - JULIANDAY(date1) >= 1
+DATEDIFF(date2, date1) >= 1
+
+-- JULIANDAY considers the year; the following will be 366
+-- This is not to say DATEDIFF() does not do it! 
+-- SELECT must be there too.
+SELECT JULIANDAY('2025-01-01') - JULIANDAY('2024-01-01');
 \end{lstlisting}
 \end{rem} 
-
-
