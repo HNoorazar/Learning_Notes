@@ -173,3 +173,30 @@ Another way would be self-join, but self-join becomes cumbersome if you have man
 the \code{CASE ...} work; our table has only 1 value per month, so, there is no collapse of
 rows here.
 \end{exm}
+
+
+
+\begin{exm} ({\bf \color{red} ID 10314: Revenue Over Time})\marginnote{\idea\idea}\\
+Find the 3-month rolling average of total revenue from purchases given a table with users, their purchase amount, and date purchased. Do not include returns which are represented by negative purchase values. Output the year-month (YYYY-MM) and 3-month rolling average of revenue, sorted from earliest month to latest month.
+
+A 3-month rolling average is defined by calculating the average total revenue from all user purchases for the current month and previous two months. The first two months will not be a true 3-month rolling average since we are not given data from last year. Assume each month has at least one purchase.
+\begin{lstlisting}[language=SQL, linewidth=1.35\textwidth]
+WITH monthly_revenue AS (SELECT strftime('%Y-%m', purchase_date) AS year_month,
+                                SUM(purchase_amount) AS total_revenue
+                         FROM purchases
+                         WHERE purchase_amount > 0
+                         GROUP BY strftime('%Y-%m', purchase_date)
+                         )
+SELECT year_month, 
+     ROUND(AVG(total_revenue) OVER (ORDER BY year_month
+                        ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3_month_avg
+FROM monthly_revenue
+ORDER BY year_month;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf \color{red}  ID })\\
+\begin{lstlisting}[language=SQL]
+\end{lstlisting}
+\end{exm}

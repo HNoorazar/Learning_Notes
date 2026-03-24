@@ -67,10 +67,9 @@ space if the string is shorter than 10 characters.
 
 You can create temporary tables using 
 \begin{lstlisting}[language=SQL]
-CREATE TEMPORARY TABLE sandals AS (
-SELECT * 
-FROM Shoes
-WHERE shoe_type = 'sandal')
+CREATE TEMPORARY TABLE sandals AS (SELECT * 
+                                    FROM Shoes
+                                    WHERE shoe_type = 'sandal')
 \end{lstlisting}
 
 Common Table Expression (CTE) is created as follows which has
@@ -78,15 +77,14 @@ differences with a temporary table. In the examples that will come up later
 you will see how CTE can be used. Google what are their similarities and
 differences.
 \begin{lstlisting}[language=SQL]
-WITH sandals AS(
-SELECT * 
-FROM Shoes
-WHERE shoe_type = 'sandal'
-)
+WITH sandals AS(SELECT * 
+                FROM Shoes
+                WHERE shoe_type = 'sandal')
 \end{lstlisting}
 
-\vspace{.5in}
-\noindent {\bf \color{red}Filtering} You already see how \texttt{WHERE} is 
+
+\subsection{Filtering}
+You already see how \texttt{WHERE} is 
 used to filter rows:
 \begin{lstlisting}[language=SQL]
 SELECT col1, col2
@@ -111,7 +109,7 @@ WHERE ProductName='Tofu' AND unitPrice>5
 
 \noindent {\bf \color{red}Filter with OR}  If there is an \texttt{OR} statement in filtering, 
 then if the first condition is met, then, the second will not be evaluated;
-\texttt{productName = 'Tofu' OR 'Kombu'}: Kombu will be ignored. 
+\texttt{productName = 'Tofu' OR productName = ' 'Kombu'}: Kombu will be ignored. 
 
 \texttt{IN} is faster than \texttt{OR}.
 My notes says \texttt{AND} is processed before \texttt{OR} but it seems it has
@@ -154,5 +152,38 @@ where NOT product_name = 'Chai' AND NOT product_name = 'Chand'
 \label{fig:SQL_Logic}
 \end{figure}
 
+\subsection{Wild Cards}
+The followings are examples of wild cards. One downside to it is that
+they are slow to process.
+\begin{itemize}[itemsep=1pt]
+\item \code{'\%pizza'} ending with pizza
+\item \code{'pizza\%'} after the word pizza
+\item \code{'\%pizza\%'} grabs things before and after pizza
+\item \code{'s\%e'} grabs anything that starts with S and ends with E.
+\item \code{'\_pizza'}: Underscore matches with only one character. So, this code
+will grab anything like \code{mpizza} or \code{spizza}
+\item Not in SQLite: The bracket [] is used to specify a set of characters in a specific location\sidenote{Expand on this}.
+\end{itemize}
+
+For example, we use these with \code{LIKE} like so:
+
+\begin{lstlisting}[language=SQL]
+WHERE size_ LIKE '%pizza'
+
+-- output:
+-- spizza
+-- mpizza
+\end{lstlisting}
+
+\subsection{Sorting}
+\code{ORDER BY} is used to sort the output. It comes at the end of
+code. It can be used by column name or column position.
+
+\begin{lstlisting}[language=SQL]
+SELECT
+FROM
+ORDER BY 2 DESC, 3 ASC
+\end{lstlisting}
 
 
+\subsection{Math Operations and Aggregate Functions}

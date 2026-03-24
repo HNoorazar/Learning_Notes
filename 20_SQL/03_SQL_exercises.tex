@@ -686,6 +686,31 @@ FROM help_t2
 \end{exm}
 
 
+\noindent {\bf \color{red}Recall: Filter with OR}  If there is an \texttt{OR} statement in filtering, 
+then if the first condition is met, then, the second will not be evaluated.
+\begin{exm} ({\bf ID 9972: Captain Base Pay})\\
+Find the base pay for Police Captains.
+Output the employee name along with the corresponding base pay.
+\begin{lstlisting}[language=SQL]
+-- My solution. Locked, cannot check
+SELECT employeename, basepay 
+FROM sf_public_salaries 
+WHERE jobtitle LIKE '%police%' AND jobtitle LIKE '%captain%';
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf \color{orange} ID 10026: Aroma-based Winery Search})\\
+Find wineries producing wines with aromas of plum, cherry, rose, or hazelnut (singular form only). To make things simpler, exclude any wine descriptions that contain the plural forms (ex. cherries).
+\begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
+-- My solution. Locked, cannot check
+SELECT winery
+FROM winemag_p1
+WHERE description LIKE '%plum%'
+  OR description LIKE '%cherry%'
+  OR description LIKE '%rose%'
+  OR description LIKE '%hazelnut%'
+\end{lstlisting}
+\end{exm}
 
 
 
