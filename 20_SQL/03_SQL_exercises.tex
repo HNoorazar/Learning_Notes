@@ -356,7 +356,7 @@ WITH t as (SELECT customers.id, customers.first_name,
            GROUP BY customers.id, customers.first_name, orders.order_date
            )
 SELECT id, first_name, order_date, cust_spent_day,
-MAX(cust_spent_day) over (partition by order_date)  as max_cost
+MAX(cust_spent_day) over (partition by order_date) AS max_cost
 from t
 ORDER BY order_date, id
 WHERE cust_spent_day = max_cost
@@ -401,16 +401,16 @@ Find all the users who were active for 3 consecutive days or more.
 
 \begin{lstlisting}[language=SQL,linewidth=1.5\textwidth]
 with t as (SELECT *,
-   LAG(record_date, 1) OVER (PARTITION BY user_id ORDER BY record_date) AS one_dayAgo,
-   LAG(record_date, 2) OVER (PARTITION BY user_id ORDER BY record_date) AS two_dayAgo
-FROM sf_events),
-retained_3days as (select DISTINCT user_id,
+              LAG(record_date, 1) OVER (PARTITION BY user_id ORDER BY record_date) AS one_dayAgo,
+              LAG(record_date, 2) OVER (PARTITION BY user_id ORDER BY record_date) AS two_dayAgo
+           FROM sf_events),
+retained_3days as (SELECT DISTINCT user_id,
        CASE WHEN one_dayAgo = DATE_SUB(record_date, INTERVAL 1 DAY) THEN 1 ELSE 0 END AS retained_1day,
        CASE WHEN two_dayAgo = DATE_SUB(record_date, INTERVAL 2 DAY) THEN 1 ELSE 0 END AS retained_2day
-       from t
-HAVING (retained_2day=1) and (retained_1day=1))
-select distinct user_id
-from retained_3days
+                  FROM t
+                  HAVING (retained_2day=1) and (retained_1day=1))
+SELECT DISTINCT user_id
+FROM retained_3days
 
 \end{lstlisting}
 \end{exm}
@@ -541,17 +541,17 @@ Output the month, description of the item, and the total amount paid.
 \begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 WITH helper_tbl AS (SELECT MONTH(invoicedate) AS month_, description,
                              SUM(quantity * unitprice) AS total_paid
-                      FROM online_retail
-                      WHERE quantity > 0
-                      GROUP BY month_, description)
+                    FROM online_retail
+                    WHERE quantity > 0
+                    GROUP BY month_, description)
 SELECT month_, description, total_paid
 FROM (SELECT *,
-      RANK() OVER (PARTITION BY month_ ORDER BY total_paid DESC) AS rnk
+        RANK() OVER (PARTITION BY month_ ORDER BY total_paid DESC) AS rnk
       FROM helper_tbl) t
 WHERE rnk = 1;
 \end{lstlisting}
 
-\begin{lstlisting}[language=SQL]
+\begin{lstlisting}[language=SQL, linewidth=1.34\textwidth]
 -- Same exact thing in slightly different ``cosmetic''
 WITH helper_table AS (SELECT MONTH(invoicedate) AS month_, description,
                            SUM(quantity * unitprice) AS total_paid
@@ -712,10 +712,89 @@ WHERE description LIKE '%plum%'
 \end{lstlisting}
 \end{exm}
 
+\begin{exm} ({\bf  \color{orange} ID 2081: Recommendation System})\\
+You are given the list of Facebook friends and the list of Facebook pages that users follow. 
+Your task is to create a new recommendation system for Facebook. 
+For each Facebook user, find pages that this user doesn't follow but at least one of their friends does. 
+Output the user ID and the ID of the page that should be recommended to this user.\sidenote{The following solutions are corrections of my solution by
+chatGPT and Claude. i.e. I could not check against website's solution,
+but hand investigation showed they are correct.}
+\begin{lstlisting}[language=SQL, linewidth=1.05\textwidth]
+WITH friend_pages AS (SELECT uf.user_id, up.page_id
+                      FROM users_friends uf JOIN users_pages up
+                              ON uf.friend_id = up.user_id)
+SELECT DISTINCT fp.user_id, fp.page_id
+FROM friend_pages fp
+WHERE NOT EXISTS (SELECT 1
+                  FROM users_pages up
+              WHERE up.user_id = fp.user_id AND up.page_id = fp.page_id)
+\end{lstlisting}
+
+In the code above \code{WHERE NOT EXISTS} removes the pages
+that a user already follows. 
+\code{SELECT 1}: In SQL, \code{EXISTS} (or \code{NOT EXISTS}) 
+does not care what you select — it only cares whether the subquery returns any rows.
+\code{SELECT 1} can be replaced by \code{SELECT *} or  \code{SELECT 'abc'}.
 
 
-\begin{exm} ({\bf ID })\\
-\begin{lstlisting}[language=SQL]
+Both above and following solutions are not
+very intuitive, are they?
+In the following, \code{WHERE up.page\_id IS NULL} keeps the
+rows where no match was found; i.e. if user 1 and his friend user 2, both 
+follow page A, then in the \code{fp} table, page A will show up for user 1 through user 2. 
+But, we are looking for a page that user 1 is not already following. 
+That is where \code{WHERE up.page\_id IS NULL} comes in
+and kicks page A out of there.
+\begin{lstlisting}[language=SQL, linewidth=1.21\textwidth]
+WITH fp AS (SELECT uf.user_id, up.page_id
+            FROM users_friends uf JOIN users_pages up ON uf.friend_id = up.user_id)
+SELECT DISTINCT fp.user_id, fp.page_id
+FROM fp LEFT JOIN users_pages up USING (user_id, page_id)
+WHERE up.page_id IS NULL;
+\end{lstlisting}
+
+\noindent And here is another solution (still feels strange; does not come naturally yet)
+\begin{lstlisting}[language=SQL, linewidth=1.05\textwidth]
+SELECT DISTINCT uf.user_id, up.page_id
+FROM users_friends uf JOIN users_pages up ON uf.friend_id = up.user_id
+WHERE (uf.user_id, up.page_id) NOT IN (SELECT user_id, page_id 
+                                       FROM users_pages)
+ORDER BY uf.user_id, up.page_id;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf  \color{orange} ID 10300: Premium vs Freemium})\\
+Find the total number of downloads for paying and non-paying users by date. Include only records where non-paying customers have more downloads than paying customers. The output should be sorted by earliest date first and contain 3 columns date, non-paying downloads, paying downloads. \\
+
+\noindent Hint: In Oracle you should use "date" when referring to date column (reserved keyword).
+Hint: The above hit is not a problem in MySQL. In fact, using quotation made a problem.
+AND, in MySQL, there should not be a space in \code{MAX (}. It creates a problem and should be
+\code{MAX(}.
+\begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
+with user_pay AS (SELECT * 
+                  FROM ms_user_dimension LEFT JOIN ms_acc_dimension USING(acc_id)
+                  ),
+     all_data AS (SELECT *
+                  FROM user_pay LEFT JOIN ms_download_facts USING (user_id)
+                  ),
+     counts AS (SELECT date, paying_customer, sum(downloads) as download_cnt
+                FROM all_data
+                GROUP BY date, paying_customer),
+     pivoted AS (SELECT date,
+                     MAX(CASE WHEN paying_customer = 'no' THEN download_cnt END) as count_non_paying,
+                     MAX(CASE WHEN paying_customer = 'yes' THEN download_cnt END) as count_paying
+                 FROM counts
+                 GROUP BY date)
+SELECT * 
+FROM pivoted
+WHERE count_non_paying > count_paying
+ORDER BY date
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf  \color{orange} ID : })\\
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 \end{lstlisting}
 \end{exm}
 

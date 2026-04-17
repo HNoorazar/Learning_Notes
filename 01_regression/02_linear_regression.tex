@@ -531,6 +531,61 @@ Seems that \citep{lehmann2005testing} is a well-known one
 for theory. Applied and intermediate books that covers hypothesis 
 testing are also available~\citep{casella2024statistical,montgomery2017design,wackerly2008mathematical}.
 
+Let us start with definition of p-value. 
+\begin{deff}
+P-value is measure of how unexpected an observation is under the null hypothesis.
+More formally, in null hypothesis significance testing, the $p$-value is the probability 
+of obtaining test results at least as extreme as the results 
+actually observed, under the assumption that the null hypothesis is 
+correct.
+\end{deff}
+
+Keep in mind that $\text{p-value} = p(\text{observed value or more extreme} | H_0)$
+and NOT: $\text{p-value} = p(H_0 | \text{observed value})$.\\
+
+A very small $p$-value means that such an extreme observed 
+outcome would be very unlikely under the null hypothesis.
+\hl{Smaller $p$-values are taken as stronger evidence against the null hypothesis}.
+
+Kohavi\cite{kohaviABBuster} mentions several examples where
+p-value and confidence intervals are misunderstood by people.
+Georgiev\cite{georgiev2019} also have some examples in it.
+I find Georgiev hard to follow and lots of problems in that book
+are presented without addressing them or building an intuition for them.
+Mostly solutions are deferred to later chapters which I have 
+not arrived to at this point (read 4 chapters so far).
+It seems that \citep{kohavi2020trustworthy} is well-written, judging by
+reading only 1 page out of it. I have ordered that book.
+For experimentation, the following resources looks good,
+at least on the paper; \citep{montgomery2017design,box2005statistics}
+and the followings seems to be good compliments to the aforementioned ones
+with their roots in theory~\citep{wackerly2008mathematical,lehmann2005testing}.
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Remark}]
+% olback=green!10!white,colframe=green!80!black
+Incorrect definitions from \emph{A/B Testing Intuition Busters
+Common Misunderstandings in Online Controlled Experiments}
+
+\begin{itemize}
+\item a statistically significant result
+with p-value 0.05 has a 5\% chance of being a false positive
+
+\item \dots to determine whether your results are statistically significant: how
+confident you can be that the results actually reflect a change in your
+visitors' behavior, not just noise or randomness… In statistical terms,
+it's 1-[p-value]. If you set a significance threshold of 90\% \dots you can
+expect a 10\% error rate
+
+\item we can compute the probability that our observed difference (-0.007)
+is due to random chance. This value, called the p-value
+
+\item when statistical significance (that is, it's unlikely the test results are
+due to chance) has been achieved
+\end{itemize}
+
+\end{tcolorbox}
+
+
 \begin{table}[h]
 \centering
 \begin{tabular}{cc|cc}
@@ -589,11 +644,58 @@ Sample size changes during sequential sampling, for example.
 You can collect enough data to reach a good power, but that needs
 to be done with care. Dig deeper later.
 
+\noindent{\bf Sample size for a test}
+\begin{description}
+\item [Significance Level] $\alpha$
+\item [Power] $p=1-\beta$ . Power is the probability of correctly rejecting the null hypothesis when it is false. 
+A commonly targeted power is 0.8 (or 80\%), meaning there’s an 80\% chance of detecting a true effect if it exists. 
+Higher power requires a larger sample size.
+Type II error ($\beta$) is the failure to reject the null hypothesis when it should be rejected. 
+If you have a power of 0.8, $\beta = 0.2$
+\item [Effect Size] The effect size is the magnitude of the difference you want to detect in the experiment. Larger effect sizes are easier to detect, meaning you need fewer participants. Small effect sizes require larger sample sizes to ensure the results are statistically significant.
+Common effect size metrics include Cohen's d for t-tests or odds ratios for categorical outcomes.
+\item [Variance or Standard Deviation] The more variable the data, the larger the sample size required to detect a meaningful effect. If the data is more spread out, you need more data points to detect a significant difference between groups.
+\item [Design of the Experiment] \hl{Whether you are doing a t-test, ANOVA, regression, or chi-square test, the statistical test impacts the sample size. For example, calculating sample size for a paired t-test differs from that for an independent two-sample t-test.}
+\end{description}
+
+For a t-test: You can use the formula for sample size per group calculation for a two-sample t-test:
+\begin{equation}
+n = \frac{(Z_{\alpha/2} + Z_\beta)^2 \times (2 \sigma^2)}{\Delta^2},
+\end{equation}
+where $\Delta$ is minimum effect size. It is the absolute MDE ($p_2 - p_1$),
+\hl{but there is more to it. Do more research. For example, how to apply it on revenue lift.}
+
+\hl{The following is a mess, we need to open it up. why}
+sometimes $\sigma^2 = p1 (1-p1) + p2(1-p2)$ and sometimes
+$\sigma^2 = p1 (1-p1)/n1 + p2(1-p2)/n2$.
+In the Bernouli/proportion situation the $\sigma^2 = p (1-p)$.
+If there are two populations then $\sigma^2 = p_1 (1-p_1) + p_2 (1-p_2)$.
+Pooled variance assumes $p_1 = p_2$ under null hypothesis, and
+then 
+\[p_{\text{pooled}} = \frac{n_1*p_1 + n_2*p_2}{n_1 + n_2}\]
+and if size of each group is identical, then the pooled variance is just 
+$p_{\text{pooled}} = \frac{p_1 + n_2}{2}$ and then $\sigma_{\text{pooled}} = p_{\text{pooled}} * (1 - p_{\text{pooled}}) * (\frac{1}{_n1} + \frac{1}{n_2})$.
+
+If $\Delta$ (which is raw) is replaced by Cohen's $d$ (for t-test) then the
+variance in numerator will disappear:
+\[d = \frac{\mu_1 - \mu_2}{\sigma}\]
+
+
+\begin{exm}
+Say baseline conversion is 10\%, I want to detect a 2 percentage point lift (to 12\%), with $\alpha = 0.05$ and 
+80\% power.
+\[
+n = \frac{2 \times (1.96 + 0.84)^2 \times 0.1 \times .9}{0.02^2} = 3528
+\]
+3,528 per group, so, in total, almost 7,000 samples.
+\end{exm}
+
 
 From~\citep{james2013introduction} ``Once the hypothesis test is performed, the row of the
 table is known (based on whether or not we have rejected $H_0$); 
 however, it is impossible for us to know which column we are in. 
-If we reject $H_0$ when $H_0$ is false (i.e., when $H_a$ is true), or if we do not reject $H_0$ when it is true, then we arrived at the correct result. 
+If we reject $H_0$ when $H_0$ is false (i.e., when $H_a$ is true), 
+or if we do not reject $H_0$ when it is true, then we arrived at the correct result. 
 However, if we erroneously reject $H_0$ when $H_0$ is in fact true, then we have committed a Type I error. 
 The Type I error rate is defined as the probability of making a Type I error given that Type I error $H_0$ holds, i.e., the probability of incorrectly rejecting $H_0$. 
 Alternatively, if rate we do not reject $H_0$ when $H_0$ is in fact false, then we have committed a

@@ -1,0 +1,119 @@
+\section{A/B Testing}
+\label{sec:ABTesting}
+
+Like anything and everything in statistics there is no unique definition
+for a unique idea. A/B testing in some fields might be called controlled experiment,
+or randomized controlled experiment and so on.
+The concept is simple; we have an idea and we want to know
+if this idea makes a difference compared to the status quo
+and if so, by how much. 
+In the field of medicine it will be testing a new 
+drug and in online setting it would be testing a new feature on the 
+app, etc. We divide our \emph{units} into two groups; one group
+is called \emph{control} which sees no change (i.e. it will not receive any update/drug/new feature),
+and there is another group called \emph{treatment} which will see the new change (get the new drug,
+new feature).
+
+
+In order to do so, we need to divide our units (could be people, animals, codes, computers, etc.)
+into two groups. 
+These memberships are assigned randomly unless there are other considerations.
+For example, we divide online users into 2 groups randomly
+and this randomization is not tied to any other things such as demographics,
+or membership of one person to control group will not affect membership of another
+person to any of these groups.
+
+But, before proceeding to the A/B testing, an A/A testing is done.
+In A/A testing none of the groups receive the treatment. They both will
+see/receive the same features/drugs.
+The purpose of A/A testing is to investigate the set up of the experiment;
+\begin{itemize}
+\setlength\itemsep{0pt}
+
+\item is the randomization done correctly? Is the population divided into 50-50 groups
+or there are 52\% in one group and 48\% in another. This 2\% can be a huge difference
+and should be prevented according to Kohavi in a podcast, and I am sure it will come up
+in his book\cite{kohavi2020trustworthy} (which I just started to read currently).
+
+\item Is the randomization done with no bias?
+
+\item Are the users' activity from each group being logged correctly?
+
+\item Establish a baseline (observe natural variation before any treatment)
+
+\end{itemize}
+
+
+Let me step back even further. Before any experimental design,
+there should be an objective that is well-defined, measurable, and agreed upon
+by parties involved\sidenote{It happens that in some setting more than one party might be involved and in another setting perhaps there is only one experimenter.}. 
+It turns out a new feature on an app
+can be tied to other systems such as security, user-experience, etc.
+For example, the whole page can be filled with ads, and revenue go up (at least in short term),
+but user-experience will be affected negatively. 
+Other than interconnected issues, there is a problem of short-term versus
+long term results/thinkiong (which is usually ignored in real life).
+So, the chosen metric must be well-established and thought of.
+Even for short-term results a good metric must be chosen.
+For example, click through rate can be high, but after clicking,
+users can just close the new window, and user-session (engagement length) can be a
+better metric perhaps.
+According to Kohavi metrics for tests should be measurable in short term (during the 2(?) weeks experiment)
+and be a good representative for long-term goals.
+For example, if click through rate is the metric, perhaps a video that goes
+viral will be recommended, but after a few weeks, click through rate will drop.
+(Or in case of movie streaming platforms, you cannot recommend the same thing
+again and again. A balance between exploration and exploitation must be considered.)\\
+
+Let me go back to A/B testing.
+Another purpose of A/B testing is to establish causality.
+Observational studies can establish only correlation.
+This is said repeatedly everywhere. Let me mention an
+example from\cite{kohavi2020trustworthy}. 
+There were data from Office 365. Users with lots of crashes and
+bug reports had more engagement with the App. This does not mean
+Microsoft should try to increase crashes to get more customers.
+It just happens that users who use Office 365 more often, get more crashes.
+
+Other than metrics, and randomization of users, we must have access to large
+population. Especially if we want to detect small differences.
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{A short break}]
+In A/B testing one idea is tried at a time. At least, that is my understanding
+at this moment. In tech companies there are thousands of ideas to try
+and it seems they do it one idea at a time.
+But, experimental design can have different purposes with
+more than one variable involved. 
+One variable at a time, fails to consider interaction of different variables 
+with each other.
+If there are two ideas each of which with two levels, their combinations will have 4 distinct 
+levels and consequently 4 experiments are needed. 
+Factorial Design is like grid search. From Page 7 of Montgomery's 5th Edition book: 
+``if there are four to five or more factors, it is usually unnecessary to run
+all possible combinations of factor levels. A fractional factorial experiment is a variation of the basic factorial design in which only a subset of the runs are made.''
+Side note about experimentation: from \emph{Design and Analysis of Experiments}
+by Montgomery on designing experiments (not A/B testing):
+\begin{itemize}
+\setlength\itemsep{0pt}
+\item Determine which variables are most influential
+\item Where to set independent variables so that the output is at/near the desired target
+\item What should input variables be so that the output has minimal variance
+\item Where should controllable variables be set so that influence of uncontrollable variables are minimized
+\end{itemize}
+\end{tcolorbox}
+
+
+
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Follow the Money}]
+It's all about money and control. 
+The purpose of A/B and lots of experiments is about money
+and \emph{optimization}.
+\begin{itemize}
+\setlength\itemsep{0pt}
+\item improve yield
+\item improve cost
+\item improve development time
+\item reduce variability of response
+\end{itemize}
+\end{tcolorbox}

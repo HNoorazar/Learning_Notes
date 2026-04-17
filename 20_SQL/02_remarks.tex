@@ -20,6 +20,8 @@ CASE WHEN gender= `M` THEN 1 else 0 END
 
 -- Incorrect: 
 CASE (WHEN gender= `M` THEN 1 else 0 END)
+
+-- Another fuss: space between MAX and parentheses breaks the code Correct: MAX(. Incorrect: MAX (
 \end{lstlisting}
 \end{rem} 
 
@@ -80,7 +82,7 @@ Pay attention to rand and dense rank functions:
 \end{rem} 
 
 
-\begin{rem} 
+\begin{rem} \label{rem:createFullCalendar}
 In MySQL the correct and incorrect way of subtracting time stamps
 seems to be in the following way
 \begin{lstlisting}[language=SQL]
@@ -96,4 +98,56 @@ DATEDIFF(date2, date1) >= 1
 -- SELECT must be there too.
 SELECT JULIANDAY('2025-01-01') - JULIANDAY('2024-01-01');
 \end{lstlisting}
+
+Also \code{DATE\_FORMAT(created\_at, '\%Y-\%m')} is a MySQL syntax. In SQLite it should be \code{strftime('\%Y-\%m', created\_at)}.
 \end{rem} 
+
+
+\begin{rem}
+The following is a for-loop that is looking at the table \code{sf\_transactions}'s minimum
+and maximum months, and creates a new table \code{months} with all the months between the
+min and max. 
+
+This is used to compute monthly income for example, if the original table \code{sf\_transactions}
+has missing months in it. This is used in Example~\ref{exm:10319MonthlyPerceDiff}
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH RECURSIVE months AS (SELECT DATE_FORMAT(MIN(created_at), '%Y-%m-01') AS month_start
+                          FROM sf_transactions
+                          UNION ALL
+                          SELECT DATE_ADD(month_start, INTERVAL 1 MONTH)
+                          FROM months
+                          WHERE month_start < (SELECT DATE_FORMAT(MAX(created_at), '%Y-%m-01')
+                          FROM sf_transactions)
+                          ),
+                          
+--- How its mechanics work
+WITH RECURSIVE months AS (
+    -- (A) Base case
+    SELECT ...
+
+    UNION ALL
+
+    -- (B) Recursive step
+    SELECT ...
+    FROM months
+    WHERE ...
+)
+\end{lstlisting}
+\end{rem}
+
+
+\begin{rem}
+The following line acts like a running window, but, since no window
+is specified it, by default, does running total:
+\begin{lstlisting}[language=SQL, linewidth=1.6\textwidth]
+SUM(CASE WHEN match_res = 'L' THEN 1 ELSE 0 END) OVER (PARTITION BY user_id ORDER BY date_visited)
+
+-- It behaves like
+ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+
+-- Simple rolling window:
+SELECT A,
+      SUM(A) OVER (ORDER BY some_column ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS rolling_sum_4
+FROM your_table;
+\end{lstlisting}
+\end{rem}

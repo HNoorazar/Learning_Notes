@@ -190,23 +190,23 @@ correct. A very small $p$-value means that such an extreme observed
 outcome would be very unlikely under the null hypothesis.
 \hl{Smaller $p$-values are taken as stronger evidence against the null hypothesis}.
 
-Let $X$ be a random variable and $x_1, x2, \dots, x_N$ be $N$ realizations.
+Let $X$ be a random variable and $x_1, x_2, \dots, x_N$ be $N$ realizations.
 $\bar x$ then is a random variable and it has expected value and variance:
 $E[\bar X ] = E[X] = \mu$; unbiasedness. Variance of $\bar X$ has its own name; standard error.
 $SE^2[\bar X] = var(\bar X) = \sigma^2/N$. We do not know $\sigma$ and we should
-estimate it. Originally we had $x_1, x2, \dots, x_N$. This set has sample variance;
+estimate it. Originally we had $x_1, x_2, \dots, x_N$. This set has sample variance;
 $S^2 = \frac{1}{N-1}\sum(x_i - \bar x)^2$ is a function of samples $x_i$'s.
 So, it has expected value and its own distribution; $E[S^2] = \sigma^2$. The sample
 variance $S^2$ is centered at $\sigma^2$. The larger the $N$ the more
-concentration about $\sigma^2$. So, mean of $S^2$ is $\sigma^2$. Therefore,
-we can use $S^2$ as an estimate of $\sigma^2$ in $SE^2[\bar X] = \frac{\sigma^2}{N}\approx \frac{S^2}{N}$. Hence, $SE[\bar X] = \frac{S}{\sqrt{N}}$.
+concentration about $\sigma^2$. So, mean of $S^2$ is $\sigma^2$. 
+Therefore, we can use $S^2$ as an estimate of $\sigma^2$ in $SE^2[\bar X] = \frac{\sigma^2}{N}\approx \frac{S^2}{N}$. Hence, $SE[\bar X] = \frac{S}{\sqrt{N}}$.
 
 \begin{itemize}
 \item sample mean estimates population mean.
 \item sample variance $S^2$ estimates population variance.
 \end{itemize}
 Variance of $\bar X$ tells us how far, on average, we are from $\mu$ 
-if we use a sample set of $x_1, x2, \dots, x_N$ to guess $\mu$.
+if we use a sample set of $x_1, x_2, \dots, x_N$ to guess $\mu$.
 This gives confidence interval and $p$-value.
 
 Again, $S\approx \sigma$ how variable the population is, and $SE$: how variable
@@ -217,7 +217,7 @@ and we have a table for $N(0, 1)$ to use for confidence intervals.
 We want to know how terrible/good is our $\bar X$ in guessing $\mu$; $\bar X \sim N(\mu, \frac{\sigma}{\sqrt{N}}) \approx \frac{S}{\sqrt{N}}$.
 CLT says $\bar X \sim N(\mu, \frac{\sigma^2}{N})$ or $\frac{\bar X - \mu}{  \sqrt{\frac{\sigma^2}{N}} } \sim N(0, 1)$.
 
-Using the table for a given set of instances $x_1, x2, \dots, x_N$ we can
+Using the table for a given set of instances $x_1, x_2, \dots, x_N$ we can
 be sure $\bar x$ is in $\bar x \pm   \frac{2\sigma}{\sqrt{n}}$ with 95\% confidence, i.e.
 \begin{equation*}
 p \left ( \bar x > \mu+\frac{2\sigma}{\sqrt{N}} or \bar x < \mu+\frac{2\sigma}{\sqrt{N}}  \right) = 0.05
@@ -230,7 +230,7 @@ So, the 0.05 is the $p$-value: probability of seeing $\bar x$ or more extreme.
 Truth & Decision &                        \\ \hline
 $H_0$ & $H_0$    & Correctly accept $H_0$ \\ \hline
 $H_0$ & $H_a$    & Type I error (also FP)      \\ \hline
-$H_a$ & $H_a$    &                        \\ \hline
+$H_a$ & $H_a$    & Correctly reject $H_0$  \\ \hline
 $H_a$ & $H_0$    & Type II error (also FN)  \\ \hline
 \end{tabular}
 \end{table}
@@ -240,7 +240,7 @@ Suppose $\bar x = 32$ with $S=10$.
 We want to test $H_0$; $\mu=30$, $H_a$: $\mu>30$.
 Reject $H_0$ if $\bar x > C$ for some $C$. $C$ takes into account variability of $\bar x$.
 Choose C so that probability type I error is $\alpha = 0.05$. 
-$\alpha = prob(\text{type I error}) = p(\text{rejecting } H_0 \text{ while it is correct})$
+$\alpha = prob(\text{Type I error}) = p(\text{rejecting } H_0 \text{ while it is correct})$
 
 $p(\bar x > C; H_0) = 0.05$ if $C = \mu +\sigma = 31.645$ or $(\bar x - \mu_0) / \left ( \frac{S}{\sqrt{N}} \right) > z_{1-\alpha}$
 
@@ -377,7 +377,7 @@ standard deviations $\hat \beta_1$ is away from zero.}
 \item [RSE]
 The RSE is an estimate of the standard deviation of $\varepsilon$ in $y = f(x) + \varepsilon$. 
 \begin{equation}
-RSE = \sqrt{\frac{1}{N-2} RSS} = \sqrt{\frac{1}{N-2}  \sum(y_i - \hat y_i)^2}
+RSE = \sqrt{\frac{RSS}{N-2} } = \sqrt{\frac{1}{N-2}  \sum(y_i - \hat y_i)^2}
 \end{equation}
 The RSE is considered a measure of the lack of fit.
 If the predictions obtained using the model are very 
