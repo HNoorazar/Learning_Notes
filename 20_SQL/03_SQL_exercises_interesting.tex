@@ -293,7 +293,8 @@ WITH RECURSIVE months AS (SELECT DATE_FORMAT(MIN(created_at), '%Y-%m-01') AS mon
                           ),
 monthly_rev AS (SELECT DATE_FORMAT(created_at,'%Y-%m-01') AS month_start, SUM(value) AS revenue
                 FROM sf_transactions
-                GROUP BY DATE_FORMAT(created_at,'%Y-%m-01')),
+                GROUP BY DATE_FORMAT(created_at,'%Y-%m-01')
+                ),
 full_data AS (SELECT m.month_start, COALESCE(r.revenue, 0) AS revenue
               FROM months m LEFT JOIN monthly_rev r USING (month_start) 
               ),

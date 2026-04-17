@@ -660,28 +660,30 @@ HAVING COUNT(a.user_id_receiver) > 0;
 \end{exm}
 
 
-\begin{exm} ({\bf \color{orange} ID 10322: Finding User Purchases})\\
+\begin{exm} ({\bf \color{orange} ID 10322: \href{https://platform.stratascratch.com/coding/10322-finding-user-purchases}{Finding User Purchases}})\\
 Identify returning active users by finding users who made a second purchase within 1 to 7 days after their first purchase. Ignore same-day purchases. Output a list of these \code{user\_ids}.\\
 
 \noindent {\color{red}{\bf NOTE}} Question is  talking only about 1st and 2nd purchase. Ignore 3rd, and 4th purchases.
 
-\begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
-with row_ as (SELECT *,
+\begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
+with distinct_days AS (SELECT DISTINCT user_id, DATE(created_at) as created_at
+                      FROM amazon_transactions), -- to merge same day purchases
+row_ as (SELECT *,
               ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at ASC) as rn
-              FROM amazon_transactions),
+              FROM distinct_days),
 filtered as (SELECT *
              FROM row_
              WHERE rn <3),
 help_t as (SELECT user_id,  created_at, 
-  LAG (created_at) OVER (PARTITION BY user_id ORDER BY created_at ASC) as prev_dt_purch
-           FROM filtered),
-help_t2 as (SELECT *
-            FROM help_t
-            WHERE prev_dt_purch IS NOT NULL AND 
-                      DATEDIFF(created_at, prev_dt_purch) >= 1 AND
-                      DATEDIFF(created_at, prev_dt_purch) <= 7)
+               LAG (created_at) OVER (PARTITION BY user_id ORDER BY created_at ASC) as prev_date_purch
+                FROM filtered),
+help2_table as (SELECT *
+                FROM help_t
+                WHERE prev_date_purch IS NOT NULL AND 
+                      DATEDIFF(created_at, prev_date_purch) >= 1 AND
+                      DATEDIFF(created_at, prev_date_purch) <= 7)
 SELECT DISTINCT (user_id) 
-FROM help_t2
+FROM help2_table
 \end{lstlisting}
 \end{exm}
 
@@ -712,13 +714,13 @@ WHERE description LIKE '%plum%'
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf  \color{orange} ID 2081: Recommendation System})\\
+\begin{exm} ({\bf  \color{orange} ID 2081: \href{https://platform.stratascratch.com/coding/2081-recommendation-system}{Recommendation System}})\\
 You are given the list of Facebook friends and the list of Facebook pages that users follow. 
 Your task is to create a new recommendation system for Facebook. 
 For each Facebook user, find pages that this user doesn't follow but at least one of their friends does. 
 Output the user ID and the ID of the page that should be recommended to this user.\sidenote{The following solutions are corrections of my solution by
 chatGPT and Claude. i.e. I could not check against website's solution,
-but hand investigation showed they are correct.}
+but hand investigation showed they are correct. \idea \idea \idea NOT EXIST is new to me}
 \begin{lstlisting}[language=SQL, linewidth=1.05\textwidth]
 WITH friend_pages AS (SELECT uf.user_id, up.page_id
                       FROM users_friends uf JOIN users_pages up
@@ -764,7 +766,7 @@ ORDER BY uf.user_id, up.page_id;
 \end{exm}
 
 
-\begin{exm} ({\bf  \color{orange} ID 10300: Premium vs Freemium})\\
+\begin{exm} ({\bf  \color{orange} ID 10300: \href{https://platform.stratascratch.com/coding/10300-premium-vs-freemium}{Premium vs Freemium}})\\
 Find the total number of downloads for paying and non-paying users by date. Include only records where non-paying customers have more downloads than paying customers. The output should be sorted by earliest date first and contain 3 columns date, non-paying downloads, paying downloads. \\
 
 \noindent Hint: In Oracle you should use "date" when referring to date column (reserved keyword).
@@ -773,11 +775,9 @@ AND, in MySQL, there should not be a space in \code{MAX (}. It creates a problem
 \code{MAX(}.
 \begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
 with user_pay AS (SELECT * 
-                  FROM ms_user_dimension LEFT JOIN ms_acc_dimension USING(acc_id)
-                  ),
+                  FROM ms_user_dimension LEFT JOIN ms_acc_dimension USING(acc_id)),
      all_data AS (SELECT *
-                  FROM user_pay LEFT JOIN ms_download_facts USING (user_id)
-                  ),
+                  FROM user_pay LEFT JOIN ms_download_facts USING (user_id)),
      counts AS (SELECT date, paying_customer, sum(downloads) as download_cnt
                 FROM all_data
                 GROUP BY date, paying_customer),
