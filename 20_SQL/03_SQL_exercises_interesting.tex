@@ -412,6 +412,124 @@ GROUP BY cust_id;
 
 
 
+\begin{exm} ({\bf \color{red}ID 2103: \href{https://platform.stratascratch.com/coding/2103-reviewed-flags-of-top-videos?code_type=3}{Reviewed flags of top videos}})\\
+For the video (or videos) that received the most user flags, how many of these flags were reviewed by YouTube? Output the video ID and the corresponding number of reviewed flags.  Ignore flags that do not have a corresponding \code{flag\_id}.
+
+
+The following can be compacted.
+I did a brute force. Is making it compact an advatnage?
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with flag_counts AS (SELECT video_id, count(flag_id) as flag_count
+                     FROM user_flags
+                     WHERE flag_id is NOT NULL
+                     GROUP BY video_id
+                     ),
+      needed_IDs AS (SELECT video_id
+                     FROM flag_counts
+                     WHERE flag_count = (SELECT MAX(flag_count)
+                                         FROM flag_counts)
+                     ),
+    max_flag_IDs AS (SELECT flag_id, video_id
+                     FROM user_flags
+                     WHERE video_id IN (SELECT video_id FROM needed_IDs) AND flag_id IS NOT NULL
+                     ),
+clean_review AS (SELECT *
+                 FROM flag_review
+                 WHERE flag_id IN (SELECT flag_id FROM max_flag_IDs) 
+                         AND reviewed_date is NOT NULL),
+merged AS (SELECT cr.reviewed_date, mf.video_id
+           FROM clean_review cr LEFT JOIN max_flag_IDs mf USING (flag_id)
+           )
+SELECT video_id, count(reviewed_date)
+FROM merged
+GROUP BY video_id
+\end{lstlisting}
+
+\noindent Compacted:
+
+\begin{lstlisting}[language=SQL, linewidth=1.6\textwidth]
+WITH flag_counts AS (SELECT video_id, COUNT(flag_id) AS flag_count
+                    FROM user_flags
+                    WHERE flag_id IS NOT NULL
+                    GROUP BY video_id
+                    ),
+      max_videos AS (SELECT video_id
+                     FROM flag_counts
+                     WHERE flag_count = (SELECT MAX(flag_count) FROM flag_counts)
+                    )
+SELECT uf.video_id, COUNT(fr.reviewed_date) AS reviewed_flags
+FROM user_flags uf INNER JOIN max_videos mv ON uf.video_id = mv.video_id
+                   LEFT JOIN flag_review fr ON uf.flag_id = fr.flag_id AND fr.reviewed_date IS NOT NULL
+WHERE uf.flag_id IS NOT NULL
+GROUP BY uf.video_id;
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf  \color{red} ID 514: \href{https://platform.stratascratch.com/coding/514-marketing-campaign-success-advanced?code_type=3}{Marketing Campaign Success}})\\
+You have the \code{marketing\_campaign} table, which records in-app purchases by users. 
+Users making their first in-app purchase enter a marketing campaign, where they see call-to-actions for more purchases.
+ Find how many users made additional purchases due to the campaign's success.
+
+The campaign starts one day after the first purchase. Users with only one or multiple purchases on the first day do not count, nor do users who later buy only the same products from their first day.
+
+{\color{red}{\bf need to check this}}
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH first_day AS (SELECT user_id, MIN(created_at) AS first_date
+                   FROM marketing_campaign
+                   GROUP BY user_id
+                   ),
+later_purchases AS (SELECT mc.user_id, mc.product_id
+                    FROM marketing_campaign mc JOIN first_day fd ON mc.user_id = fd.user_id
+                    WHERE mc.created_at > fd.first_date
+                    ),
+first_day_products AS (SELECT mc.user_id, mc.product_id
+                       FROM marketing_campaign mc JOIN first_day fd ON mc.user_id = fd.user_id
+                                                        AND mc.created_at = fd.first_date
+                    ),
+new_products AS (SELECT lp.user_id
+                 FROM later_purchases lp LEFT JOIN first_day_products fp
+                          ON lp.user_id = fp.user_id AND lp.product_id = fp.product_id
+                 WHERE fp.product_id IS NULL
+                  )
+SELECT COUNT(DISTINCT np.user_id) AS users_with_new_purchases
+FROM new_products np;
+
+-----------
+WITH first_day AS (
+    SELECT mc.user_id, mc.created_at AS first_date
+    FROM marketing_campaign mc
+    WHERE mc.created_at = (
+        SELECT MIN(mc2.created_at) 
+        FROM marketing_campaign mc2
+        WHERE mc2.user_id = mc.user_id
+    )
+),
+later_purchases AS (
+    SELECT mc.user_id, mc.product_id
+    FROM marketing_campaign mc
+    JOIN first_day fd ON mc.user_id = fd.user_id
+    WHERE mc.created_at > fd.first_date
+),
+first_day_products AS (
+    SELECT mc.user_id, mc.product_id
+    FROM marketing_campaign mc
+    JOIN first_day fd ON mc.user_id = fd.user_id
+    WHERE mc.created_at = fd.first_date
+),
+new_products AS (
+    SELECT DISTINCT lp.user_id
+    FROM later_purchases lp
+    LEFT JOIN first_day_products fp
+           ON lp.user_id = fp.user_id AND lp.product_id = fp.product_id
+    WHERE fp.product_id IS NULL
+)
+SELECT COUNT(DISTINCT np.user_id) AS users_with_new_purchases
+FROM new_products np;
+\end{lstlisting}
+\end{exm}
+
+
+
 
 \begin{exm} ({\bf \color{red}ID: \href{}{}})\\
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
