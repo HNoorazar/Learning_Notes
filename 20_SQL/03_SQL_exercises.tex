@@ -878,8 +878,273 @@ FROM (select from_user, count(id) as sent_count
 \end{lstlisting}
 \end{exm}
 
+\begin{exm} ({\bf  \color{orange} ID 2084: \href{https://platform.stratascratch.com/coding/2084-blocked-users?code_type=3}{Blocked Users}})\\
+You are given a table of users who have been blocked from Facebook, together with the date, duration, and the reason for the blocking. The duration is expressed as the number of days after blocking date and if this field is empty, this means that a user is blocked permanently.
+For each blocking reason, count how many users were blocked in December 2021. Include both the users who were blocked in December 2021 and those who were blocked before but remained blocked for at least a part of December 2021.
 
-\begin{exm} ({\bf  \color{orange} ID: })\\
+In the following this is what I have done:
+If a user is blocked during or before December permanently,
+then, she has been blocked during December. 
+So, when there is a NULL in \code{duration} column, 
+I set the \code{block\_date} to \code{2021-12-03} to count them.
+Furthermore, if a user is blocked and unblocked multiple times
+during December, then I counted them as once.
+Question said how many \emph{users} were blocked; not number of blocking events!
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH clean AS (SELECT *,
+                    CASE 
+                      WHEN block_duration IS NULL AND block_date<='2021-12-31' THEN '2021-12-03'
+                      ELSE block_date
+                     END AS updated_block_date
+               FROM fb_blocked_users),
+dec_blocks AS (SELECT block_reason, COUNT(DISTINCT user_id) AS user_count
+               FROM clean
+               WHERE updated_block_date <= '2021-12-31' AND updated_block_date >= '2021-12-01'
+               GROUP BY block_reason
+               ),
+dec_partial AS (SELECT block_reason, COUNT(DISTINCT user_id) AS user_count
+                FROM (SELECT *,
+                             DATE_ADD(block_date, INTERVAL block_duration DAY) as end_block
+                      FROM fb_blocked_users
+                      WHERE block_date < '2021-12-01' AND block_duration is not NULL
+                      ) as T
+                WHERE end_block >= '2021-12-01'
+                )
+SELECT block_reason, SUM(user_count) AS total_user_count
+FROM (SELECT block_reason, user_count FROM dec_blocks
+      UNION ALL
+      SELECT block_reason, user_count FROM dec_partial
+      ) AS combined
+GROUP BY block_reason;
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf  \color{orange} ID 2128: \href{}{Book Sales}})\\
+Calculate the total revenue made per book. Output the book ID and total sales per book. In case there is a book that has never been sold, include it in your output with a value of 0.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH order_quantity AS (SELECT book_id, sum(quantity) as quantity
+                        FROM amazon_books_order_details
+                        GROUP BY book_id
+                        ),
+sales AS (select ab.book_id, COALESCE(oq.quantity, 0) as quantity_, ab.unit_price
+          FROM amazon_books ab LEFT JOIN order_quantity oq USING(book_id)
+          )
+SELECT book_id, quantity_* unit_price as total_saes
+FROM sales
+order by book_id
+\end{lstlisting}
+\end{exm}
+
+
+
+
+\begin{exm} ({\bf  \color{orange} ID 2026: \href{https://platform.stratascratch.com/coding/2026-bottom-2-companies-by-mobile-usage?code_type=3}{Bottom 2 Companies By Mobile Usage}})\\
+Write a query to identify all companies (\code{customer\_id}) whose mobile usage ranks in the bottom two positions. 
+Mobile usage is the count of events where \code{client\_id = 'mobile'}. 
+Companies with the same usage count should share the same rank, and all companies in the bottom two ranks should be included.
+Return the \code{customer\_id} and event count, sorted in ascending order by the number of events.\\
+
+\noindent Question is not well-written. 
+More usage is positive or negative?
+skip ranks or not?
+If we are only returning bottom 2, why at the end it says ``\dots sorted in ascending order by the number of events."
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with events_ AS (select customer_id, COUNT(client_id) as event_count
+                 FROM fact_events
+                 WHERE client_id='mobile'
+                 GROUP BY customer_id),
+ranked AS (SELECT *, DENSE_rank() over (ORDER BY event_count) as rank_
+           FROM events_)
+SELECT customer_id, event_count
+from ranked
+where rank_<=2
+order by event_count ASC
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf  \color{orange} ID 2020: \href{https://platform.stratascratch.com/coding/2020-call-declines?code_type=3}{Call Declines}})\\
+Which company had the biggest month call decline from March to April 2020? Return the \code{company\_id} and calls difference for the company with the highest decline.
+
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH clean AS (SELECT users.company_id, DATE_FORMAT(calls.call_date, '%Y-%m') AS ym,
+                                COUNT(*) AS call_count
+              FROM rc_users users JOIN rc_calls calls USING (user_id)
+              WHERE calls.call_date >= '2020-03-01' AND calls.call_date < '2020-05-01'
+              GROUP BY users.company_id, ym
+              ),
+lagged AS (SELECT company_id, ym, call_count,
+              LAG(call_count) OVER (PARTITION BY company_id ORDER BY ym) AS prev_count
+           FROM clean)
+SELECT company_id, prev_count - call_count AS call_difference
+FROM lagged
+WHERE prev_count IS NOT NULL
+ORDER BY call_difference DESC
+LIMIT 1;
+
+-- OR
+with call_count_t AS (select users.company_id, COUNT(calls.call_id)as call_count, 
+                              DATE_FORMAT(calls.call_date, '%Y-%m') AS ym
+                      FROM rc_users users JOIN rc_calls calls USING(user_id)
+                      WHERE calls.call_date >= '2020-03-01' AND calls.call_date < '2020-05-01'
+                      GROUP BY users.company_id, ym),
+diff AS (SELECT company_id, 
+                  (call_count - COALESCE(LEAD(call_count) OVER
+                           (PARTITION BY company_id ORDER BY ym ))) as diff_call_count
+         FROM call_count_t
+         )
+SELECT diff_call_count
+FROM diff
+WHERE diff_call_count IS NOT NULL
+ORDER BY diff_call_count DESC
+LIMIT 1
+
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf  \color{orange} ID 2132: \href{https://platform.stratascratch.com/coding/2132-caller-history?code_type=3}{Caller History}})\\
+Given a phone log table that has information about callers' call history, find out the callers whose first and last calls were to the same person on a given day. Output the caller ID, recipient ID, and the date called.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+-- The following brute force code considers 1 call in 1 day, 
+-- as first and last calls being the same.
+with first_time_t AS (SELECT caller_id, MIN(date_called) as first_time
+                      FROM caller_history
+                      GROUP BY caller_id, DATE_FORMAT(date_called, '%Y-%m-%d')
+                      ),
+last_time_t AS (SELECT caller_id, MAX(date_called) as last_time
+                FROM caller_history
+                GROUP BY caller_id, DATE_FORMAT(date_called, '%Y-%m-%d')
+              ),
+first_receipt_t AS (SELECT h.recipient_id as first_receipt, f.caller_id,
+                            DATE_FORMAT(f.first_time, '%Y-%m-%d') as first_date
+                    FROM caller_history h JOIN first_time_t f ON 
+                            h.caller_id=f.caller_id AND f.first_time = h.date_called
+                    ),
+last_receipt_t AS (SELECT h.recipient_id as last_receipt, l.caller_id,
+                           DATE_FORMAT(l.last_time, '%Y-%m-%d') as last_date
+                   FROM caller_history h JOIN last_time_t l ON 
+                            h.caller_id=l.caller_id AND l.last_time = h.date_called
+                    ),
+firs_and_last AS (SELECT lt.caller_id, lt.last_receipt, lt.last_date, ft.first_receipt
+                  FROM last_receipt_t lt JOIN first_receipt_t ft 
+                        ON lt.caller_id = ft.caller_id AND lt.last_date = ft.first_date
+                  )
+SELECT caller_id, last_receipt as recipient_id, last_date as date_called
+FROM firs_and_last
+WHERE last_receipt = first_receipt
+\end{lstlisting}
+
+\noindent A clever solution that avoids multiple \code{DATE\_FORMAT}
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH ranked_calls AS (SELECT caller_id, recipient_id, DATE(date_called) AS call_date,
+                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
+                                                ORDER BY date_called) AS rn_first,
+                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
+                                                ORDER BY date_called DESC) AS rn_last
+                      FROM caller_history)
+SELECT f.caller_id, f.recipient_id, f.call_date AS date_called
+FROM ranked_calls f JOIN ranked_calls l ON f.caller_id = l.caller_id
+                                                    AND f.call_date = l.call_date
+WHERE f.rn_first = 1 AND l.rn_last = 1 AND f.recipient_id = l.recipient_id;
+\end{lstlisting}
+\end{exm}
+
+
+
+\begin{exm} ({\bf  \color{orange} ID: 2079} \href{https://platform.stratascratch.com/coding/2079-city-with-most-customers?code_type=3}{City with Most Customers})\\
+For each city, find the number of rides in August 2021 that were paid without using a promotional code (i.e., where no discount was applied). Output the city or cities where this number was the highest.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with ride_count AS (SELECT city, count(*) as ride_count
+                    FROM (SELECT c.city as city
+                          FROM lyft_payments p LEFT JOIN lyft_orders c USING(order_id)
+                          WHERE p.promo_code=0 AND DATE_FORMAT(p.order_date, '%Y-%m') = '2021-08') as t
+                          GROUP BY city)
+SELECT city
+From ride_count
+WHERE ride_count = (SELECT MAX(ride_count) FROM ride_count)
+
+-- Compact
+-- COUNT acts after JOIN and WHERE are applied
+WITH ride_count AS (SELECT c.city, COUNT(*) AS ride_count
+                    FROM lyft_payments p JOIN lyft_orders c USING(order_id)
+                    WHERE p.promo_code = 0 AND DATE_FORMAT(p.order_date, '%Y-%m') = '2021-08'
+                    GROUP BY c.city)
+SELECT city
+FROM ride_count
+WHERE ride_count = (SELECT MAX(ride_count) FROM ride_count);
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf  \color{orange} ID 10365: \href{https://platform.stratascratch.com/coding/10365-common-friends-script?code_type=3}{Common Friends Script}})\\
+You are analyzing a social network dataset at Google. Your task is to find mutual friends between two users, Karl and Hans. There is only one user named Karl and one named Hans in the dataset.\\
+
+\noindent The output should contain \code{'user\_id'} and \code{'user\_name'} columns.\\
+
+\noindent  Since Karl and Hans are unique, I hard coded! Karl is 1. Hans is 2.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with mutual_friends AS (SELECT DISTINCT f1.friend_id
+                        FROM friends f1 JOIN friends f2 on f1.friend_id = f2.user_id
+                        WHERE f1.user_id in (1, 2) and f2.friend_id in (1, 2))
+SELECT *
+FROM users
+where user_id in (SELECT friend_id FROM mutual_friends)
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf  \color{orange} ID 10288: \href{https://platform.stratascratch.com/coding/10288-clicked-vs-non-clicked-search-results?code_type=3}{Clicked Vs Non-Clicked Search Results}})\\
+The question asks you to calculate two percentages based on search result records. 
+For the first percentage, find the percentage of records where a search result was clicked on in the top 3 positions. Records that were clicked will have \code{clicked = 1}. 
+Use the \code{search\_results\_position} to find the position of the search result. For the second percentage: find the percentage of records that were not clicked on in the top 3 positions. Both percentages are calculated with respect to the total number of search result records and should be output in the same row as two columns.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+SELECT SUM(CASE WHEN search_results_position IN (1,2,3) AND clicked=1 THEN 1 ELSE 0 END)*1.0 
+                            / COUNT(*) AS clicked_in_top3_ratio,
+       SUM(CASE WHEN search_results_position IN (1,2,3) AND clicked=0 THEN 1 ELSE 0 END)*1.0 
+                            / COUNT(*) AS not_clicked_in_top3_ratio
+FROM fb_search_events;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf  \color{orange} ID 9908: \href{https://platform.stratascratch.com/coding/9908-customer-orders-and-details?code_type=3}{Customer Orders and Details}})\\
+Find the number of orders, the number of customers, and the total cost of orders for each city. Only include cities that have made at least 5 orders and count all customers in each city even if they did not place an order.\\
+
+\noindent Output each calculation along with the corresponding city name.
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+WITH orders_table AS(SELECT cust_id as id, count(*) as order_count, 
+                             sum(total_order_cost) as customer_spending
+                     FROM orders
+                     GROUP BY cust_id
+                     ),
+city_orders AS (SELECT c.id, o.order_count, o.customer_spending, c.city
+                FROM customers c left join orders_table o ON c.id = o.id)
+SELECT city,
+       SUM(CASE WHEN order_count IS NULL THEN 0 else order_count END) as city_order_count,
+       SUM(CASE WHEN customer_spending IS NULL THEN 0 else customer_spending END) as total_spending,
+       COUNT(DISTINCT id) as customer_count
+FROM city_orders
+GROUP BY city
+HAVING SUM(CASE WHEN order_count IS NULL THEN 0 else order_count END) >= 5
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf \color{orange} ID 2150: \href{https://platform.stratascratch.com/coding/2150-customers-who-purchased-the-same-product?code_type=3}{Customers Who Purchased the Same Product}})\\
+In order to improve customer segmentation efforts for users interested in purchasing furniture, you have been asked to find customers who have purchased the same items of furniture.\\
+
+\noindent Output the \code{product\_id}, \code{brand\_name}, unique customer ID's who purchased that product, and the count of unique customer ID's who purchased that product. Arrange the output in descending order with the highest count at the top.\marginnote{\idea \idea \code{GROUP\_CONCAT} is new here.}
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+SELECT o.product_id, GROUP_CONCAT(DISTINCT o.customer_id) AS customer_list, 
+       count(DISTINCT o.customer_id) as cust_count, p.brand_name
+FROM online_orders o LEFT JOIN online_products p ON o.product_id = p.product_id
+GROUP BY o.product_id, p.brand_name -- SQL requires non-agg. columns be here?
+HAVING COUNT(DISTINCT o.customer_id) > 1 -- since said multiple orders
+ORDER BY count(DISTINCT o.customer_id) DESC
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf \color{orange} ID: })\\
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 \end{lstlisting}
 \end{exm}

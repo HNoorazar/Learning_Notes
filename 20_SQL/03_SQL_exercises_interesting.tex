@@ -529,7 +529,110 @@ FROM new_products np;
 \end{exm}
 
 
+\begin{exm} ({\bf \color{red}ID 10131: \href{https://platform.stratascratch.com/coding/10131-business-name-lengths?code_type=3}{Business Name Lengths}})\\
+Find the number of words in each business name. Avoid counting special symbols as words (e.g. \&). Output the business name and its count of words.\\
 
+\noindent ChatGPT wrote this and seems it is working.
+I did not know any of these.
+\code{TRIM} removes leading and tailing spaces.
+\code{REGEXP\_REPLACE(..., ' +', ' ')} replaces multiple spaces by only 1 space.
+The \code{'+'} sign is a wild card meaning more of previous character.
+What the code is doing is counting number spaces; length of everything (including spaces) minus length of everything with spaces removed.
+\begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
+SELECT business_name,
+    (
+      LENGTH(TRIM(REGEXP_REPLACE(REGEXP_REPLACE(business_name, '[^A-Za-z0-9 ]', ' '), ' +', ' ')))
+      - LENGTH(REPLACE(TRIM(REGEXP_REPLACE(REGEXP_REPLACE(
+                           business_name, '[^A-Za-z0-9 ]', ' '), ' +', ' ')), ' ', '')) + 1
+    ) AS word_count
+FROM sf_restaurant_health_violations;
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf \color{red}ID 9776: \href{https://platform.stratascratch.com/coding/9776-common-interests-amongst-users?code_type=3}{Common Interests Amongst Users}})~\idea\idea\idea\marginnote{\idea \idea This has so much going on. Converting and expanding a string from a column into several rows, taking intersection and count of pairwise users}\\
+Count the subpopulations across datasets. Assume that a subpopulation is a group of users sharing a common interest (ex: Basketball, Food). Output the percentage of overlapping interests for two posters along with those poster's IDs. Calculate the percentage from the number of poster's interests. The poster column in the dataset refers to the user that posted the comment.
+\begin{lstlisting}[language=SQL, linewidth=1.6\textwidth]
+WITH user_interests AS (SELECT poster, TRIM(jt.interest) AS interest
+                        FROM facebook_posts, -- CROSS JOIN: not having anything here is like CROSS JOIN
+                             JSON_TABLE(CONCAT('["', 
+                     REPLACE(REPLACE(REPLACE(post_keywords, '[', ''),  ']', '' ),  ',', '","'  ), 
+                                               '"]'
+                                               ), 
+                                        '$[*]' COLUMNS (interest VARCHAR(100) PATH '$')
+                                        ) AS jt
+                        ),
+pairwise_matches AS (SELECT a.poster AS user1, b.poster AS user2, a.interest
+                     FROM user_interests a JOIN user_interests b ON a.interest=b.interest 
+                     AND a.poster < b.poster
+                     ),
+shared_count_t AS (SELECT user1, user2, COUNT(*) AS shared_count
+                 FROM pairwise_matches
+                 GROUP BY user1, user2),
+user_counts AS (SELECT poster, COUNT(*) AS total_interests
+                FROM user_interests
+                GROUP BY poster)
+SELECT s.user1, s.user2, s.shared_count,
+          ROUND(100.0*s.shared_count/(u1.total_interests+u2.total_interests-s.shared_count), 2) 
+                              AS overlap_percentage
+FROM shared_count_t s JOIN user_counts u1 ON s.user1=u1.poster JOIN user_counts u2 ON s.user2=u2.poster;
+\end{lstlisting}
+\end{exm}
+
+\begin{exm} ({\bf \color{red}ID 9821: \href{https://platform.stratascratch.com/coding/9821-common-friends-friend?code_type=3}{Common Friends Friend}})\\
+Find the number of a user's friends' friend who are also the user's friend. Output the user id along with the count.
+\begin{lstlisting}[language=SQL, linewidth=1.6\textwidth]
+WITH second_f AS (SELECT g1.user_id, g2.friend_id AS hop_friend
+                  FROM google_friends_network g1 JOIN google_friends_network g2 ON g1.friend_id = g2.user_id)
+SELECT g.user_id, COUNT(DISTINCT g.friend_id) AS mutual_count
+FROM google_friends_network g JOIN second_f sf ON g.user_id = sf.user_id AND g.friend_id = sf.hop_friend
+GROUP BY g.user_id
+ORDER BY g.user_id;
+\end{lstlisting}
+\end{exm}
+
+
+\begin{exm} ({\bf \color{red}ID 517: \href{https://platform.stratascratch.com/coding/10572-city-with-most-amenities?code_type=3}{City With Most Amenities}})\\
+
+You're given a dataset of searches for properties on Airbnb. For simplicity, each row represents a unique host.
+
+Your task is to find the city whose hosts collectively list the greatest total number of amenities across all their properties.
+
+Treat \code{amenities} as a comma-separated list and count each listed entry as-is, even if the same  \code{amenities} appear multiple times within the same property's amenities, count each occurrence (do not deduplicate).
+
+If multiple cities tie for the highest total, return all of those cities. Output the name of the city/cities.
+
+
+\noindent Both of following solutions can break down if there are extra commas
+somewhere in the list of amenities!
+
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with all_amenities as (SELECT a.city, TRIM(t.interest) as interest
+                       FROM airbnb_search_details a JOIN JSON_TABLE(concat('["',
+replace(replace(replace(replace(replace(
+       replace(a.amenities, '}', ''), '{', ''), '"', ''), '[', ''), ']', ''), ',', '","' ),
+                                                                 '"]'
+                                                                           ),
+                                         '$[*]' COLUMNS (interest VARCHAR(100) PATH '$')
+                                                         ) as t
+                        ),
+count_per_city AS (SELECT city, count(interest) as amenity_count
+                   FROM all_amenities
+                   GROUP BY city)
+SELECT city
+FROM count_per_city 
+WHERE amenity_count = (SELECT MAX(amenity_count) FROM count_per_city)
+
+-- Solution 2: cleaner to remember that JSON table and nice trick
+-- number of amenities is one more than number of commas:
+WITH city_amenities AS (SELECT city, 
+     SUM(LENGTH(amenities) - LENGTH(REPLACE(amenities, ',', '')) + 1) AS amenity_count
+                        FROM airbnb_search_details 
+                        GROUP BY city)
+SELECT city
+FROM city_amenities
+WHERE amenity_count = (SELECT MAX(amenity_count)FROM city_amenities);
+\end{lstlisting}
+\end{exm}
 
 \begin{exm} ({\bf \color{red}ID: \href{}{}})\\
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
