@@ -117,3 +117,32 @@ and \emph{optimization}.
 \item reduce variability of response
 \end{itemize}
 \end{tcolorbox}
+
+
+\subsection{Kohavi Notes}
+\label{sec:KohaviNotes}
+
+\begin{enumerate}
+\item Note that even though we want to increase overall revenue, we do
+not recommend using the sum of revenue itself, as it depends on the number of
+users in each variant. Even if the variants are allocated with equal traffic, the
+actual number of users may vary due to chance. We recommend that key
+metrics be normalized by the actual sample sizes, making revenue-per-user a
+good OEC\sidenote{Page 27}.
+
+\item Some metrics have growing variance over time\sidenote{Page 30}.
+
+\item Statistical power is the probability of detecting a meaningful difference
+between the variants when there really is one (statistically, reject the null when
+there is a difference). 
+Practically speaking, you want enough power in your
+experiment to be able to conclude with high probability whether your 
+experiment has resulted in a change bigger than what you care about. Usually, we get
+more power when the sample size is larger. It is common practice to design
+experiments for 80–90\% power\sidenote{Page 30}.
+
+\item \hl{If we use purchase indicator} (i.e., did the user purchase yes/no, without
+regard to the purchase amount) instead of using revenue-per-user as our
+OEC, the standard error will be smaller, meaning that we will not need to
+expose the experiment to as many users to achieve the same sensitivity\sidenote{Page 32}.
+\end{enumerate}
