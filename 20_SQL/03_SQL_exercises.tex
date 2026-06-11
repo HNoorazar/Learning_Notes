@@ -716,15 +716,15 @@ For each Facebook user, find pages that this user doesn't follow but at least on
 Output the user ID and the ID of the page that should be recommended to this user.\sidenote{The following solutions are corrections of my solution by
 chatGPT and Claude. i.e. I could not check against website's solution,
 but hand investigation showed they are correct. \idea \idea \idea NOT EXIST is new to me}
-\begin{lstlisting}[language=SQL, linewidth=1.05\textwidth]
+\begin{lstlisting}[language=SQL, linewidth=1.15\textwidth]
 WITH friend_pages AS (SELECT uf.user_id, up.page_id
                       FROM users_friends uf JOIN users_pages up
-                              ON uf.friend_id = up.user_id)
+                                       ON uf.friend_id = up.user_id)
 SELECT DISTINCT fp.user_id, fp.page_id
 FROM friend_pages fp
 WHERE NOT EXISTS (SELECT 1
                   FROM users_pages up
-              WHERE up.user_id = fp.user_id AND up.page_id = fp.page_id)
+                  WHERE up.user_id = fp.user_id AND up.page_id = fp.page_id)
 \end{lstlisting}
 
 In the code above \code{WHERE NOT EXISTS} removes the pages
@@ -787,6 +787,24 @@ WHERE count_non_paying > count_paying
 ORDER BY date
 \end{lstlisting}
 \end{exm}
+
+\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+-- Less steps
+with help AS (SELECT *
+              FROM ms_acc_dimension JOIN ms_user_dimension USING(acc_id)),
+help2 AS (SELECT d.date, d.downloads, h.paying_customer
+          FROM ms_download_facts d JOIN help h USING(user_id)),
+help3 AS (SELECT date,
+           SUM(CASE WHEN paying_customer = 'yes' THEN downloads ELSE 0 END) AS count_paying,
+           SUM(CASE WHEN paying_customer = 'no' THEN downloads ELSE 0 END) AS count_non_paying
+          FROM help2
+          GROUP BY date
+          ORDER BY date)
+SELECT *
+FROM help3
+WHERE count_non_paying > count_paying
+ORDER BY date
+\end{lstlisting}
 
 
 \begin{exm} ({\bf  \color{orange} ID 10569: VR App Sessions})\\
