@@ -4,7 +4,8 @@ These are from \href{sql-practice.com}{sql-practice.com}
 Some Queries are on \href{https://docs.google.com/document/d/10g0QW-8TP935AQhp6Wcjyli3I-zSqmvAGqt1ORVYnio/edit?usp=sharing}{this google doc}.
 
 
-\begin{exm} For each day display the total amount of admissions on that day. Display the amount changed from the previous date.
+\begin{exm} For each day display the total amount of admissions on that day. 
+Display the amount changed from the previous date.
 \begin{lstlisting}[language=SQL, linewidth=1.2\textwidth]
 SELECT admission_date, COUNT(admission_date) AS admission_day,
  COUNT(admission_date) - 
@@ -134,7 +135,8 @@ WHERE p.patient_id = admissions.patient_id
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} All patients who have gone through admissions, can see their medical documents on our site. Those patients are given a temporary password after their first admission. 
+\begin{exm} All patients who have gone through admissions, can see their medical 
+documents on our site. Those patients are given a temporary password after their first admission. 
 Show the patient\_id and temp\_password.
 
 The password must be the following, in order:
@@ -267,7 +269,9 @@ WHERE province_id IN (SELECT province_id
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} We need a breakdown for the total amount of admissions each doctor has started each year. Show the doctor\_id, doctor\_full\_name, specialty, year, total\_admissions for that year.
+\begin{exm} We need a breakdown for the total amount of admissions each 
+doctor has started each year. Show the doctor\_id, doctor\_full\_name, specialty, 
+year, total\_admissions for that year.
 \begin{lstlisting}[language=SQL]
 WITH super_table AS (SELECT *
                      FROM admissions JOIN doctors 
@@ -316,7 +320,9 @@ ORDER BY CASE WHEN province_name = 'Ontario' THEN 1 ELSE
 \label{sec:SQLExercises2}
 These questions are from \href{https://platform.stratascratch.com}{https://platform.stratascratch.com}
 and might be harder than the questions in~\Cref{sec:SQLExercises1}.
-The free version has limited number of questions available (you can see and run them, just cannot check your solution or see Expected Output!!!), but this \href{https://github.com/TeslaNik/stratascratch-SQL}{GitHub repo} has a list of questions in it which hopefully is more than free version.
+The free version has limited number of questions available (you can see and 
+run them, just cannot check your solution or see Expected Output!!!), but this 
+\href{https://github.com/TeslaNik/stratascratch-SQL}{GitHub repo} has a list of questions in it which hopefully is more than free version.
 I have not checked at the time of writing this (Feb, 05, 2026). 
 This platform does not have SQLite. I am using MySQL.
 
@@ -339,13 +345,15 @@ First difference between SQLite and MySQL I had:
 
 \begin{exm} ({\bf ID 9915: \href{https://platform.stratascratch.com/coding/9915-highest-cost-orders?code_type=3}{Highest Cost Orders}})\marginnote{This ID is from stratascratch.com}\\
 Find the customers with the highest daily total order cost between 2019-02-01 and 2019-05-01. 
-If a customer had more than one order on a certain day, sum the order costs on a daily basis. Output each customer's first name, total cost of their items, and the date. 
+If a customer had more than one order on a certain day, sum the order costs 
+on a daily basis. Output each customer's first name, total cost of their items, and the date. 
 If multiple customers tie for the highest daily total on the same date, return all of them.
 
 For simplicity, you can assume that every first name in the dataset is unique.
 
 {\bf \color{red} Recall} the order of execution of statements in SQL~\cref{fig:SQL_LogicMargin}.
-That means Window functions are evaluated after \code{WHERE}, so \code{max\_cost} doesn't exist yet when \code{WHERE} runs.
+That means Window functions are evaluated after \code{WHERE}, so 
+\code{max\_cost} doesn't exist yet when \code{WHERE} runs.
 \begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 --- This will not work due to above remark.
 WITH t as (SELECT customers.id, customers.first_name, 
@@ -417,7 +425,13 @@ FROM retained_3days
 \end{exm}
 
 \begin{exm} ({\bf ID 10299: \href{https://platform.stratascratch.com/coding/10299-finding-updated-records?code_type=3}{Finding Updated Records}})\\
-We have a table with employees and their salaries; however, some of the records are old and contain outdated salary information. Since there is no timestamp, assume salary is non-decreasing over time. You can consider the current salary for an employee is the largest salary value among their records. If multiple records share the same maximum salary, return any one of them. Output their id, first name, last name, department ID, and current salary. Order your list by employee ID in ascending order.
+We have a table with employees and their salaries; however, some of the 
+records are old and contain outdated salary information. Since there is no 
+timestamp, assume salary is non-decreasing over time. You can consider the 
+current salary for an employee is the largest salary value among their records. 
+If multiple records share the same maximum salary, return any one of them. 
+Output their id, first name, last name, department ID, and current salary. 
+Order your list by employee ID in ascending order.
 \begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
 with help_t AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY id ORDER BY salary DESC) as rn
                 FROM ms_employee_salary
@@ -431,7 +445,8 @@ ORDER BY id ASC
 
 
 \begin{exm} ({\bf \href{https://platform.stratascratch.com/coding/10318-new-products?code_type=3}{ID 10318: New Products}})\\
-Calculate the net change in the number of products launched by companies in 2020 compared to 2019. Your output should include the company names and the net difference.
+Calculate the net change in the number of products launched by companies 
+in 2020 compared to 2019. Your output should include the company names and the net difference.
 
 (Net difference = Number of products launched in 2020 - The number launched in 2019.)
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
@@ -486,8 +501,11 @@ So, in the example above if a company has no launches in 2020, \code{COUNT(DISTI
 
 
 \begin{exm} ({\bf ID 515: City With the Biggest Growth and Drop})\\
-Find which cities recorded the largest growth and biggest drop in order amount between March 11, 2019, and April 11, 2019.
-Just compare the total order amount on March 11 and April 11, 2019 for each city. Your output should include the names of the cities and the corresponding amount of growth or drop.
+Find which cities recorded the largest growth and biggest drop in 
+order amount between March 11, 2019, and April 11, 2019.
+Just compare the total order amount on March 11 and April 11, 2019 for 
+each city. Your output should include the names of the cities and the 
+corresponding amount of growth or drop.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 -- My First Solution:
 with growth_table as (SELECT city_id,
@@ -567,8 +585,11 @@ WHERE rnk = 1;
 
 
 \begin{exm} ({\bf {\color{orange}ID 10352:} \href{https://platform.stratascratch.com/coding/10352-users-by-avg-session-time?code_type=3}{Users By Average Session Time}})\\
-Calculate each user's average session time, where a session is defined as the time difference between a  \code{page\_load} and a \code{page\_exit}. Assume each user has only one session per day. 
-If there are multiple \code{page\_load} or \code{page\_exit} events on the same day, use only the latest 
+Calculate each user's average session time, where a session is 
+defined as the time difference between a  \code{page\_load} and 
+a \code{page\_exit}. Assume each user has only one session per day. 
+If there are multiple \code{page\_load} or \code{page\_exit} events 
+on the same day, use only the latest 
  \code{page\_load} and the earliest  \code{page\_exit}. 
 Only consider sessions where the \code{page\_load} occurs before the 
 \code{page\_exit} on the same day. 
@@ -615,7 +636,8 @@ GROUP BY user_id;
 
 \begin{exm} ({\bf {\color{red} ID 10171}: \href{https://platform.stratascratch.com/coding/10171-find-the-genre-of-the-person-with-the-most-number-of-oscar-winnings?code_type=3}{Find the genre of the person with the most number of Oscar winnings}})\\
 Find the genre of the person with the most number of oscar winnings.
-If there are more than one person with the same number of oscar wins, return the first one in alphabetic order based on their name. Use the names as keys when joining the tables.
+If there are more than one person with the same number of oscar wins, 
+return the first one in alphabetic order based on their name. Use the names as keys when joining the tables.
 \begin{lstlisting}[language=SQL]
 with tab_ as (SELECT ni.name as name, ni.top_genre, 
                     SUM(o_n.winner) AS win_count
@@ -635,7 +657,8 @@ Calculate the friend acceptance rate for each \code{date} when friend requests w
 A request is sent if \code{action = sent} and accepted if \code{action = accepted}. 
 If a request is not accepted, there is no record of it being accepted in the table.
 
-The output will only include dates where requests were sent and at least one of them was accepted (acceptance can occur on any date after the request is sent).
+The output will only include dates where requests were sent and at 
+least one of them was accepted (acceptance can occur on any date after the request is sent).
 
 {\bf Shorter and clearer:}  Of all friend requests sent on a given day, what fraction eventually got accepted?
 \marginnote{\idea Look at how left join is done by \code{a.date >= b.date}}
@@ -655,9 +678,12 @@ HAVING COUNT(a.user_id_receiver) > 0;
 
 
 \begin{exm} ({\bf \color{orange} ID 10322: \href{https://platform.stratascratch.com/coding/10322-finding-user-purchases}{Finding User Purchases}})\\
-Identify returning active users by finding users who made a second purchase within 1 to 7 days after their first purchase. Ignore same-day purchases. Output a list of these \code{user\_ids}.\\
+Identify returning active users by finding users who made a second 
+purchase within 1 to 7 days after their first purchase. Ignore same-day 
+purchases. Output a list of these \code{user\_ids}.\\
 
-\noindent {\color{red}{\bf NOTE}} Question is  talking only about 1st and 2nd purchase. Ignore 3rd, and 4th purchases.
+\noindent {\color{red}{\bf NOTE}} Question is  talking only about 
+1st and 2nd purchase. Ignore 3rd, and 4th purchases.
 
 \begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
 with distinct_days AS (SELECT DISTINCT user_id, DATE(created_at) as created_at
@@ -697,7 +723,9 @@ WHERE jobtitle LIKE '%police%' AND jobtitle LIKE '%captain%';
 \end{exm}
 
 \begin{exm} ({\bf {\color{orange} ID 10026: }\href{https://platform.stratascratch.com/coding/10026-find-all-wineries-which-produce-wines-by-possessing-aromas-of-plum-cherry-rose-or-hazelnut?code_type=3}{Aroma-based Winery Search}})\\
-Find wineries producing wines with aromas of plum, cherry, rose, or hazelnut (singular form only). To make things simpler, exclude any wine descriptions that contain the plural forms (ex. cherries).
+Find wineries producing wines with aromas of plum, cherry, rose, or 
+hazelnut (singular form only). To make things simpler, exclude any wine 
+descriptions that contain the plural forms (ex. cherries).
 \begin{lstlisting}[language=SQL, linewidth=1.1\textwidth]
 -- My solution. Locked, cannot check
 SELECT winery
@@ -712,8 +740,10 @@ WHERE description LIKE '%plum%'
 \begin{exm} ({\bf  \color{orange} ID 2081: \href{https://platform.stratascratch.com/coding/2081-recommendation-system}{Recommendation System}})\\
 You are given the list of Facebook friends and the list of Facebook pages that users follow. 
 Your task is to create a new recommendation system for Facebook. 
-For each Facebook user, find pages that this user doesn't follow but at least one of their friends does. 
-Output the user ID and the ID of the page that should be recommended to this user.\sidenote{The following solutions are corrections of my solution by
+For each Facebook user, find pages that this user doesn't follow but 
+at least one of their friends does. 
+Output the user ID and the ID of the page that should be recommended to
+ this user.\sidenote{The following solutions are corrections of my solution by
 chatGPT and Claude. i.e. I could not check against website's solution,
 but hand investigation showed they are correct. \idea \idea \idea NOT EXIST is new to me}
 \begin{lstlisting}[language=SQL, linewidth=1.15\textwidth]
@@ -762,7 +792,10 @@ ORDER BY uf.user_id, up.page_id;
 
 
 \begin{exm} ({\bf  \color{orange} ID 10300: \href{https://platform.stratascratch.com/coding/10300-premium-vs-freemium}{Premium vs Freemium}})\\
-Find the total number of downloads for paying and non-paying users by date. Include only records where non-paying customers have more downloads than paying customers. The output should be sorted by earliest date first and contain 3 columns date, non-paying downloads, paying downloads. \\
+Find the total number of downloads for paying and non-paying users by date. 
+Include only records where non-paying customers have more downloads than 
+paying customers. The output should be sorted by earliest date first and contain 
+3 columns date, non-paying downloads, paying downloads. \\
 
 \noindent Hint: In Oracle you should use "date" when referring to date column (reserved keyword).
 Hint: The above hit is not a problem in MySQL. In fact, using quotation made a problem.
@@ -814,33 +847,61 @@ The platform analytics team needs to understand app popularity and usage pattern
 
 Calculate the total number of unique sessions for each VR application. 
 A session is identified by a unique \code{session\_id}. 
-If the same \code{session\_id} appears multiple times in the table (which can happen due to connection retries or logging issues), count it as only one session by keeping the record with the earliest \code{start\_time}. 
+If the same \code{session\_id} appears multiple times in the table (which can happen due 
+to connection retries or logging issues), count it as only one session by keeping the 
+record with the earliest \code{start\_time}. 
 Include all applications that have at least one session in your results. 
 Return the app name and the total number of sessions.\\
 
 I don't understand why it is concerned about the earliest start time, if we
 are not returning that!
-\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
-with time_sort AS (SELECT session_id, start_time, app_name,
-                        ROW_NUMBER() OVER (partition BY session_id order by session_id) as rn
-                    FROM vr_sessions
-                    ),
+\clearpage
+\begin{lstlisting}[language=SQL, linewidth=1.3\textwidth]
+-- The second is incomplete. A practice on avoiding row number.
+-- Also, first one has potentially a problem. Question says "Calculate the total 
+-- number of unique sessions for each VR application". So, if one session ID 
+-- is linked to two different Apps and their earliest time is identical, then, 
+-- what? problem is kind of under specified in this particular scenario!
+-- The row_number however, chooses one row exactly, but which App? random!
+with help AS (SELECT *
+              FROM vr_sessions t
+              WHERE start_time = (SELECT MIN(start_time)
+                                  FROM vr_sessions t2
+                                  WHERE t2.session_id = t.session_id)
+              ORDER BY session_id)
+SELECT app_name, COUNT(DISTINCT session_id)
+FROM HELP
+GROUP BY app_name
+---------------------
+SELECT t.*
+FROM your_table t JOIN (SELECT session_id, MIN(session_time) AS first_time
+                        FROM your_table
+                        GROUP BY session_id) x
+                        ON t.session_id = x.session_id AND t.session_time = x.first_time;
+---------------------
+with ts AS (SELECT session_id, start_time, app_name,
+                  ROW_NUMBER() OVER (partition BY session_id order by session_id) as rn
+            FROM vr_sessions),
     first_time AS (SELECT *
-                   FROM time_sort
+                   FROM ts
                    WHERE rn = 1)
 SELECT DISTINCT(app_name), count(session_id)
 FROM first_time
 GROUP BY app_name
-
--- OR
-
-with time_sort AS (SELECT session_id, start_time, app_name,
-                        ROW_NUMBER() OVER (partition BY session_id order by session_id) as rn
-                    FROM vr_sessions
-                    )
+----- OR
+with ts AS (SELECT session_id, start_time, app_name,
+                   ROW_NUMBER() OVER (partition BY session_id order by session_id) as rn
+            FROM vr_sessions)
 SELECT DISTINCT(app_name), count(session_id)
-FROM time_sort
+FROM ts
 WHERE rn = 1
+GROUP BY app_name
+----- OR
+SELECT app_name, count(DISTINCT  session_id) as session_count
+FROM (SELECT session_id, app_name, MIN(start_time)
+      FROM vr_sessions
+      GROUP BY  session_id, app_name
+      ) x
 GROUP BY app_name
 \end{lstlisting}
 \end{exm}
@@ -849,12 +910,17 @@ GROUP BY app_name
 
 \begin{exm} ({\bf  \color{orange} ID 10571: \href{https://platform.stratascratch.com/coding/10571-vehicle-gear-usage?code_type=3}{Vehicle Gear Usage}}) \idea\idea\idea\\
 A company tracks data from its delivery vehicles. 
-Every time a driver changes gears, the system records which vehicle (\code{'car\_id'}), when it happened (\code{timestamp} in Unix epoch seconds), and which gear: \code{P} (Park), \code{D} (Drive), or \code{R} (Reverse).
+Every time a driver changes gears, the system records which vehicle (\code{'car\_id'}), 
+when it happened (\code{timestamp} in Unix epoch seconds), and which 
+gear: \code{P} (Park), \code{D} (Drive), or \code{R} (Reverse).
 
 Calculate how many total hours all vehicles spent in each gear. 
-To determine the duration of a gear period, calculate the time difference between when that gear was engaged and when the next gear change occurred. For each vehicle's final gear change (which has no subsequent change recorded), assume the shift ended 2 hours after that final timestamp. Return \code{gear} and \code{total hours}.
+To determine the duration of a gear period, calculate the time difference between 
+when that gear was engaged and when the next gear change occurred. For
+ each vehicle's final gear change (which has no subsequent change recorded), 
+ assume the shift ended 2 hours after that final timestamp. Return \code{gear} and \code{total hours}.
 \begin{lstlisting}[language=SQL, linewidth=1.55\textwidth]
--- This is doing it for each care. Just take car_IDs out from first and last lines
+-- This is doing it for each car. Just take car_IDs out from first and last lines
 SELECT car_id, gear, SUM(duration_seconds) / 3600.00 AS total_hours
 FROM (SELECT car_id, gear, 
       (COALESCE(LEAD(timestamp_epoch) 
@@ -875,7 +941,8 @@ Output the user, total emails, and their activity rank.
 \begin{itemize}
 \item Order records first by the total emails in descending order.
 \item Then, sort users with the same number of emails in alphabetical order by their username.
-\item In your rankings, return a unique value (i.e., a unique rank) even if multiple users have the same number of emails.
+\item In your rankings, return a unique value (i.e., a unique rank) even if 
+multiple users have the same number of emails.
 
 I am not sure what \code{day} means in that table. 
 If it is number of emails sent from one user to another, then
@@ -892,8 +959,13 @@ FROM (select from_user, count(id) as sent_count
 \end{exm}
 
 \begin{exm} ({\bf  \color{orange} ID 2084: \href{https://platform.stratascratch.com/coding/2084-blocked-users?code_type=3}{Blocked Users}})\\
-You are given a table of users who have been blocked from Facebook, together with the date, duration, and the reason for the blocking. The duration is expressed as the number of days after blocking date and if this field is empty, this means that a user is blocked permanently.
-For each blocking reason, count how many users were blocked in December 2021. Include both the users who were blocked in December 2021 and those who were blocked before but remained blocked for at least a part of December 2021.
+You are given a table of users who have been blocked from Facebook, 
+together with the date, duration, and the reason for the blocking. The
+ duration is expressed as the number of days after blocking date and
+  if this field is empty, this means that a user is blocked permanently.
+For each blocking reason, count how many users were blocked in 
+December 2021. Include both the users who were blocked in December
+ 2021 and those who were blocked before but remained blocked for at least a part of December 2021.
 
 In the following this is what I have done:
 If a user is blocked during or before December permanently,
@@ -932,8 +1004,10 @@ GROUP BY block_reason;
 \end{lstlisting}
 \end{exm}
 
-\begin{exm} ({\bf  \color{orange} ID 2128: \href{}{Book Sales}})\\
-Calculate the total revenue made per book. Output the book ID and total sales per book. In case there is a book that has never been sold, include it in your output with a value of 0.
+\begin{exm} ({\bf  \color{orange} ID 2128: \href{https://platform.stratascratch.com/coding/2128-book-sales?code_type=3}{Book Sales}})\\
+Calculate the total revenue made per book. 
+Output the book ID and total sales per book. 
+In case there is a book that has never been sold, include it in your output with a value of 0.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 WITH order_quantity AS (SELECT book_id, sum(quantity) as quantity
                         FROM amazon_books_order_details
@@ -952,10 +1026,13 @@ order by book_id
 
 
 \begin{exm} ({\bf  \color{orange} ID 2026: \href{https://platform.stratascratch.com/coding/2026-bottom-2-companies-by-mobile-usage?code_type=3}{Bottom 2 Companies By Mobile Usage}})\\
-Write a query to identify all companies (\code{customer\_id}) whose mobile usage ranks in the bottom two positions. 
+Write a query to identify all companies (\code{customer\_id}) whose mobile 
+usage ranks in the bottom two positions. 
 Mobile usage is the count of events where \code{client\_id = 'mobile'}. 
-Companies with the same usage count should share the same rank, and all companies in the bottom two ranks should be included.
-Return the \code{customer\_id} and event count, sorted in ascending order by the number of events.\\
+Companies with the same usage count should share the same rank, and
+ all companies in the bottom two ranks should be included.
+Return the \code{customer\_id} and event count, sorted in ascending 
+order by the number of events.\\
 
 \noindent Question is not well-written. 
 More usage is positive or negative?
@@ -977,15 +1054,15 @@ order by event_count ASC
 
 
 \begin{exm} ({\bf  \color{orange} ID 2020: \href{https://platform.stratascratch.com/coding/2020-call-declines?code_type=3}{Call Declines}})\\
-Which company had the biggest month call decline from March to April 2020? Return the \code{company\_id} and calls difference for the company with the highest decline.
+Which company had the biggest month call decline from March to April 2020? 
+Return the \code{company\_id} and calls difference for the company with the highest decline.
 
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
-WITH clean AS (SELECT users.company_id, DATE_FORMAT(calls.call_date, '%Y-%m') AS ym,
-                                COUNT(*) AS call_count
-              FROM rc_users users JOIN rc_calls calls USING (user_id)
-              WHERE calls.call_date >= '2020-03-01' AND calls.call_date < '2020-05-01'
-              GROUP BY users.company_id, ym
-              ),
+WITH clean AS (SELECT users.company_id, COUNT(*) AS call_count,
+                        DATE_FORMAT(calls.call_date, '%Y-%m') AS ym
+               FROM rc_users users JOIN rc_calls calls USING (user_id)
+               WHERE calls.call_date >= '2020-03-01' AND calls.call_date < '2020-05-01'
+               GROUP BY users.company_id, ym),
 lagged AS (SELECT company_id, ym, call_count,
               LAG(call_count) OVER (PARTITION BY company_id ORDER BY ym) AS prev_count
            FROM clean)
@@ -994,29 +1071,43 @@ FROM lagged
 WHERE prev_count IS NOT NULL
 ORDER BY call_difference DESC
 LIMIT 1;
-
--- OR
-with call_count_t AS (select users.company_id, COUNT(calls.call_id)as call_count, 
+---------- OR
+with call_count_t AS (SELECT users.company_id, COUNT(calls.call_id)as call_count, 
                               DATE_FORMAT(calls.call_date, '%Y-%m') AS ym
                       FROM rc_users users JOIN rc_calls calls USING(user_id)
                       WHERE calls.call_date >= '2020-03-01' AND calls.call_date < '2020-05-01'
                       GROUP BY users.company_id, ym),
 diff AS (SELECT company_id, 
-                  (call_count - COALESCE(LEAD(call_count) OVER
-                           (PARTITION BY company_id ORDER BY ym ))) as diff_call_count
-         FROM call_count_t
-         )
+                (call_count - 
+               LEAD(call_count) OVER (PARTITION BY company_id ORDER BY ym)) as diff_call_count
+          FROM call_count_t)
 SELECT diff_call_count
 FROM diff
 WHERE diff_call_count IS NOT NULL
 ORDER BY diff_call_count DESC
 LIMIT 1
-
+--- June 19, 2026: If you want the decline be in positive form, switch order of subtraction.
+with t AS (SELECT u.company_id, MONTH(c.call_date) as month_
+          FROM rc_users u JOIN rc_calls c USING(user_id)
+          WHERE DATE(c.call_date) BETWEEN DATE('2020-03-01') AND DATE('2020-04-29')),
+count_perMonth AS (SELECT company_id, month_, COUNT(month_) as call_count
+                   FROM t
+                   GROUP BY company_id, month_),
+diffs as (SELECT company_id, 
+        LEAD(call_count) OVER (PARTITION BY company_id ORDER BY month_ ASC)-call_count as diff_
+          FROM count_perMonth)
+SELECT *
+FROM diffs
+WHERE diff_ IN (SELECT MIN(diff_) 
+                FROM diffs)
 \end{lstlisting}
 \end{exm}
 
 \begin{exm} ({\bf  \color{orange} ID 2132: \href{https://platform.stratascratch.com/coding/2132-caller-history?code_type=3}{Caller History}})\\
-Given a phone log table that has information about callers' call history, find out the callers whose first and last calls were to the same person on a given day. Output the caller ID, recipient ID, and the date called.
+Given a phone log table that has information about callers' call history, 
+find out the 
+callers whose first and last calls were to the same person on a given day. 
+Output the caller ID, recipient ID, and the date called.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 -- The following brute force code considers 1 call in 1 day, 
 -- as first and last calls being the same.
@@ -1065,7 +1156,9 @@ WHERE f.rn_first = 1 AND l.rn_last = 1 AND f.recipient_id = l.recipient_id;
 
 
 \begin{exm} ({\bf  \color{orange} ID: 2079} \href{https://platform.stratascratch.com/coding/2079-city-with-most-customers?code_type=3}{City with Most Customers})\\
-For each city, find the number of rides in August 2021 that were paid without using a promotional code (i.e., where no discount was applied). Output the city or cities where this number was the highest.
+For each city, find the number of rides in August 2021 that were paid without using a 
+promotional code (i.e., where no discount was applied). Output the 
+city or cities where this number was the highest.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 with ride_count AS (SELECT city, count(*) as ride_count
                     FROM (SELECT c.city as city
@@ -1089,7 +1182,10 @@ WHERE ride_count = (SELECT MAX(ride_count) FROM ride_count);
 \end{exm}
 
 \begin{exm} ({\bf  \color{orange} ID 10365: \href{https://platform.stratascratch.com/coding/10365-common-friends-script?code_type=3}{Common Friends Script}})\\
-You are analyzing a social network dataset at Google. Your task is to find mutual friends between two users, Karl and Hans. There is only one user named Karl and one named Hans in the dataset.\\
+You are analyzing a social network dataset at Google. 
+Your task is to find mutual friends 
+between two users, Karl and Hans. There is only one user 
+named Karl and one named Hans in the dataset.\\
 
 \noindent The output should contain \code{'user\_id'} and \code{'user\_name'} columns.\\
 
@@ -1107,8 +1203,12 @@ where user_id in (SELECT friend_id FROM mutual_friends)
 
 \begin{exm} ({\bf  \color{orange} ID 10288: \href{https://platform.stratascratch.com/coding/10288-clicked-vs-non-clicked-search-results?code_type=3}{Clicked Vs Non-Clicked Search Results}})\\
 The question asks you to calculate two percentages based on search result records. 
-For the first percentage, find the percentage of records where a search result was clicked on in the top 3 positions. Records that were clicked will have \code{clicked = 1}. 
-Use the \code{search\_results\_position} to find the position of the search result. For the second percentage: find the percentage of records that were not clicked on in the top 3 positions. Both percentages are calculated with respect to the total number of search result records and should be output in the same row as two columns.
+For the first percentage, find the percentage of records where a search result 
+was clicked on in the top 3 positions. Records that were clicked will have \code{clicked = 1}. 
+Use the \code{search\_results\_position} to find the position of the search result. 
+For the second percentage: find the percentage of records that were not clicked on 
+in the top 3 positions. Both percentages are calculated with respect to the total number 
+of search result records and should be output in the same row as two columns.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 SELECT SUM(CASE WHEN search_results_position IN (1,2,3) AND clicked=1 THEN 1 ELSE 0 END)*1.0 
                             / COUNT(*) AS clicked_in_top3_ratio,
@@ -1120,7 +1220,11 @@ FROM fb_search_events;
 
 
 \begin{exm} ({\bf  \color{orange} ID 9908: \href{https://platform.stratascratch.com/coding/9908-customer-orders-and-details?code_type=3}{Customer Orders and Details}})\\
-Find the number of orders, the number of customers, and the total cost of orders for each city. Only include cities that have made at least 5 orders and count all customers in each city even if they did not place an order.\\
+Find the number of orders, the number of customers, 
+and the total cost of orders for each city. 
+Only include cities that have made at least 5 orders 
+and count all customers in each city 
+even if they did not place an order.\\
 
 \noindent Output each calculation along with the corresponding city name.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
@@ -1143,9 +1247,13 @@ HAVING SUM(CASE WHEN order_count IS NULL THEN 0 else order_count END) >= 5
 
 
 \begin{exm} ({\bf \color{orange} ID 2150: \href{https://platform.stratascratch.com/coding/2150-customers-who-purchased-the-same-product?code_type=3}{Customers Who Purchased the Same Product}})\\
-In order to improve customer segmentation efforts for users interested in purchasing furniture, you have been asked to find customers who have purchased the same items of furniture.\\
+In order to improve customer segmentation efforts for users interested in 
+purchasing furniture, you have been asked to find customers who have 
+purchased the same items of furniture.\\
 
-\noindent Output the \code{product\_id}, \code{brand\_name}, unique customer ID's who purchased that product, and the count of unique customer ID's who purchased that product. Arrange the output in descending order with the highest count at the top.\marginnote{\idea \idea \code{GROUP\_CONCAT} is new here.}
+\noindent Output the \code{product\_id}, \code{brand\_name}, unique customer ID's who 
+purchased that product, and the count of unique customer ID's who purchased that product. 
+Arrange the output in descending order with the highest count at the top.\marginnote{\idea \idea \code{GROUP\_CONCAT} is new here.}
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 SELECT o.product_id, GROUP_CONCAT(DISTINCT o.customer_id) AS customer_list, 
        count(DISTINCT o.customer_id) as cust_count, p.brand_name

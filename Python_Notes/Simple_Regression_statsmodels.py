@@ -29,7 +29,7 @@ from sklearn.model_selection import cross_val_score
 #
 #  - ```ols``` (from ```statsmodels.formula.api```) is the formula-based API --> it expects a formula string, not arrays.
 #
-# And, ANOVA table uses the ols from ```statsmodels.formula.api```:
+# And, ANOVA table uses the ```ols``` from ```statsmodels.formula.api```:
 # https://www.statsmodels.org/dev/generated/statsmodels.stats.anova.anova_lm.html
 #
 # ```result_smf.predict(X)``` from ```smf``` works just like ```result.predict(X)```. The same is true about ```conf_int()```
@@ -49,36 +49,11 @@ from sklearn.model_selection import cross_val_score
 # ci = pred.summary_frame(alpha=0.05)
 # ```
 
-# %% [markdown]
-# ## Lets stick to ```smf```
-#
-# ## Working with ```smf```
-#
-# Model like so
-#
-# ```
-# mpg_model = smf.ols('mpg ~ engine_displacement', data = mpg_df)
-# mpg_result = mpg_model.fit()
-# ```
-#
-# - It automatically adds intercept.
-# - ```mpg_result.summary()``` Produces summary that includes CI of coefficients at 95% sigfinicance level
-# - ```sm.stats.anova_lm(mpg_result, typ=2)``` creates analysis-of-variance table
-# - ```mpg_result.conf_int()``` shows the CI from the ```.summary()```
-# - ```mpg_result.conf_int(alpha=0.01)``` shows CI at 99% significance level
-# - RSS can be accessed in 2 ways:
-#   - ```(mpg_result.resid ** 2).sum()```
-#   - ```mpg_anova_tbl.loc["Residual", "sum_sq"]```
-#   
-# - To predict at new values of ```x``` we need a dataframe:
-#    - new_data = pd.DataFrame({"engine_displacement": [x0]})
-#    - predict_table = mpg_result.get_prediction(new_data)
-#    - The above result is a table with predictions, CIs and PIs.
-#    - ```yhat_tbl.summary_frame(alpha=0.01)```
-#    - Predicted values are obtained by ```yhat_tbl.predicted_mean[0]```
+# %%
 
 # %% [markdown]
-# ## Recall: Summary of working with ```smf```
+# ## Lets stick to ```smf```
+# #### Recall: Summary of working with ```smf```
 #
 # Model like so
 #
@@ -94,7 +69,7 @@ from sklearn.model_selection import cross_val_score
 # - ```mpg_result.conf_int(alpha=0.01)``` shows CI at 99% significance level
 # - RSS can be accessed in 2 ways:
 #   - ```(mpg_result.resid ** 2).sum()```
-#   - ```mpg_anova_tbl.loc["Residual", "sum_sq"]```
+#   - ```mpg_anova_tbl.loc["Residual", "sum_sq"]``` where ```mpg_anova_tbl = sm.stats.anova_lm(mpg_result, typ=2)```
 #   
 # - To predict at new values of ```x``` we need a dataframe:
 #    - ```new_data = pd.DataFrame({"engine_displacement": [x0]})```
@@ -105,8 +80,10 @@ from sklearn.model_selection import cross_val_score
 #    
 # **See them in action [here](https://github.com/HNoorazar/Montgomery_Intro_Linear_Regression_Analysis/blob/main/CH2_SimpleLinearRegression.ipynb)**
 
+# %%
+
 # %% [markdown]
-# # SkLearn vs statsmodel
+# ### SkLearn vs statsmodel
 #
 # According to chatGPT: 
 # - Sklearn better for ML, pipeline, production, integration. Cross-validation

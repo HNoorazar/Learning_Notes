@@ -1,10 +1,11 @@
-# %% [markdown]
-# # SKlearn vs statsmodel
-#
-# According to chatGPT: Sklearn better for
-# ML, pipeline, production, integration. Cross-validation
-#
-# Statsmodel good for inference.
+# %%
+# SKlearn vs statsmodel
+"""
+According to chatGPT: Sklearn better for
+ML, pipeline, production, integration. Cross-validation
+
+Statsmodel good for inference.
+"""
 
 # %%
 from sklearn.pipeline import Pipeline

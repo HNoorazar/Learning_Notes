@@ -119,7 +119,6 @@ WITH RECURSIVE months AS (SELECT DATE_FORMAT(MIN(created_at), '%Y-%m-01') AS mon
                           WHERE month_start < (SELECT DATE_FORMAT(MAX(created_at), '%Y-%m-01')
                           FROM sf_transactions)
                           ),
-                          
 --- How its mechanics work
 WITH RECURSIVE months AS (
     -- (A) Base case
