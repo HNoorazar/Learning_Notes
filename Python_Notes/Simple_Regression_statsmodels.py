@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.16.1
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: Python 3.13.11 (Conda)
 #     language: python
@@ -75,8 +76,8 @@ from sklearn.model_selection import cross_val_score
 #    - ```new_data = pd.DataFrame({"engine_displacement": [x0]})```
 #    - ```predict_table = mpg_result.get_prediction(new_data)```
 #    - The above result is a table with predictions, CIs and PIs.
-#    - ```yhat_tbl.summary_frame(alpha=0.01)```
-#    - Predicted values are obtained by ```yhat_tbl.predicted_mean[0]```
+#    - ```predict_table.summary_frame(alpha=0.01)```
+#    - Predicted values are obtained by ```predict_table.predicted_mean[0]```
 #    
 # **See them in action [here](https://github.com/HNoorazar/Montgomery_Intro_Linear_Regression_Analysis/blob/main/CH2_SimpleLinearRegression.ipynb)**
 

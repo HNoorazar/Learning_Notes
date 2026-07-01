@@ -1,5 +1,21 @@
+# ---
+# jupyter:
+#   jupytext:
+#     cell_metadata_filter: -all
+#     formats: ipynb,py:percent
+#     text_representation:
+#       extension: .py
+#       format_name: percent
+#       format_version: '1.3'
+#       jupytext_version: 1.19.4
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
+# ---
+
 # %% [markdown]
-# # SKlearn vs statsmodel
+# # Sklearn vs statsmodel
 #
 # According to chatGPT: Sklearn better for
 # ML, pipeline, production, integration. Cross-validation
