@@ -518,6 +518,26 @@ trimmed mean are two examples.
 \label{sec:Hypothesis-Testing}
 
 \begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Remark}]
+To understand t-tests and F-tests
+\begin{enumerate}
+\setlength{\itemsep}{-2pt}
+\item Start with independent normal variables.
+\item Derive the sample mean.
+\item Derive the sample variance.
+\item Prove the sample mean and sample variance are independent.
+\item Show
+\begin{itemize}
+\setlength{\itemsep}{-2pt}
+\item scaled variance follows a chi-square distribution,
+\item ratio of a normal variable to the square root of an independent chi-square variable gives a t-distribution,
+\item ratio of two independent chi-square variables gives an F-distribution.
+\end{itemize}
+\end{enumerate}
+After that, things (confidence intervals, t-tests, ANOVA, linear regression) follow naturally.
+This is exactly how Casella \& Berger develops the subject.
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=aliceblue!10!white,colframe=blue!70!black,title=\textbf{Remark}]
 % olback=green!10!white,colframe=green!80!black
 There is a tendency to use hypothesis testing methods even
 when they are not appropriate. Often, estimation and confidence intervals are
@@ -567,6 +587,7 @@ Incorrect definitions from \emph{A/B Testing Intuition Busters
 Common Misunderstandings in Online Controlled Experiments}
 
 \begin{itemize}
+\setlength{\itemsep}{-2pt}
 \item a statistically significant result
 with p-value 0.05 has a 5\% chance of being a false positive
 

@@ -1108,8 +1108,41 @@ Given a phone log table that has information about callers' call history,
 find out the 
 callers whose first and last calls were to the same person on a given day. 
 Output the caller ID, recipient ID, and the date called.
+
+\noindent A clever solution that avoids multiple \code{DATE\_FORMAT}
+\begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
+WITH ranked_calls AS (SELECT caller_id, recipient_id, DATE(date_called) AS call_date,
+                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
+                                                ORDER BY date_called) AS rn_first,
+                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
+                                                ORDER BY date_called DESC) AS rn_last
+                      FROM caller_history)
+SELECT f.caller_id, f.recipient_id, f.call_date AS date_called
+FROM ranked_calls f JOIN ranked_calls l ON f.caller_id = l.caller_id AND f.call_date = l.call_date
+WHERE f.rn_first = 1 AND l.rn_last = 1 AND f.recipient_id = l.recipient_id;
+\end{lstlisting}
+
+\begin{lstlisting}[language=SQL, linewidth=1.6\textwidth]
+-- Brute Force 2
+WITH first_calls AS (SELECT caller_id, recipient_id as first_person, 
+              DATE(date_called) as call_Date, date_called as callTime,
+              ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called) ORDER BY date_called ASC) AS rn
+              FROM caller_history),
+              
+   last_calls AS (SELECT caller_id, recipient_id as last_person, 
+              DATE(date_called) as call_Date, date_called AS callTime,
+              ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called) ORDER BY date_called DESC) as rn
+                FROM caller_history),
+merged AS (SELECT f.caller_id, f.first_person, l.last_person, f.call_Date
+           FROM first_calls f JOIN last_calls l ON f.caller_id = l.caller_id AND f.call_Date = l.call_Date 
+                 AND f.rn = 1 AND l.rn = 1)
+SELECT caller_id, first_person as recipient_id, call_Date
+FROM merged
+WHERE first_person = last_person
+\end{lstlisting}
+
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
--- The following brute force code considers 1 call in 1 day, 
+-- The following brute force and strange code considers 1 call in 1 day, 
 -- as first and last calls being the same.
 with first_time_t AS (SELECT caller_id, MIN(date_called) as first_time
                       FROM caller_history
@@ -1138,19 +1171,7 @@ FROM firs_and_last
 WHERE last_receipt = first_receipt
 \end{lstlisting}
 
-\noindent A clever solution that avoids multiple \code{DATE\_FORMAT}
-\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
-WITH ranked_calls AS (SELECT caller_id, recipient_id, DATE(date_called) AS call_date,
-                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
-                                                ORDER BY date_called) AS rn_first,
-                          ROW_NUMBER() OVER (PARTITION BY caller_id, DATE(date_called)
-                                                ORDER BY date_called DESC) AS rn_last
-                      FROM caller_history)
-SELECT f.caller_id, f.recipient_id, f.call_date AS date_called
-FROM ranked_calls f JOIN ranked_calls l ON f.caller_id = l.caller_id
-                                                    AND f.call_date = l.call_date
-WHERE f.rn_first = 1 AND l.rn_last = 1 AND f.recipient_id = l.recipient_id;
-\end{lstlisting}
+
 \end{exm}
 
 
@@ -1159,7 +1180,7 @@ WHERE f.rn_first = 1 AND l.rn_last = 1 AND f.recipient_id = l.recipient_id;
 For each city, find the number of rides in August 2021 that were paid without using a 
 promotional code (i.e., where no discount was applied). Output the 
 city or cities where this number was the highest.
-\begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+\begin{lstlisting}[language=SQL, linewidth=1.55\textwidth]
 with ride_count AS (SELECT city, count(*) as ride_count
                     FROM (SELECT c.city as city
                           FROM lyft_payments p LEFT JOIN lyft_orders c USING(order_id)
@@ -1190,18 +1211,41 @@ named Karl and one named Hans in the dataset.\\
 \noindent The output should contain \code{'user\_id'} and \code{'user\_name'} columns.\\
 
 \noindent  Since Karl and Hans are unique, I hard coded! Karl is 1. Hans is 2.
+However, this approach mail fail if the friendships are saved only once (see~\cref{tab:FriendTablesMutual});
+It includes Karl -> HN but not HN->Karl.
+\begin{table}[h!]
+\begin{tabular}{l|l}
+\hline
+user   & friend \\ \hline
+Karl   & HN   \\ \hline
+Hans & HN \\ \hline
+Karl   & Kevin   \\ \hline
+Hans & Brad \\ \hline
+\end{tabular}
+\caption{Friendship Table}
+\label{tab:FriendTablesMutual}
+\end{table}
+
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+-- Potential bug
 with mutual_friends AS (SELECT DISTINCT f1.friend_id
                         FROM friends f1 JOIN friends f2 on f1.friend_id = f2.user_id
                         WHERE f1.user_id in (1, 2) and f2.friend_id in (1, 2))
 SELECT *
 FROM users
 where user_id in (SELECT friend_id FROM mutual_friends)
+
+-- Better. Not only takes care of the bug, but cleaner and faster:
+SELECT * 
+FROM users
+WHERE user_id in (SELECT friend_id FROM friends WHERE user_id = 1
+                  INTERSECT
+                  SELECT friend_id FROM friends WHERE user_id = 2) 
 \end{lstlisting}
 \end{exm}
 
 
-\begin{exm} ({\bf  \color{orange} ID 10288: \href{https://platform.stratascratch.com/coding/10288-clicked-vs-non-clicked-search-results?code_type=3}{Clicked Vs Non-Clicked Search Results}})\\
+\begin{exm} ({\bf  \color{orange} ID 10288: \href{https://platform.stratascratch.com/coding/10288-clicked-vs-non-clicked-search-results?code_type=3}{Clicked vs Non-Clicked Search Results}})\\
 The question asks you to calculate two percentages based on search result records. 
 For the first percentage, find the percentage of records where a search result 
 was clicked on in the top 3 positions. Records that were clicked will have \code{clicked = 1}. 
@@ -1228,20 +1272,14 @@ even if they did not place an order.\\
 
 \noindent Output each calculation along with the corresponding city name.
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
-WITH orders_table AS(SELECT cust_id as id, count(*) as order_count, 
-                             sum(total_order_cost) as customer_spending
-                     FROM orders
-                     GROUP BY cust_id
-                     ),
-city_orders AS (SELECT c.id, o.order_count, o.customer_spending, c.city
-                FROM customers c left join orders_table o ON c.id = o.id)
-SELECT city,
-       SUM(CASE WHEN order_count IS NULL THEN 0 else order_count END) as city_order_count,
-       SUM(CASE WHEN customer_spending IS NULL THEN 0 else customer_spending END) as total_spending,
-       COUNT(DISTINCT id) as customer_count
-FROM city_orders
+with joied_t AS (SELECT c.city, o.total_order_cost, o.id, c.id AS customer_id
+                 FROM customers c LEFT JOIN orders o on (c.id = o.cust_id)
+                 )
+SELECT city, SUM(total_order_cost) as total_cost, COUNT(DISTINCT customer_id) as cust_count, 
+            COUNT(id) as order_count
+FROM joied_t
 GROUP BY city
-HAVING SUM(CASE WHEN order_count IS NULL THEN 0 else order_count END) >= 5
+HAVING COUNT(id) > 4
 \end{lstlisting}
 \end{exm}
 
