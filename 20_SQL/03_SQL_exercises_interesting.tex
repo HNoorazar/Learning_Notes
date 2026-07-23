@@ -9,7 +9,7 @@ how to behave, i.e. \code{prev\_active\_dt} is the previous day that a user was 
 if user 1 is active on Jan 2, 2026 but not on Jan 1, 2026, in the new column \code{prev\_active\_date} the row that contains date = Jan 2, 2026, the \code{prev\_active\_date} = NULL.
 Said differently, the \code{LAG()} function is not just subtracting current date by 1.
 
-\begin{lstlisting}[language=SQL, linewidth=1.5\textwidth]
+\begin{lstlisting}[language=SQL, linewidth=1.62\textwidth]
 -- 1-day retention. 
 WITH t AS (SELECT date_, ID, LAG(date_) OVER (PARTITION BY ID ORDER BY date_) AS prev_active_dt
            FROM activity)
@@ -94,7 +94,7 @@ The second table, \code{win\_streaks}, looks like
 
 \noindent {\bf Reminder}
 The following line acts like a running window, but, since no window
-is specified it, by default, does running total:
+is specified, by default, it does running total:
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
 SUM(CASE WHEN match_result = 'L' THEN 1 ELSE 0 END)
                          OVER (PARTITION BY player_id ORDER BY match_date) AS loss_grp
@@ -151,13 +151,24 @@ SELECT r.actor_name,
 FROM rnk_film r LEFT JOIN avg_previous a ON r.actor_name = a.actor_name
 WHERE r.rn = 1
 ORDER BY r.actor_name;
+------
+with rank_t AS (SELECT *, row_number() OVER (PARTITION BY actor_name ORDER BY release_date DESC) as rn
+                FROM actor_rating_shift),
+last_t AS (SELECT * FROM rank_t WHERE rn = 1),
+avg_t AS (SELECT actor_name, AVG(film_rating) AS avg_film
+          FROM rank_t
+          WHERE rn > 1
+          GROUP BY actor_name)
+SELECT l.actor_name, l.film_rating, COALESCE(a.avg_film, l.film_rating) AS average_,
+          l.film_rating - COALESCE(a.avg_film, l.film_rating) as delta_rate
+FROM last_t l LEFT JOIN avg_t a USING(actor_name)
 \end{lstlisting}
 \end{exm}
 
 
 \begin{exm}\label{exm:2007}
 ({\bf \color{red} ID 2007 : \href{https://platform.stratascratch.com/coding/2007-rank-variance-per-country?code_type=3}{Rank Variance Per Country}})\\
-Compare the total number of comments made by users in each country during December 2019 and January 2020.
+Compare the total number of comments made by users in each country during December 2019 and January 2020.\sidenote{User 5 has a duplicate row in fb\_comments\_count table. Why? did he make 2 comments on 2019-12-19 and it was not aggregated? or this is a mistake?}
 
 For each month, rank countries by their total number of comments in descending order. Countries with the same total should share the same rank, and the next rank should increase by one (without skipping numbers).
 
@@ -168,28 +179,78 @@ Return the names of the countries whose rank improved from December to January (
 \item \code{RANK()}: skips numbers (1, 1, 3)
 \item  \code{DENSE\_RANK()}: no skipping (1, 1, 2)\marginnote{\idea}
 \end{itemize}
-\begin{lstlisting}[language=SQL, linewidth=1.35\textwidth]
+\begin{lstlisting}[language=SQL, linewidth=1.45\textwidth]
+-- Below, c.created_at >= '2019-12-01' is put in the JOIN statement. that way even if 
+-- users don't have a comment on a given month, they will be presented.
+WITH helper_t AS (SELECT u.country, MONTH(c.created_at) AS cmt_month,
+                        COALESCE(SUM(c.number_of_comments), 0) AS cmt_cnt
+                 FROM fb_active_users u LEFT JOIN fb_comments_count c ON u.user_id = c.user_id
+                            AND c.created_at >= '2019-12-01' AND c.created_at < '2020-02-01'
+                WHERE u.country IS NOT NULL
+                GROUP BY u.country, MONTH(c.created_at)),
+helper_rank AS (SELECT country, cmt_month, cmt_cnt,
+                    DENSE_RANK() OVER (PARTITION BY cmt_month ORDER BY cmt_cnt DESC) AS rnk
+                FROM helper_t),
+pivoted AS (SELECT country, MAX(CASE WHEN cmt_month = 12 THEN rnk END) AS dec_rank,
+                            MAX(CASE WHEN cmt_month = 1 THEN rnk END) AS jan_rank
+            FROM helper_rank
+            GROUP BY country)
+SELECT country
+FROM pivoted
+WHERE jan_rank < dec_rank;
+
+-- This passes Strata test. but it is incorrect: it does not handle the case in which 
+-- a country does not have a comment in a given month! we should have a value 
+-- for comment_count for each pair of country and month. so, either use 
+-- UNION ALL or introduce zero before ranking. These are above.
 WITH helper_t AS (SELECT SUM(cnt.number_of_comments) AS cmt_cnt, 
-                         country.country, MONTH(cnt.created_at) AS cmt_month
+                      country.country, MONTH(cnt.created_at) AS cmt_month
                   FROM fb_comments_count cnt JOIN fb_active_users country USING (user_id)
                   WHERE created_at>='2019-12-01'AND created_at<'2020-02-01'
                   GROUP BY country.country, cmt_month),
 helper_rank AS (SELECT *,  
                    DENSE_RANK() OVER (PARTITION BY cmt_month ORDER BY cmt_cnt DESC) AS rnk
                 FROM helper_t),
-pivoted AS (SELECT country, MAX(CASE WHEN cmt_month=12 THEN rnk END) AS dec_rank,
-                            MAX(CASE WHEN cmt_month=1 THEN rnk END) AS jan_rank
+pivoted AS (SELECT country, MIN(CASE WHEN cmt_month=12 THEN rnk END) AS dec_rank,
+                            MAX(CASE WHEN cmt_month=1  THEN rnk END) AS jan_rank
             FROM helper_rank
             GROUP BY country)
 SELECT country
 FROM pivoted
-WHERE jan_rank > dec_rank;
+WHERE jan_rank < dec_rank;
 \end{lstlisting}
 \code{pivoted} table is a table whose columns are rows of \code{helper\_rank} table to make
 comparison possible.  It is doing pivoting in Python; converting tall table into wide table.
 Another way would be self-join, but self-join becomes cumbersome if you have many columns to pivot. \code{MAX} in the code above is not doing nothing, we just need it to make
 the \code{CASE ...} work; our table has only 1 value per month, so, there is no collapse of
 rows here.
+
+\pagebreak
+\begin{lstlisting}[language=SQL, linewidth=1.45\textwidth]
+-- UNION ALL Solution
+WITH countries AS (SELECT DISTINCT country
+                   FROM fb_active_users),
+months AS (SELECT 12 AS cmt_month UNION ALL SELECT 1),
+country_month AS (SELECT c.country, m.cmt_month
+                  FROM countries c CROSS JOIN months m),
+helper_t AS (SELECT cm.country, cm.cmt_month, COALESCE(SUM(cnt.number_of_comments), 0) AS cmt_cnt
+             FROM country_month cm LEFT JOIN fb_active_users u ON cm.country = u.country
+                       LEFT JOIN fb_comments_count cnt ON cnt.user_id = u.user_id 
+                                       AND cnt.created_at >= '2019-12-01'
+                                       AND cnt.created_at < '2020-02-01'
+                                       AND MONTH(cnt.created_at) = cm.cmt_month
+             GROUP BY cm.country, cm.cmt_month),
+helper_rank AS (SELECT *, DENSE_RANK() OVER (PARTITION BY cmt_month ORDER BY cmt_cnt DESC) AS rnk
+                FROM helper_t),
+pivoted AS (SELECT country, MAX(CASE WHEN cmt_month = 12 THEN rnk END) AS dec_rank,
+                      MAX(CASE WHEN cmt_month = 1 THEN rnk END) AS jan_rank
+            FROM helper_rank
+            GROUP BY country)
+SELECT country
+FROM pivoted
+WHERE jan_rank < dec_rank;
+\end{lstlisting}
+
 \end{exm}
 
 
@@ -214,8 +275,7 @@ or Example~\ref{exm:10319MonthlyPerceDiff}.
 WITH month_revenue AS (SELECT DATE_FORMAT(created_at,'%Y-%m') AS ym, SUM(purchase_amt) AS t_rev
                        FROM amazon_purchases
                        WHERE purchase_amt > 0
-                       GROUP BY DATE_FORMAT(created_at, '%Y-%m')
-                       ORDER BY ym)
+                       GROUP BY DATE_FORMAT(created_at, '%Y-%m'))
 SELECT ym, ROUND(AVG(t_rev) OVER (ORDER BY ym
                         ROWS BETWEEN 2 PRECEDING AND CURRENT ROW), 2) AS rolling_3_month_avg
 FROM month_revenue
@@ -238,6 +298,28 @@ Rank all resulting actor + genre pairs in descending order by their average movi
 \end{itemize}
 
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+with t AS (SELECT actor_name, genre, COUNT(*) as frequency, AVG(movie_rating) as avg_rating
+           FROM top_actors_rating
+           GROUP BY actor_name, genre),
+ranked AS (SELECT *, RANK() OVER 
+                      (PARTITION BY actor_name ORDER BY frequency DESC, avg_rating DESC) as rnk
+           FROM t),
+clean_t AS (SELECT *
+            FROM ranked
+            where rnk=1)
+SELECT *
+FROM clean_t
+-- The reason for having 2 SELECT statements here is that MySQL does 
+-- not allow to use IN (SELECT) with one SELECT only.
+WHERE avg_rating IN (SELECT avg_rating 
+                     FROM (SELECT DISTINCT avg_rating
+                          FROM clean_t
+                          ORDER BY avg_rating DESC
+                          LIMIT 3) 
+                      AS top3)
+ORDER BY avg_rating DESC
+
+---
 with helper_ AS (SELECT actor_name, genre, count(*) as freq, AVG(movie_rating) as avg_rat
                  FROM top_actors_rating
                  GROUP BY actor_name, genre),

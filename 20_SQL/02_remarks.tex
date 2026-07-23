@@ -21,7 +21,8 @@ CASE WHEN gender= `M` THEN 1 else 0 END
 -- Incorrect: 
 CASE (WHEN gender= `M` THEN 1 else 0 END)
 
--- Another fuss: space between MAX and parentheses breaks the code Correct: MAX(. Incorrect: MAX (
+-- Another fuss: space between MAX and parentheses breaks the code 
+-- Correct: MAX(. Incorrect: MAX (
 \end{lstlisting}
 \end{rem} 
 

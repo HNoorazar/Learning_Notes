@@ -338,8 +338,9 @@ First difference between SQLite and MySQL I had:
 \begin{marginfigure}% [-1\baselineskip]  % Vertical offset of 1 line,
   \centering
   %\captionsetup{justification=centering}
-  \includegraphics[width=2\textwidth]{00_figures/SQL/SQL_Logic}
-  \caption{SQL order of execution of commands}
+%  \includegraphics[width=2\textwidth]{00_figures/SQL/SQL_Logic}
+  \includegraphics[width=1.3\textwidth]{00_figures/SQL/SQLOrder}
+  \caption{\href{https://www.stratascratch.com/blog/sql-execution-order-explained}{SQL order of execution of commands}}
   \label{fig:SQL_LogicMargin}
 \end{marginfigure}
 
@@ -1227,6 +1228,12 @@ Hans & Brad \\ \hline
 \end{table}
 
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
+-- Better. Not only takes care of the bug, but cleaner and faster:
+SELECT * 
+FROM users
+WHERE user_id in (SELECT friend_id FROM friends WHERE user_id = 1
+                  INTERSECT
+                  SELECT friend_id FROM friends WHERE user_id = 2) 
 -- Potential bug
 with mutual_friends AS (SELECT DISTINCT f1.friend_id
                         FROM friends f1 JOIN friends f2 on f1.friend_id = f2.user_id
@@ -1234,13 +1241,6 @@ with mutual_friends AS (SELECT DISTINCT f1.friend_id
 SELECT *
 FROM users
 where user_id in (SELECT friend_id FROM mutual_friends)
-
--- Better. Not only takes care of the bug, but cleaner and faster:
-SELECT * 
-FROM users
-WHERE user_id in (SELECT friend_id FROM friends WHERE user_id = 1
-                  INTERSECT
-                  SELECT friend_id FROM friends WHERE user_id = 2) 
 \end{lstlisting}
 \end{exm}
 
@@ -1289,7 +1289,7 @@ In order to improve customer segmentation efforts for users interested in
 purchasing furniture, you have been asked to find customers who have 
 purchased the same items of furniture.\\
 
-\noindent Output the \code{product\_id}, \code{brand\_name}, unique customer ID's who 
+\noindent Output the \code{product\_id}, \code{brand\_name}, unique customer IDs who 
 purchased that product, and the count of unique customer ID's who purchased that product. 
 Arrange the output in descending order with the highest count at the top.\marginnote{\idea \idea \code{GROUP\_CONCAT} is new here.}
 \begin{lstlisting}[language=SQL, linewidth=1.4\textwidth]
@@ -1299,6 +1299,16 @@ FROM online_orders o LEFT JOIN online_products p ON o.product_id = p.product_id
 GROUP BY o.product_id, p.brand_name -- SQL requires non-agg. columns be here?
 HAVING COUNT(DISTINCT o.customer_id) > 1 -- since said multiple orders
 ORDER BY count(DISTINCT o.customer_id) DESC
+-- Same thing
+with t as (SELECT product_id, GROUP_CONCAT(DISTINCT customer_id) as customer_list, 
+                                count(DISTINCT customer_id) as customer_count
+          FROM online_orders
+          GROUP BY product_id
+          HAVING count(DISTINCT customer_id) > 1
+          )
+SELECT t.product_id, t.customer_list, t.customer_count, p.brand_name
+FROM t LEFT JOIN online_products p USING (product_id)
+ORDER BY customer_count DESC
 \end{lstlisting}
 \end{exm}
 
